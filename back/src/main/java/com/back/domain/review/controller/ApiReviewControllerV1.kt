@@ -47,7 +47,7 @@ class ApiReviewControllerV1(
     }
 
     @GetMapping("/member/{memberId}")
-    @Operation(summary = "특정 회원이 작성한 리뷰 다건 조회")
+    @Operation(summary = "회원별 리뷰 다건 조회")
     fun getReviewsByMember(
         @PathVariable @Valid memberId: @Valid Long
     ): ReviewsByMemberDto {
@@ -61,7 +61,7 @@ class ApiReviewControllerV1(
     }
 
     @GetMapping("/member/mine")
-    @Operation(summary = "내가 작성한 리뷰 다건 조회")
+    @Operation(summary = "내 리뷰 다건 조회")
     @SecurityRequirement(name = "bearerAuth")
     fun getReviewsMine(): ReviewsByMemberDto {
         return getReviewsByMember(rq.actor.id)
