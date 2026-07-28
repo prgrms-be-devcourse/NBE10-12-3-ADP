@@ -1,8 +1,5 @@
 package com.back.domain.tag.controller;
 
-import com.back.domain.review.controller.ApiV1ReviewController;
-import com.back.domain.tag.controller.ApiV1TagController;
-import com.back.domain.tag.entity.Tag;
 import com.back.domain.tag.service.TagService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -15,10 +12,6 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.transaction.annotation.Transactional;
-import org.w3c.dom.stylesheets.LinkStyle;
-
-import javax.print.attribute.standard.Media;
-import java.util.List;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;

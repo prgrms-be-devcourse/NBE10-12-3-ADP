@@ -1,21 +1,16 @@
 package com.back.domain.review.controller;
 
-import com.back.domain.review.entity.Review;
 import com.back.domain.review.service.ReviewService;
-import org.hamcrest.Matchers;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
-import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -52,7 +47,7 @@ public class ApiV1ReviewControllerDeleteTest {
         ResultActions resultActions = deleteReview(reviewId);
 
         resultActions
-                .andExpect(handler().handlerType(ApiV1ReviewController.class))
+                .andExpect(handler().handlerType(ApiReviewControllerV1.class))
                 .andExpect(handler().methodName("delete"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.resultCode").value("200-1"))
@@ -70,7 +65,7 @@ public class ApiV1ReviewControllerDeleteTest {
         ResultActions resultActions = deleteReview(reviewId);
 
         resultActions
-                .andExpect(handler().handlerType(ApiV1ReviewController.class))
+                .andExpect(handler().handlerType(ApiReviewControllerV1.class))
                 .andExpect(handler().methodName("delete"))
                 .andExpect(status().isForbidden())
                 .andExpect(jsonPath("$.resultCode").value("403-1"))
@@ -88,7 +83,7 @@ public class ApiV1ReviewControllerDeleteTest {
         ResultActions resultActions = deleteReview(reviewId);
 
         resultActions
-                .andExpect(handler().handlerType(ApiV1ReviewController.class))
+                .andExpect(handler().handlerType(ApiReviewControllerV1.class))
                 .andExpect(handler().methodName("delete"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.resultCode").value("200-1"))

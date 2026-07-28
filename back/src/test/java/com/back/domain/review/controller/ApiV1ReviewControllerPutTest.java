@@ -64,10 +64,10 @@ public class ApiV1ReviewControllerPutTest {
 
         ResultActions resultActions = putReview(id, rating, content, tags);
 
-        Review review = reviewService.findById(id);
+        Review review = reviewService.getById(id);
 
         resultActions
-                .andExpect(handler().handlerType(ApiV1ReviewController.class))
+                .andExpect(handler().handlerType(ApiReviewControllerV1.class))
                 .andExpect(handler().methodName("edit"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.resultCode").value("200-1"))
@@ -99,7 +99,7 @@ public class ApiV1ReviewControllerPutTest {
         ResultActions resultActions = putReview(id, rating, content, tags);
 
         resultActions
-                .andExpect(handler().handlerType(ApiV1ReviewController.class))
+                .andExpect(handler().handlerType(ApiReviewControllerV1.class))
                 .andExpect(handler().methodName("edit"))
                 .andExpect(status().isForbidden())
                 .andExpect(jsonPath("$.resultCode").value("403-1"))
@@ -120,7 +120,7 @@ public class ApiV1ReviewControllerPutTest {
         ResultActions resultActions = putReview(id, rating, content, tags);
 
         resultActions
-                .andExpect(handler().handlerType(ApiV1ReviewController.class))
+                .andExpect(handler().handlerType(ApiReviewControllerV1.class))
                 .andExpect(handler().methodName("edit"))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.resultCode").value("404-1"))

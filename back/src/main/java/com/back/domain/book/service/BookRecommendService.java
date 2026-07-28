@@ -53,7 +53,7 @@ public class BookRecommendService {
         Set<Member> members = new HashSet<>();
 
         for (var review : recentReviews)
-            reviewService.getByBookId(review.getBook().getId(), 0, 10)
+            reviewService.getReviewsByBookId(review.getBook().getId(), 0, 10)
                     .stream()
                     .forEach(r -> members.add(r.getReviewer()));
 
