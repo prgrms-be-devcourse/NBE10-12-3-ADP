@@ -62,10 +62,10 @@ public class ApiV1ReviewControllerPostTest {
 
         ResultActions resultActions = postReview(bookId, rating, content, tags);
 
-        Review review = reviewService.findLatest().get();
+        Review review = reviewService.getLatest().get();
 
         resultActions
-                .andExpect(handler().handlerType(ApiV1ReviewController.class))
+                .andExpect(handler().handlerType(ApiReviewControllerV1.class))
                 .andExpect(handler().methodName("post"))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.resultCode").value("201-1"))
@@ -100,7 +100,7 @@ public class ApiV1ReviewControllerPostTest {
         ResultActions resultActions = postReview(bookId, rating, content, tags);
 
         resultActions
-                .andExpect(handler().handlerType(ApiV1ReviewController.class))
+                .andExpect(handler().handlerType(ApiReviewControllerV1.class))
                 .andExpect(handler().methodName("post"))
                 .andExpect(status().isConflict())
                 .andExpect(jsonPath("$.resultCode").value("409-1"))
@@ -121,7 +121,7 @@ public class ApiV1ReviewControllerPostTest {
         ResultActions resultActions = postReview(bookId, rating, content, tags);
 
         resultActions
-                .andExpect(handler().handlerType(ApiV1ReviewController.class))
+                .andExpect(handler().handlerType(ApiReviewControllerV1.class))
                 .andExpect(handler().methodName("post"))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.resultCode").value("404-1"))

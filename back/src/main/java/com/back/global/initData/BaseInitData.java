@@ -79,17 +79,17 @@ public class BaseInitData {
         wishService.addWish(memberUser2, book2);
         wishService.addWish(memberUser3, book3);
 
-        reviewService.addReview(book1.getId(), memberUser1, 4.0f, "comment", List.of("a", "b"));
-        reviewService.addReview(book2.getId(), memberUser1, 3.5f, "", List.of("Java", "Spring", "신입 개발자"));
-        reviewService.addReview(book3.getId(), memberUser1, 1.5f, "많이 아쉬운 책입니다..", List.of("소설", "감자"));
-        reviewService.addReview(book4.getId(), memberUser1, 4.5f, "", List.of("소설"));
+        reviewService.createReview(book1.getId(), memberUser1, 4.0f, "comment", List.of("a", "b"));
+        reviewService.createReview(book2.getId(), memberUser1, 3.5f, "", List.of("Java", "Spring", "신입 개발자"));
+        reviewService.createReview(book3.getId(), memberUser1, 1.5f, "많이 아쉬운 책입니다..", List.of("소설", "감자"));
+        reviewService.createReview(book4.getId(), memberUser1, 4.5f, "", List.of("소설"));
 
-        reviewService.addReview(book2.getId(), memberUser2, 3.5f, "", List.of("Java", "Spring", "신입 개발자"));
-        reviewService.addReview(book3.getId(), memberUser2, 1.5f, "많이 아쉬운 책입니다..", List.of("소설", "감자"));
-        reviewService.addReview(book4.getId(), memberUser2, 4.5f, "", List.of("소설"));
+        reviewService.createReview(book2.getId(), memberUser2, 3.5f, "", List.of("Java", "Spring", "신입 개발자"));
+        reviewService.createReview(book3.getId(), memberUser2, 1.5f, "많이 아쉬운 책입니다..", List.of("소설", "감자"));
+        reviewService.createReview(book4.getId(), memberUser2, 4.5f, "", List.of("소설"));
 
-        reviewService.addReview(book2.getId(), memberUser3, 3.5f, "", List.of("Java", "Spring", "신입 개발자"));
-        reviewService.addReview(book3.getId(), memberUser3, 1.5f, "많이 아쉬운 책입니다..", List.of("소설", "감자"));
+        reviewService.createReview(book2.getId(), memberUser3, 3.5f, "", List.of("Java", "Spring", "신입 개발자"));
+        reviewService.createReview(book3.getId(), memberUser3, 1.5f, "많이 아쉬운 책입니다..", List.of("소설", "감자"));
     }
 
 }

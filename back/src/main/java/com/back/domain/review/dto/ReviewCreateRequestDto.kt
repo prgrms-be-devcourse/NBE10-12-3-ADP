@@ -1,0 +1,15 @@
+package com.back.domain.review.dto
+
+import com.back.domain.review.validation.ValidRating
+import com.back.domain.review.validation.ValidTags
+import jakarta.validation.constraints.NotNull
+import jakarta.validation.constraints.Size
+
+class ReviewCreateRequestDto(
+    @field:ValidRating
+    val rating: Float,
+    @field:Size(max = 500)
+    val content: String,
+    @field:ValidTags
+    val tags: List<String>
+)

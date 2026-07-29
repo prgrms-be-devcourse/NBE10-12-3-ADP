@@ -7,9 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
-import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -39,10 +37,10 @@ public class BookRankServiceTest {
             System.out.println("출력: " + book.id());
         }
 
-        int upperCnt = reviewService.findByBookId(bookRank.getFirst().id()).size();
+        int upperCnt = reviewService.getReviewsByBookId(bookRank.getFirst().id()).size();
 
         for (int i = 1; i < bookRank.size(); i++) {
-            int nowCnt = reviewService.findByBookId(bookRank.get(i).id()).size();
+            int nowCnt = reviewService.getReviewsByBookId(bookRank.get(i).id()).size();
 
             assertThat(upperCnt).isGreaterThanOrEqualTo(nowCnt);
 

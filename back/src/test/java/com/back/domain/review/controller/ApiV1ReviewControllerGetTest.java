@@ -1,27 +1,21 @@
 package com.back.domain.review.controller;
 
-import com.back.domain.book.entity.Book;
 import com.back.domain.book.service.BookService;
 import com.back.domain.member.entity.Member;
 import com.back.domain.member.service.MemberService;
-import com.back.domain.review.controller.ApiV1ReviewController;
 import com.back.domain.review.entity.Review;
 import com.back.domain.review.service.ReviewService;
 import org.hamcrest.Matchers;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
-import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.context.WebApplicationContext;
 
 import java.util.List;
 import java.util.Map;
@@ -51,7 +45,7 @@ public class ApiV1ReviewControllerGetTest {
     @DisplayName("리뷰 다건 조회")
     void t1() throws Exception {
         long bookId = 1L;
-        List<Review> reviews = reviewService.findByBookId(bookId);
+        List<Review> reviews = reviewService.getReviewsByBookId(bookId);
 
         ResultActions resultActions = mvc
                 .perform(
@@ -59,7 +53,7 @@ public class ApiV1ReviewControllerGetTest {
                 .andDo(print());
 
         resultActions
-                .andExpect(handler().handlerType(ApiV1ReviewController.class))
+                .andExpect(handler().handlerType(ApiReviewControllerV1.class))
                 .andExpect(handler().methodName("getReviewsByBook"))
                 .andExpect(status().isOk());
 
@@ -100,7 +94,7 @@ public class ApiV1ReviewControllerGetTest {
                 .andDo(print());
 
         resultActions
-                .andExpect(handler().handlerType(ApiV1ReviewController.class))
+                .andExpect(handler().handlerType(ApiReviewControllerV1.class))
                 .andExpect(handler().methodName("getReviewsByBook"))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.resultCode").value("404-1"))
@@ -114,7 +108,7 @@ public class ApiV1ReviewControllerGetTest {
         long memberId = 3L;
         Member member = memberService.findById(memberId);
         Map<String, Object> ratings = reviewService.getRatingMap(member);
-        List<Review> reviews = reviewService.findByMember(member);
+        List<Review> reviews = reviewService.getByMemberId(member);
 
         ResultActions resultActions = mvc
                 .perform(
@@ -122,7 +116,7 @@ public class ApiV1ReviewControllerGetTest {
                 .andDo(print());
 
         resultActions
-                .andExpect(handler().handlerType(ApiV1ReviewController.class))
+                .andExpect(handler().handlerType(ApiReviewControllerV1.class))
                 .andExpect(handler().methodName("getReviewsByMember"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.rating").exists())
@@ -162,7 +156,7 @@ public class ApiV1ReviewControllerGetTest {
                 .andDo(print());
 
         resultActions
-                .andExpect(handler().handlerType(ApiV1ReviewController.class))
+                .andExpect(handler().handlerType(ApiReviewControllerV1.class))
                 .andExpect(handler().methodName("getReviewsByMember"))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.resultCode").value("404-1"))
@@ -181,10 +175,10 @@ public class ApiV1ReviewControllerGetTest {
 
         Member member = memberService.findByUsername("user1");
         Map<String, Object> ratings = reviewService.getRatingMap(member);
-        List<Review> reviews = reviewService.findByMember(member);
+        List<Review> reviews = reviewService.getByMemberId(member);
 
         resultActions
-                .andExpect(handler().handlerType(ApiV1ReviewController.class))
+                .andExpect(handler().handlerType(ApiReviewControllerV1.class))
                 .andExpect(handler().methodName("mine"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.rating").exists())
