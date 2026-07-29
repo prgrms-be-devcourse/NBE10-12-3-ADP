@@ -97,7 +97,7 @@ class BookService(
     ): Book {
         val book = getBookById(id)
 
-        book.modify(title, description, authors, publisher, imgUrl)
+        book.update(title, description, authors, publisher, imgUrl)
 
         return book
     }
