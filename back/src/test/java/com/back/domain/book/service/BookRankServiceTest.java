@@ -31,16 +31,16 @@ public class BookRankServiceTest {
     @DisplayName("리뷰 수 기반 도서 순위 조회")
     void t1() {
 
-        List<BookDto> bookRank = bookRankService.getBooksByReviewCnt(0, 100);
+        List<BookDto> bookRank = bookRankService.getBooksOrderByReviewCnt(0, 100);
 
         for (var book : bookRank) {
-            System.out.println("출력: " + book.id());
+            System.out.println("출력: " + book.id);
         }
 
-        int upperCnt = reviewService.getReviewsByBookId(bookRank.getFirst().id()).size();
+        int upperCnt = reviewService.findByBookId(bookRank.getFirst().id).size();
 
         for (int i = 1; i < bookRank.size(); i++) {
-            int nowCnt = reviewService.getReviewsByBookId(bookRank.get(i).id()).size();
+            int nowCnt = reviewService.findByBookId(bookRank.get(i).id).size();
 
             assertThat(upperCnt).isGreaterThanOrEqualTo(nowCnt);
 
@@ -54,11 +54,11 @@ public class BookRankServiceTest {
     @DisplayName("평점 기반 도서 순위 조회")
     void t2(){
 
-        List<BookDto> bookRank = bookRankService.getBooksByRating(0, 100);
-        double upperRating = bookService.getPureBook(bookRank.getFirst().id()).getAverageRating();
+        List<BookDto> bookRank = bookRankService.getBooksOrderByRating(0, 100);
+        double upperRating = bookService.getBook(bookRank.getFirst().id).getAverageRating();
 
         for (int i = 1; i < bookRank.size(); i++) {
-            double nowRating = bookService.getPureBook(bookRank.get(i).id()).getAverageRating();
+            double nowRating = bookService.getBook(bookRank.get(i).id).getAverageRating();
 
             assertThat(upperRating).isGreaterThanOrEqualTo(nowRating);
 
