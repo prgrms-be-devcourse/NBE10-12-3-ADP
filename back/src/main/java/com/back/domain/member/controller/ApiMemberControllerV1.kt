@@ -17,8 +17,8 @@ import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping("/api/v1/members")
-@Tag(name = "MemberControllerV1", description = "API 회원 컨트롤러 V1")
-class MemberControllerV1(
+@Tag(name = "ApiMemberControllerV1", description = "API 회원 컨트롤러 V1")
+class ApiMemberControllerV1(
     private val memberService: MemberService,
     private val rq: Rq
 ) {

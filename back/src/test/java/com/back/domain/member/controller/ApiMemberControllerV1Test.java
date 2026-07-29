@@ -29,7 +29,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @Transactional
-public class MemberControllerV1Test {
+public class ApiMemberControllerV1Test {
 
     @Autowired
     private MockMvc mvc;
@@ -53,7 +53,7 @@ public class MemberControllerV1Test {
         Member member = memberService.getByUsername("user1");
 
         resultActions
-                .andExpect(handler().handlerType(MemberControllerV1.class))
+                .andExpect(handler().handlerType(ApiMemberControllerV1.class))
                 .andExpect(handler().methodName("me"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(member.getId()))
@@ -78,7 +78,7 @@ public class MemberControllerV1Test {
         Member member = memberService.getById(id);
 
         resultActions
-                .andExpect(handler().handlerType(MemberControllerV1.class))
+                .andExpect(handler().handlerType(ApiMemberControllerV1.class))
                 .andExpect(handler().methodName("getMember"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(member.getId()))
@@ -98,7 +98,7 @@ public class MemberControllerV1Test {
                 .andDo(print());
 
         resultActions
-                .andExpect(handler().handlerType(MemberControllerV1.class))
+                .andExpect(handler().handlerType(ApiMemberControllerV1.class))
                 .andExpect(handler().methodName("delete"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.resultCode").value("200-1"))
@@ -144,7 +144,7 @@ public class MemberControllerV1Test {
         Member member = memberService.getByUsername("user1");
 
         resultActions
-                .andExpect(handler().handlerType(MemberControllerV1.class))
+                .andExpect(handler().handlerType(ApiMemberControllerV1.class))
                 .andExpect(handler().methodName("login"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.resultCode").value("200-1"))
@@ -192,7 +192,7 @@ public class MemberControllerV1Test {
         Member member = memberService.getByUsername("user7");
 
         resultActions
-                .andExpect(handler().handlerType(MemberControllerV1.class))
+                .andExpect(handler().handlerType(ApiMemberControllerV1.class))
                 .andExpect(handler().methodName("join"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.resultCode").value("200-1"))
@@ -232,7 +232,7 @@ public class MemberControllerV1Test {
                 .andDo(print());
 
         resultActions
-                .andExpect(handler().handlerType(MemberControllerV1.class))
+                .andExpect(handler().handlerType(ApiMemberControllerV1.class))
                 .andExpect(handler().methodName("getMembers"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content").isArray())
@@ -272,7 +272,7 @@ public class MemberControllerV1Test {
                 .andDo(print());
 
         resultActions
-                .andExpect(handler().handlerType(MemberControllerV1.class))
+                .andExpect(handler().handlerType(ApiMemberControllerV1.class))
                 .andExpect(handler().methodName("deleteMember"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.resultCode").value("200-1"))
@@ -312,7 +312,7 @@ public class MemberControllerV1Test {
                 .andDo(print());
 
         resultActions
-                .andExpect(handler().handlerType(MemberControllerV1.class))
+                .andExpect(handler().handlerType(ApiMemberControllerV1.class))
                 .andExpect(handler().methodName("logout"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.resultCode").value("200-1"))
