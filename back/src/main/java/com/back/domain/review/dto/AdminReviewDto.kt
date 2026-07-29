@@ -4,8 +4,7 @@ import com.back.domain.member.dto.MemberDto
 import com.back.domain.review.entity.Review
 import java.time.LocalDateTime
 
-@JvmRecord
-data class AdminReviewDto(
+class AdminReviewDto(
     val id: Long,
     val bookTitle: String,
     val rating: Float,

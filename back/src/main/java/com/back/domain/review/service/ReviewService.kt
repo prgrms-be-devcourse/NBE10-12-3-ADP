@@ -130,7 +130,7 @@ class ReviewService(
         val actor = getMemberById(actorId)
 
         if (reviewRepository.findFirstByBookAndReviewer(book, actor) != null)
-            throw ServiceException("409-1", "이미 작성한 리뷰가 있습니다.")
+            throw ServiceException("409-1", "이미 존재하는 리뷰입니다.")
 
         val review: Review = reviewRepository.save<Review>(
             Review(
@@ -152,7 +152,7 @@ class ReviewService(
         val reviewer = getMemberById(reviewerId)
 
         if (review.reviewer != reviewer) {
-            throw ServiceException("403-1", "수정 권한이 없습니다.")
+            throw ServiceException("403-1", "리뷰 수정 권한이 없습니다.")
         }
 
         review.modify(
@@ -171,7 +171,7 @@ class ReviewService(
         val reviewer = getMemberById(reviewerId)
 
         if (review.reviewer != reviewer && !reviewer.isAdmin) {
-            throw ServiceException("403-1", "삭제 권한이 없습니다.")
+            throw ServiceException("403-1", "리뷰 삭제 권한이 없습니다.")
         }
 
         val book: Book = review.book
