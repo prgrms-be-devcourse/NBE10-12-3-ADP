@@ -1,9 +1,7 @@
 package com.back.domain.wish.controller;
 
-import com.back.domain.book.dto.BookDto;
 import com.back.domain.book.dto.BookWithTagDto;
 import com.back.domain.book.entity.Book;
-import com.back.domain.book.repository.BookRepository;
 import com.back.domain.book.service.BookService;
 import com.back.domain.member.entity.Member;
 import com.back.domain.member.service.MemberService;
@@ -55,7 +53,7 @@ public class ApiV1WishController {
             @PathVariable @Valid long id
     ) {
 
-        Book book = bookService.getPureBook(id);
+        Book book = bookService.getBook(id);
 
         wishService.addWish(
                 rq.getActorFromDb(),
@@ -74,7 +72,7 @@ public class ApiV1WishController {
             @PathVariable @Valid long id
     ) {
 
-        Book book = bookService.getPureBook(id);
+        Book book = bookService.getBook(id);
 
         wishService.deleteWish(
                 rq.getActorFromDb(),

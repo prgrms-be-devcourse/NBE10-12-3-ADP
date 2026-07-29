@@ -63,7 +63,7 @@ public class ApiV1BookControllerAdminTest {
                 .andDo(print());
 
         resultActions
-                .andExpect(handler().handlerType(ApiV1BookController.class))
+                .andExpect(handler().handlerType(ApiBookControllerV1.class))
                 .andExpect(handler().methodName("modify"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.resultCode").value("200-1"))
@@ -118,7 +118,7 @@ public class ApiV1BookControllerAdminTest {
                 .andDo(print());
 
         resultActions
-                .andExpect(handler().handlerType(ApiV1BookController.class))
+                .andExpect(handler().handlerType(ApiBookControllerV1.class))
                 .andExpect(handler().methodName("delete"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.resultCode").value("200-1"))
