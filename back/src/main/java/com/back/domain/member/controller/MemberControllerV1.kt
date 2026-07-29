@@ -2,6 +2,8 @@ package com.back.domain.member.controller
 
 import com.back.domain.member.dto.AdminMemberDto
 import com.back.domain.member.dto.MemberDto
+import com.back.domain.member.dto.MemberJoinRequestDto
+import com.back.domain.member.dto.MemberLoginRequestDto
 import com.back.domain.member.dto.MemberWithUsernameAndWidgetLinkDto
 import com.back.domain.member.service.MemberService
 import com.back.global.rq.Rq
@@ -10,18 +12,13 @@ import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.validation.Valid
-import jakarta.validation.constraints.NotBlank
-import jakarta.validation.constraints.Pattern
-import jakarta.validation.constraints.Size
 import org.springframework.data.domain.Page
-import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping("/api/v1/members")
-@Transactional(readOnly = true)
-@Tag(name = "ApiV1MemberController", description = "API 회원 컨트롤러")
-class ApiV1MemberController(
+@Tag(name = "MemberControllerV1", description = "API 회원 컨트롤러 V1")
+class MemberControllerV1(
     private val memberService: MemberService,
     private val rq: Rq
 ) {
@@ -29,7 +26,7 @@ class ApiV1MemberController(
     @Operation(summary = "내 정보 조회")
     @SecurityRequirement(name = "bearerAuth")
     fun me(): MemberWithUsernameAndWidgetLinkDto {
-        val actor = memberService.findById(rq.actor.getId())
+        val actor = memberService.getById(rq.actor.getId())
         return MemberWithUsernameAndWidgetLinkDto(actor)
     }
 
@@ -38,19 +35,10 @@ class ApiV1MemberController(
     fun getMember(
         @PathVariable @Valid id: Long
     ): MemberDto {
-        val member = memberService.findById(id)
+        val member = memberService.getById(id)
 
         return MemberDto(member)
     }
-
-    data class MemberLoginReqBody(
-        @NotBlank
-        @Size(min = 2, max = 30)
-        val username: String,
-        @NotBlank
-        @Size(min = 2, max = 30)
-        val password: String
-    )
 
     data class MemberLoginResBody(
         val accessToken: String,
@@ -58,7 +46,6 @@ class ApiV1MemberController(
     )
 
     @DeleteMapping
-    @Transactional
     @Operation(summary = "회원 탈퇴")
     @SecurityRequirement(name = "bearerAuth")
     fun delete(): RsData<Void> {
@@ -73,9 +60,9 @@ class ApiV1MemberController(
     @PostMapping("/login")
     @Operation(summary = "로그인")
     fun login(
-        @RequestBody @Valid reqBody: MemberLoginReqBody
+        @RequestBody @Valid reqBody: MemberLoginRequestDto
     ): RsData<MemberLoginResBody> {
-        val member = memberService.findByUsername(reqBody.username)
+        val member = memberService.getByUsername(reqBody.username)
 
         memberService.checkPassword(member, reqBody.password)
 
@@ -94,27 +81,10 @@ class ApiV1MemberController(
         )
     }
 
-    data class MemberJoinReqBody(
-        @NotBlank
-        @Size(min = 2, max = 30)
-        val username: String,
-        @NotBlank
-        @Size(min = 2, max = 30)
-        val password: String,
-        @NotBlank
-        @Size(max = 39)
-        @Pattern(
-            regexp = "^[a-z0-9]+(-[a-z0-9]+)*$",
-            message = "githubId는 영문 소문자, 숫자, 하이픈(-)만 사용할 수 있으며 하이픈은 처음/끝/연속으로 올 수 없습니다."
-        )
-        val githubId: String
-    )
-
     @PostMapping
     @Operation(summary = "회원 가입")
-    @Transactional
     fun join(
-        @RequestBody @Valid reqBody: MemberJoinReqBody
+        @RequestBody @Valid reqBody: MemberJoinRequestDto
     ): RsData<MemberLoginResBody> {
         val member = memberService.join(
             reqBody.username,
@@ -161,7 +131,6 @@ class ApiV1MemberController(
     }
 
     @DeleteMapping("/admin/{id}")
-    @Transactional
     @Operation(summary = "회원 강제 탈퇴 (관리자)")
     @SecurityRequirement(name = "bearerAuth")
     fun deleteMember(

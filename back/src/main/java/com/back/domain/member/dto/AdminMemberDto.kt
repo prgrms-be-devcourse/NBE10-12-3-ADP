@@ -4,20 +4,22 @@ import com.back.domain.member.entity.Member
 import jakarta.validation.constraints.NotNull
 import java.time.LocalDateTime
 
-data class AdminMemberDto(
-    @field:NotNull val id: Long,
+class AdminMemberDto(
+    id: Long,
+    githubId: String?,
+    githubLink: String?,
     val username: String?,
     val nickname: String?,
-    val githubId: String?,
     @field:NotNull val isAdmin: Boolean,
     @field:NotNull val isDeleted: Boolean,
     @field:NotNull val createdDate: LocalDateTime
-) {
+) : MemberDto(id, githubId, githubLink) {
     constructor(member: Member) : this(
         member.getId(),
+        member.githubId,
+        member.githubLink,
         member.username,
         member.nickname,
-        member.githubId,
         member.isAdmin,
         member.isDeleted,
         member.getCreatedDate()

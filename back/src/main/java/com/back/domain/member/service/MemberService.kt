@@ -22,7 +22,7 @@ class MemberService(
     private val authTokenService: AuthTokenService,
     private val passwordEncoder: PasswordEncoder
 ) {
-    fun findById(id: Long): Member {
+    fun getById(id: Long): Member {
         val member = memberRepository.findById(id)
             .orElseThrow { NoSuchElementException("존재하지 않는 회원입니다.") }
 
@@ -33,7 +33,7 @@ class MemberService(
         return member
     }
 
-    fun findByUsername(username: String): Member {
+    fun getByUsername(username: String): Member {
         val member = memberRepository.findByUsername(username)
             .orElseThrow { UsernameNotFoundException("존재하지 않는 회원입니다.") }
 
@@ -43,9 +43,11 @@ class MemberService(
         return member
     }
 
+    @Transactional
     fun join(username: String, password: String, githubId: String, imgUrl: String?): Member =
         join(username, password, githubId, githubId, imgUrl)
 
+    @Transactional
     fun join(username: String, password: String, githubId: String?, nickname: String, imgUrl: String?): Member {
         memberRepository.findByUsername(username).ifPresent {
             throw ServiceException("409-1", "이미 존재하는 아이디입니다.")
@@ -61,15 +63,16 @@ class MemberService(
         return memberRepository.save(Member(username, encodedPassword, githubId, nickname, imgUrl))
     }
 
+    @Transactional
     fun delete(id: Long) {
-        val member = findById(id)
+        val member = getById(id)
         member.deletedDate = LocalDateTime.now()
     }
 
     fun getMembers(page: Int, size: Int): Page<Member> =
         memberRepository.findAll(PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "id")))
 
-    fun findByRefreshToken(apiKey: String): Optional<Member> =
+    fun getByRefreshToken(apiKey: String): Optional<Member> =
         memberRepository.findByRefreshToken(apiKey)
 
     fun genAccessToken(member: Member): String =
@@ -85,10 +88,11 @@ class MemberService(
             throw ServiceException("401-1", "비밀번호가 일치하지 않습니다.")
     }
 
-    fun findByGithubId(githubId: String): Member =
+    fun getByGithubId(githubId: String): Member =
         memberRepository.findByGithubId(githubId)
             .orElseThrow { NoSuchElementException("존재하지 않는 회원입니다.") }
 
+    @Transactional
     fun modifyOrJoin(username: String, password: String, nickname: String, profileImgUrl: String?): RsData<Member> {
         val member = memberRepository.findByUsername(username)
         if (member.isEmpty) {
