@@ -73,7 +73,7 @@ class ApiBookControllerV1(
     }
 
     @GetMapping("/recommend")
-    @Operation(summary = "도서 추천 다건 조회)")
+    @Operation(summary = "도서 추천 다건 조회")
     fun getBooksByRecommend(): List<BookDto> {
         return bookRecommendService
             .getBooksByRecommend(rq.actor)
@@ -81,7 +81,7 @@ class ApiBookControllerV1(
     }
 
     @GetMapping("/rank")
-    @Operation(summary = "도서 인기순 다건 조회)")
+    @Operation(summary = "도서 인기순 다건 조회")
     fun getBooksOrderByRank(
         @RequestParam(defaultValue = "") type: String,
         @RequestParam(defaultValue = "0") page: Int,
