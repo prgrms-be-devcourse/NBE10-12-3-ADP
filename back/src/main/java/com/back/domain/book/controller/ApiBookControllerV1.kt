@@ -3,10 +3,8 @@ package com.back.domain.book.controller
 import com.back.domain.book.dto.BookUpdateRequestDto
 import com.back.domain.book.dto.BookDetailDto
 import com.back.domain.book.dto.BookDto
-import com.back.domain.book.service.BookRankService
 import com.back.domain.book.service.BookRecommendService
 import com.back.domain.book.service.BookService
-import com.back.domain.book.service.BookViewsService
 import com.back.global.rq.Rq
 import com.back.global.rsData.RsData
 import io.swagger.v3.oas.annotations.Operation
@@ -32,9 +30,7 @@ import org.springframework.web.bind.annotation.RestController
 class ApiBookControllerV1(
     private val rq: Rq,
     private val bookService: BookService,
-    private val bookRecommendService: BookRecommendService,
-    private val bookRankService: BookRankService,
-    private val bookViewsService: BookViewsService
+    private val bookRecommendService: BookRecommendService
 ) {
 
     @GetMapping("/admin")
@@ -87,14 +83,7 @@ class ApiBookControllerV1(
         @RequestParam(defaultValue = "0") page: Int,
         @RequestParam(defaultValue = "10") size: Int
     ): List<BookDto> {
-        if (type == "rating")
-            return bookRankService.getBooksOrderByRating(page, size)
-                .toList().map { book -> BookDto(book)}
-        if (type == "reviewCount")
-            return bookRankService.getBooksOrderByReviewCnt(page, size)
-                .toList().map { book -> BookDto(book)}
-
-        return bookService.getBooksOrderByTopViewedInLastHour(page, size)
+        return bookService.getBooksOrderByRank(type, page, size)
             .map { book -> BookDto(book)}
     }
 

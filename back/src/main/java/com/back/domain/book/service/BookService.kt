@@ -53,6 +53,19 @@ class BookService(
         return books.map { bookId: Long -> getBookById(bookId) }
     }
 
+    fun getBooksOrderByRank(type: String, page: Int, size: Int): List<Book> {
+
+        if (type == "views")
+            return getBooksOrderByTopViewedInLastHour(page, size)
+
+        val pageable = PageRequest.of(page, size)
+
+        if (type == "rating")
+            return bookRepository.findAllByOrderByAverageRatingDesc(pageable).toList()
+
+        return bookRepository.findAllByOrderByReviewCountDesc(pageable).toList()
+    }
+
     @Transactional
     fun incrementViewCount(book: Book) {
         if (rq.getCookieValue("viewed:%d".format(book.id), "") == "true") {
