@@ -97,7 +97,7 @@ class SecurityConfig(
                 }
                 accessDeniedHandler = AccessDeniedHandler { _, response, _ ->
                     response.contentType = "application/json;charset=UTF-8"
-                    response.status = 401
+                    response.status = 403
                     response.writer.write(
                         Ut.json.toString(
                             RsData<Void>("403-1", "권한이 없습니다.")
