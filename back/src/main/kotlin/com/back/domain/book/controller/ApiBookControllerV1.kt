@@ -98,7 +98,7 @@ class ApiBookControllerV1(
             id, req.title, req.description, req.authors, req.publisher, req.imgUrl
         )
 
-        return RsData<BookDto?>("200-1", "도서 수정을 성공했습니다.", BookDto(book))
+        return RsData("200-1", "도서 수정을 성공했습니다.", BookDto(book))
     }
 
     @DeleteMapping("/{id}")
@@ -109,6 +109,6 @@ class ApiBookControllerV1(
     ): RsData<Void?> {
         bookService.deleteBook(id)
 
-        return RsData<Void?>("200-1", "도서 삭제를 성공했습니다.")
+        return RsData("200-1", "도서 삭제를 성공했습니다.")
     }
 }
