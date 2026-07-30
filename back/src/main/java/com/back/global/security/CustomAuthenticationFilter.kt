@@ -36,7 +36,7 @@ class CustomAuthenticationFilter(
         try {
             work(request, response, filterChain)
         } catch (e: ServiceException) {
-            val rsData: RsData<Void?> = e.rsData
+            val rsData: RsData<Void> = e.rsData
             response.contentType = "application/json;charset=UTF-8"
             response.status = rsData.statusCode
             response.writer.write(
@@ -91,10 +91,10 @@ class CustomAuthenticationFilter(
         logger.debug("refreshToken : $refreshToken")
         logger.debug("accessToken : $accessToken")
 
-        val isrefreshTokenExists = !refreshToken.isBlank()
+        val isRefreshTokenExists = !refreshToken.isBlank()
         val isAccessTokenExists = !accessToken.isBlank()
 
-        if (!isrefreshTokenExists && !isAccessTokenExists) {
+        if (!isRefreshTokenExists && !isAccessTokenExists) {
             filterChain.doFilter(request, response)
             return
         }
@@ -109,7 +109,7 @@ class CustomAuthenticationFilter(
                 val id = payload["id"] as Int
                 val username = payload["username"] as String
                 val name = payload["name"] as String
-                val role = Role.valueOf((payload["role"] as String?)!!)
+                val role = Role.valueOf(payload["role"] as String)
                 member = Member(id.toLong(), username, name, role)
 
                 isAccessTokenValid = true
@@ -119,7 +119,7 @@ class CustomAuthenticationFilter(
         if (member == null) {
             member = memberService
                 .getByRefreshToken(refreshToken)
-                .orElseThrow({ ServiceException("401-3", "API 키가 유효하지 않습니다.") })
+                .orElseThrow{ ServiceException("401-3", "API 키가 유효하지 않습니다.") }
         }
 
         if (isAccessTokenExists && !isAccessTokenValid) {
@@ -131,8 +131,8 @@ class CustomAuthenticationFilter(
 
         val user: UserDetails = SecurityUser(
             member.id,
-            member!!.username!!,
-            member.name!!,
+            member.username ?: "",
+            member.name ?: "",
             member.authorities
         )
 
