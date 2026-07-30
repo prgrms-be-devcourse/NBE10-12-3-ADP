@@ -1,6 +1,5 @@
 package com.back.domain.member.controller;
 
-import com.back.domain.member.controller.ApiV1MemberController;
 import com.back.domain.member.entity.Member;
 import com.back.domain.member.repository.MemberRepository;
 import com.back.domain.member.service.MemberService;
@@ -30,7 +29,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @Transactional
-public class ApiV1MemberControllerTest {
+public class ApiMemberControllerV1Test {
 
     @Autowired
     private MockMvc mvc;
@@ -51,10 +50,10 @@ public class ApiV1MemberControllerTest {
                         get("/api/v1/members/me"))
                 .andDo(print());
 
-        Member member = memberService.findByUsername("user1");
+        Member member = memberService.getByUsername("user1");
 
         resultActions
-                .andExpect(handler().handlerType(ApiV1MemberController.class))
+                .andExpect(handler().handlerType(ApiMemberControllerV1.class))
                 .andExpect(handler().methodName("me"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(member.getId()))
@@ -76,11 +75,11 @@ public class ApiV1MemberControllerTest {
                         get("/api/v1/members/%d".formatted(id)))
                 .andDo(print());
 
-        Member member = memberService.findById(id);
+        Member member = memberService.getById(id);
 
         resultActions
-                .andExpect(handler().handlerType(ApiV1MemberController.class))
-                .andExpect(handler().methodName("getUser"))
+                .andExpect(handler().handlerType(ApiMemberControllerV1.class))
+                .andExpect(handler().methodName("getMember"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(member.getId()))
                 .andExpect(jsonPath("$.githubId").value(member.getGithubId()))
@@ -99,11 +98,11 @@ public class ApiV1MemberControllerTest {
                 .andDo(print());
 
         resultActions
-                .andExpect(handler().handlerType(ApiV1MemberController.class))
+                .andExpect(handler().handlerType(ApiMemberControllerV1.class))
                 .andExpect(handler().methodName("delete"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.resultCode").value("200-1"))
-                .andExpect(jsonPath("$.message").value("회원 탈퇴 성공"));
+                .andExpect(jsonPath("$.message").value("회원 탈퇴를 성공했습니다."));
 
         resultActions.andExpect(
                 result -> {
@@ -142,14 +141,14 @@ public class ApiV1MemberControllerTest {
                                         """))
                 .andDo(print());
 
-        Member member = memberService.findByUsername("user1");
+        Member member = memberService.getByUsername("user1");
 
         resultActions
-                .andExpect(handler().handlerType(ApiV1MemberController.class))
+                .andExpect(handler().handlerType(ApiMemberControllerV1.class))
                 .andExpect(handler().methodName("login"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.resultCode").value("200-1"))
-                .andExpect(jsonPath("$.message").value("로그인 성공"))
+                .andExpect(jsonPath("$.message").value("로그인을 성공했습니다."))
                 .andExpect(jsonPath("$.data").exists())
                 .andExpect(jsonPath("$.data.accessToken").isNotEmpty())
                 .andExpect(jsonPath("$.data.refreshToken").value(member.getRefreshToken()));
@@ -190,14 +189,14 @@ public class ApiV1MemberControllerTest {
                                         """))
                 .andDo(print());
 
-        Member member = memberService.findByUsername("user7");
+        Member member = memberService.getByUsername("user7");
 
         resultActions
-                .andExpect(handler().handlerType(ApiV1MemberController.class))
+                .andExpect(handler().handlerType(ApiMemberControllerV1.class))
                 .andExpect(handler().methodName("join"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.resultCode").value("200-1"))
-                .andExpect(jsonPath("$.message").value("회원가입 성공"))
+                .andExpect(jsonPath("$.message").value("회원가입을 성공했습니다."))
                 .andExpect(jsonPath("$.data").exists())
                 .andExpect(jsonPath("$.data.accessToken").isNotEmpty())
                 .andExpect(jsonPath("$.data.refreshToken").value(member.getRefreshToken()));
@@ -233,7 +232,7 @@ public class ApiV1MemberControllerTest {
                 .andDo(print());
 
         resultActions
-                .andExpect(handler().handlerType(ApiV1MemberController.class))
+                .andExpect(handler().handlerType(ApiMemberControllerV1.class))
                 .andExpect(handler().methodName("getMembers"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content").isArray())
@@ -265,7 +264,7 @@ public class ApiV1MemberControllerTest {
     @WithUserDetails("admin")
     void t9() throws Exception {
 
-        Member member = memberService.findByUsername("user2");
+        Member member = memberService.getByUsername("user2");
 
         ResultActions resultActions = mvc
                 .perform(
@@ -273,11 +272,11 @@ public class ApiV1MemberControllerTest {
                 .andDo(print());
 
         resultActions
-                .andExpect(handler().handlerType(ApiV1MemberController.class))
+                .andExpect(handler().handlerType(ApiMemberControllerV1.class))
                 .andExpect(handler().methodName("deleteMember"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.resultCode").value("200-1"))
-                .andExpect(jsonPath("$.message").value("회원 강제 탈퇴 완료"));
+                .andExpect(jsonPath("$.message").value("회원 강제 탈퇴를 성공했습니다."));
 
         assertThat(memberRepository.findById(member.getId()).orElseThrow().isDeleted()).isTrue();
 
@@ -288,7 +287,7 @@ public class ApiV1MemberControllerTest {
     @WithUserDetails("user1")
     void t10() throws Exception {
 
-        Member member = memberService.findByUsername("user2");
+        Member member = memberService.getByUsername("user2");
 
         ResultActions resultActions = mvc
                 .perform(
@@ -313,11 +312,11 @@ public class ApiV1MemberControllerTest {
                 .andDo(print());
 
         resultActions
-                .andExpect(handler().handlerType(ApiV1MemberController.class))
+                .andExpect(handler().handlerType(ApiMemberControllerV1.class))
                 .andExpect(handler().methodName("logout"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.resultCode").value("200-1"))
-                .andExpect(jsonPath("$.message").value("로그아웃 성공"));
+                .andExpect(jsonPath("$.message").value("로그아웃을 성공했습니다."));
 
         resultActions.andExpect(
                 result -> {
