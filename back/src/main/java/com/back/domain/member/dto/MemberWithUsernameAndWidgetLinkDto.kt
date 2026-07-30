@@ -10,7 +10,7 @@ class MemberWithUsernameAndWidgetLinkDto(
     val widgetLink: String?
 ) : MemberDto(id, githubId, githubLink) {
     constructor(member: Member) : this(
-        member.getId(),
+        member.id,
         member.githubId,
         member.githubLink,
         member.username,

@@ -54,7 +54,7 @@ public class ApiV1WishControllerTest {
     @WithUserDetails("user1")
     void t1() throws Exception {
 
-        Member actor = memberService.findByUsername("user1");
+        Member actor = memberService.getByUsername("user1");
 
         List<Wish> wishes = wishService.findByMember(actor);
         int wishesSize = wishes.size();

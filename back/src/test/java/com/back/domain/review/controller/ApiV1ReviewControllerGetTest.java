@@ -106,9 +106,9 @@ public class ApiV1ReviewControllerGetTest {
     void t2() throws Exception {
 
         long memberId = 3L;
-        Member member = memberService.findById(memberId);
-        Map<String, Object> ratings = reviewService.getRatingMap(member);
-        List<Review> reviews = reviewService.getByMemberId(member);
+        Member member = memberService.getById(memberId);
+        Map<String, Object> ratings = reviewService.getRatingMap(member.getId());
+        List<Review> reviews = reviewService.getByMemberId(member.getId());
 
         ResultActions resultActions = mvc
                 .perform(
@@ -173,9 +173,9 @@ public class ApiV1ReviewControllerGetTest {
                         get("/api/v1/reviews/member/mine"))
                 .andDo(print());
 
-        Member member = memberService.findByUsername("user1");
-        Map<String, Object> ratings = reviewService.getRatingMap(member);
-        List<Review> reviews = reviewService.getByMemberId(member);
+        Member member = memberService.getByUsername("user1");
+        Map<String, Object> ratings = reviewService.getRatingMap(member.getId());
+        List<Review> reviews = reviewService.getByMemberId(member.getId());
 
         resultActions
                 .andExpect(handler().handlerType(ApiReviewControllerV1.class))

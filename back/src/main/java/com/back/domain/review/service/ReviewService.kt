@@ -29,7 +29,7 @@ class ReviewService(
     private val tagRepository: TagRepository
 ) {
 
-    private fun getBookById(bookId: Long) : Book {
+    private fun getBookById(bookId: Long): Book {
 
         val book = bookRepository.findById(bookId).getOrElse {
             throw ServiceException("404-1", "존재하지 않는 도서입니다.")
@@ -37,7 +37,7 @@ class ReviewService(
         return book
     }
 
-    private fun getMemberById(memberId: Long) : Member {
+    private fun getMemberById(memberId: Long): Member {
 
         val member = memberRepository.findById(memberId).getOrElse {
             throw ServiceException("404-1", "존재하지 않는 회원입니다.")
@@ -46,12 +46,8 @@ class ReviewService(
         return member
     }
 
-    private fun getOrCreateTag(tagName: String) : Tag {
-        val tag = tagRepository.findByName(tagName)
-        if (tag.isPresent) return tag.get()
-
-        return tagRepository.save(Tag(tagName))
-    }
+    private fun getOrCreateTag(tagName: String): Tag =
+        tagRepository.findByName(tagName) ?: tagRepository.save(Tag(tagName))
 
     private fun refreshBookRating(book: Book) {
         val averageRating = reviewRepository.getAverageRatingByBook(book)
@@ -124,8 +120,10 @@ class ReviewService(
 
     @Transactional
     @Throws(ServiceException::class)
-    fun createReview(bookId: Long, actorId: Long,
-                     rating: Float, comment: String, tags: List<String>): Review {
+    fun createReview(
+        bookId: Long, actorId: Long,
+        rating: Float, comment: String, tags: List<String>
+    ): Review {
         val book = getBookById(bookId)
         val actor = getMemberById(actorId)
 
@@ -145,8 +143,10 @@ class ReviewService(
     }
 
     @Transactional
-    fun updateReview(reviewId: Long, reviewerId: Long,
-                     rating: Float, content: String, tags: List<String>) : Review {
+    fun updateReview(
+        reviewId: Long, reviewerId: Long,
+        rating: Float, content: String, tags: List<String>
+    ): Review {
 
         val review = getById(reviewId)
         val reviewer = getMemberById(reviewerId)

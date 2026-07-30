@@ -32,13 +32,13 @@ public class BookRankServiceTest {
         List<Book> bookRank = bookService.getBooksOrderByRank("reviewCnt", 0, 100);
 
         for (var book : bookRank) {
-            System.out.println("출력: " + book.id);
+            System.out.println("출력: " + book.getId());
         }
 
-        int upperCnt = reviewService.getReviewsByBookId(bookRank.getFirst().id).size();
+        int upperCnt = reviewService.getReviewsByBookId(bookRank.getFirst().getId()).size();
 
         for (int i = 1; i < bookRank.size(); i++) {
-            int nowCnt = reviewService.getReviewsByBookId(bookRank.get(i).id).size();
+            int nowCnt = reviewService.getReviewsByBookId(bookRank.get(i).getId()).size();
 
             assertThat(upperCnt).isGreaterThanOrEqualTo(nowCnt);
 
@@ -55,10 +55,10 @@ public class BookRankServiceTest {
 
         List<Book> bookRank = bookService.getBooksOrderByRank("rating", 0, 100);
 
-        double upperRating = bookService.getBook(bookRank.getFirst().id).getAverageRating();
+        double upperRating = bookService.getBook(bookRank.getFirst().getId()).getAverageRating();
 
         for (int i = 1; i < bookRank.size(); i++) {
-            double nowRating = bookService.getBook(bookRank.get(i).id).getAverageRating();
+            double nowRating = bookService.getBook(bookRank.get(i).getId()).getAverageRating();
 
             assertThat(upperRating).isGreaterThanOrEqualTo(nowRating);
 

@@ -62,7 +62,7 @@ public class ApiV1ReviewControllerPostTest {
 
         ResultActions resultActions = postReview(bookId, rating, content, tags);
 
-        Review review = reviewService.getLatest().get();
+        Review review = reviewService.getLatest();
 
         resultActions
                 .andExpect(handler().handlerType(ApiReviewControllerV1.class))

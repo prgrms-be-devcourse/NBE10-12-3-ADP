@@ -59,8 +59,15 @@ class MemberService(
             }
         }
 
-        val encodedPassword = passwordEncoder.encode(password)
-        return memberRepository.save(Member(username, encodedPassword, githubId, nickname, imgUrl))
+        return memberRepository.save(
+            Member(
+                username = username,
+                password = encodePasswordImplementation(password),
+                githubId = githubId,
+                nickname = nickname,
+                imgUrl = imgUrl
+            )
+        )
     }
 
     @Transactional
@@ -108,4 +115,7 @@ class MemberService(
     private fun modify(member: Member, nickname: String) {
         member.modify(nickname)
     }
+
+    private fun encodePasswordImplementation(password: String): String =
+        requireNotNull(passwordEncoder.encode(password))
 }

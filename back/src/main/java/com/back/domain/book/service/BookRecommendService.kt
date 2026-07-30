@@ -55,7 +55,7 @@ class BookRecommendService(
 
             reviewRepository
                 .findByBook(book.get(),PageRequest.of(0, 10))
-                .forEach { r: Review? -> members.add(r.reviewer) }
+                .forEach { r -> members.add(r.reviewer) }
         }
 
         for (reviewer in members) {

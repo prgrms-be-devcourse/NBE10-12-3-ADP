@@ -6,6 +6,7 @@ import com.back.domain.book.repository.BookRepository
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.context.annotation.Lazy
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.client.RestTemplate
@@ -22,6 +23,7 @@ class BookFetchService(
 ) {
 
     @Autowired
+    @Lazy
     private lateinit var self: BookFetchService
 
     @Value($$"${custom.book-fetch.api-keys}")
@@ -85,7 +87,7 @@ class BookFetchService(
 
             progress.incrementCallCount()
             progress.nextPage()
-            bookFetchProgressRepository.save<BookFetchProgress?>(progress)
+            bookFetchProgressRepository.save(progress)
 
             log.info(
                 "수집 완료 - apiKeyIndex: {}, page: {}, callCount: {}",
@@ -95,7 +97,7 @@ class BookFetchService(
             if (progress.dailyCallCount >= DAILY_LIMIT) {
                 log.info("API 키 {} 한도 소진. 다음 키로 전환합니다.", progress.currentApiKeyIndex)
                 progress.nextApiKeyIndex()
-                bookFetchProgressRepository.save<BookFetchProgress?>(progress)
+                bookFetchProgressRepository.save(progress)
             }
         } catch (e: java.lang.Exception) {
             log.error("도서 수집 중 오류 발생 - page: {}", progress.currentPage, e)
@@ -146,7 +148,7 @@ class BookFetchService(
             item.path("TITLE_URL").asText(null)
         )
 
-        bookRepository.save<com.back.domain.book.entity.Book?>(book)
+        bookRepository.save(book)
     }
 
     companion object {

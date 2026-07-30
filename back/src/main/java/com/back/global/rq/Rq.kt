@@ -3,6 +3,7 @@ package com.back.global.rq
 import com.back.domain.member.entity.Member
 import com.back.domain.member.entity.Role
 import com.back.domain.member.service.MemberService
+import com.back.global.exception.ServiceException
 import com.back.global.security.SecurityUser
 import jakarta.servlet.http.Cookie
 import jakarta.servlet.http.HttpServletRequest
@@ -26,17 +27,23 @@ class Rq(
     @Value($$"${custom.security.cookieDomain}")
     private val cookieDomain: String? = null
 
-    val actor: Member?
-        get() = SecurityContextHolder
-            .getContext()
-            .authentication
-            ?.principal
-            ?.let {
-                if (it is SecurityUser) { Member(it.id, it.username, it.name,
-                    if (hasAdminAuthority(it.authorities)) Role.ADMIN else Role.USER)}
-                else null
-            }
+    val actor: Member
+        get() {
+            val principal = SecurityContextHolder
+                .getContext()
+                .authentication
+                ?.principal
 
+            if (principal == null || principal !is SecurityUser)
+                throw ServiceException("401-1", "로그인이 필요합니다.")
+
+            return Member(
+                id = principal.id,
+                username = principal.username,
+                name = principal.name,
+                role = if (hasAdminAuthority(principal.authorities)) Role.ADMIN else Role.USER
+            )
+        }
 
     private fun hasAdminAuthority(authorities: Collection<GrantedAuthority>): Boolean {
         return authorities.any { authority -> "ROLE_ADMIN" == authority.authority }
@@ -92,10 +99,6 @@ class Rq(
         resp.sendRedirect(url)
     }
 
-    val actorFromDb: Member?
-        get() {
-            val actor = this.actor ?: return null
-
-            return memberService.getById(actor.id)
-        }
+    val actorFromDb: Member
+        get() = memberService.getById(actor.id)
 }
