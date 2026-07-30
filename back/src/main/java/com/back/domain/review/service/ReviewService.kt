@@ -56,7 +56,7 @@ class ReviewService(
     private fun refreshBookRating(book: Book) {
         val averageRating = reviewRepository.getAverageRatingByBook(book)
         val reviewCount = reviewRepository.countByBook(book)
-        book.refreshRating(averageRating, reviewCount)
+        book.updateRating(averageRating, reviewCount)
     }
 
 
