@@ -5,9 +5,9 @@ import org.springframework.security.core.userdetails.User
 import org.springframework.security.oauth2.core.user.OAuth2User
 
 class SecurityUser(
-    private val id: Long,
+    val id: Long,
     username: String,
-    private val name: String,
+    val name: String,
     authorities: Collection<GrantedAuthority>
 ) : User(username, "", authorities), OAuth2User {
 

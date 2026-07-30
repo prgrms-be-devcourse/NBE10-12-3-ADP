@@ -8,12 +8,10 @@ import jakarta.servlet.http.Cookie
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import org.springframework.beans.factory.annotation.Value
-import org.springframework.security.core.Authentication
 import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Component
 import java.util.*
-import java.util.function.Function
 import java.util.function.Predicate
 
 @Component
@@ -36,7 +34,8 @@ class Rq(
             .authentication
             ?.principal
             ?.let {
-                if (it is SecurityUser) { Member(it.id, it.username, it.name)}
+                if (it is SecurityUser) { Member(it.id, it.username, it.name,
+                    if (hasAdminAuthority(it.authorities)) Role.ADMIN else Role.USER)}
                 else null
             }
 
