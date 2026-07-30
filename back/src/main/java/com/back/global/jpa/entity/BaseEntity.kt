@@ -24,10 +24,10 @@ abstract class BaseEntity(
     @LastModifiedDate
     lateinit var modifiedDate: LocalDateTime
 
-    override fun equals(o: Any?): Boolean {
-        if (o === this) return true
-        if (o == null || javaClass != o.javaClass) return false
-        val that = o as BaseEntity
+    override fun equals(other: Any?): Boolean {
+        if (other === this) return true
+        if (other == null || javaClass != other.javaClass) return false
+        val that = other as BaseEntity
         return id == that.id
     }
 

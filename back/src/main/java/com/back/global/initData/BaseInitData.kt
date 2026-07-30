@@ -88,70 +88,70 @@ class BaseInitData(
         wishService.addWish(memberUser2, book2)
         wishService.addWish(memberUser3, book3)
 
-        reviewService.addReview(
+        reviewService.createReview(
             book1.id,
-            memberUser1,
+            memberUser1.id,
             4.0f,
             "comment",
-            mutableListOf<String?>("a", "b")
+            listOf("a", "b")
         )
-        reviewService.addReview(
+        reviewService.createReview(
             book2.id,
-            memberUser1,
+            memberUser1.id,
             3.5f,
             "",
-            mutableListOf<String?>("Java", "Spring", "신입 개발자")
+            listOf("Java", "Spring", "신입 개발자")
         )
-        reviewService.addReview(
+        reviewService.createReview(
             book3.id,
-            memberUser1,
+            memberUser1.id,
             1.5f,
             "많이 아쉬운 책입니다..",
-            mutableListOf<String?>("소설", "감자")
+            listOf("소설", "감자")
         )
-        reviewService.addReview(
+        reviewService.createReview(
             book4.id,
-            memberUser1,
+            memberUser1.id,
             4.5f,
             "",
-            mutableListOf<String?>("소설")
+            listOf("소설")
         )
 
-        reviewService.addReview(
+        reviewService.createReview(
             book2.id,
-            memberUser2,
+            memberUser2.id,
             3.5f,
             "",
-            mutableListOf<String?>("Java", "Spring", "신입 개발자")
+            listOf("Java", "Spring", "신입 개발자")
         )
-        reviewService.addReview(
+        reviewService.createReview(
             book3.id,
-            memberUser2,
+            memberUser2.id,
             1.5f,
             "많이 아쉬운 책입니다..",
-            mutableListOf<String?>("소설", "감자")
+            listOf("소설", "감자")
         )
-        reviewService.addReview(
+        reviewService.createReview(
             book4.id,
-            memberUser2,
+            memberUser2.id,
             4.5f,
             "",
-            mutableListOf<String?>("소설")
+            listOf("소설")
         )
 
-        reviewService.addReview(
+        reviewService.createReview(
             book2.id,
-            memberUser3,
+            memberUser3.id,
             3.5f,
             "",
-            mutableListOf<String?>("Java", "Spring", "신입 개발자")
+            listOf("Java", "Spring", "신입 개발자")
         )
-        reviewService.addReview(
+        reviewService.createReview(
             book3.id,
-            memberUser3,
+            memberUser3.id,
             1.5f,
             "많이 아쉬운 책입니다..",
-            mutableListOf<String?>("소설", "감자")
+            listOf("소설", "감자")
         )
     }
 }
