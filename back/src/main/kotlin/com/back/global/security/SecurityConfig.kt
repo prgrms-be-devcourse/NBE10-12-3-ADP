@@ -52,6 +52,7 @@ class SecurityConfig(
                 authorize(HttpMethod.POST,"/api/*/members", permitAll)
 
                 authorize(HttpMethod.PUT, "/api/*/books/{id:\\d+}", hasRole("ADMIN"))
+                authorize(HttpMethod.DELETE, "/api/*/books/{id:\\d+}", hasRole("ADMIN"))
                 authorize("/api/*/members/admin", hasRole("ADMIN"))
                 authorize("/api/*/members/admin/**", hasRole("ADMIN"))
                 authorize("/api/*/reviews/admin", hasRole("ADMIN"))
