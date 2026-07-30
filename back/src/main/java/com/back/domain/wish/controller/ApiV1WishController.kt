@@ -2,9 +2,9 @@ package com.back.domain.wish.controller
 
 import com.back.domain.book.dto.BookWithTagDto
 import com.back.domain.book.service.BookService
-import com.back.domain.member.service.MemberService
 import com.back.domain.tag.service.TagService
 import com.back.domain.wish.service.WishService
+import com.back.global.exception.ServiceException
 import com.back.global.rq.Rq
 import com.back.global.rsData.RsData
 import io.swagger.v3.oas.annotations.Operation
@@ -26,7 +26,6 @@ import org.springframework.web.bind.annotation.RestController
 @SecurityRequirement(name = "bearerAuth")
 class ApiV1WishController(
     private val wishService: WishService,
-    private val memberService: MemberService,
     private val bookService: BookService,
     private val rq: Rq,
     private val tagService: TagService
@@ -35,7 +34,7 @@ class ApiV1WishController(
     @GetMapping("/mine")
     @Operation(summary = "내 찜 목록 조회")
     fun getWishes(): List<BookWithTagDto> {
-        val actor = memberService.getById(rq.actor.getId())
+        val actor = rq.actorFromDb ?: throw ServiceException("401-1", "로그인이 필요합니다.")
 
         return wishService
             .findByMember(actor)
@@ -50,7 +49,8 @@ class ApiV1WishController(
     ): RsData<Void> {
         val book = bookService.getBook(id)
 
-        wishService.addWish(rq.actorFromDb, book)
+        val actor = rq.actorFromDb ?: throw ServiceException("401-1", "로그인이 필요합니다.")
+        wishService.addWish(actor, book)
 
         return RsData("201-1", "찜 추가 성공")
     }
@@ -63,7 +63,8 @@ class ApiV1WishController(
     ): RsData<Void> {
         val book = bookService.getBook(id)
 
-        wishService.deleteWish(rq.actorFromDb, book)
+        val actor = rq.actorFromDb ?: throw ServiceException("401-1", "로그인이 필요합니다.")
+        wishService.deleteWish(actor, book)
 
         return RsData("200-1", "찜 삭제 성공")
     }
