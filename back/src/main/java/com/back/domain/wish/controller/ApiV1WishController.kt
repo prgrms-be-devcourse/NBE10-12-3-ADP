@@ -1,0 +1,71 @@
+package com.back.domain.wish.controller
+
+import com.back.domain.book.dto.BookWithTagDto
+import com.back.domain.book.service.BookService
+import com.back.domain.tag.service.TagService
+import com.back.domain.wish.service.WishService
+import com.back.global.exception.ServiceException
+import com.back.global.rq.Rq
+import com.back.global.rsData.RsData
+import io.swagger.v3.oas.annotations.Operation
+import io.swagger.v3.oas.annotations.security.SecurityRequirement
+import io.swagger.v3.oas.annotations.tags.Tag
+import jakarta.validation.Valid
+import org.springframework.transaction.annotation.Transactional
+import org.springframework.web.bind.annotation.DeleteMapping
+import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PathVariable
+import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RestController
+
+@RestController
+@RequestMapping("/api/v1/wishes")
+@Transactional(readOnly = true)
+@Tag(name = "ApiV1WishController", description = "API 찜 컨트롤러")
+@SecurityRequirement(name = "bearerAuth")
+class ApiV1WishController(
+    private val wishService: WishService,
+    private val bookService: BookService,
+    private val rq: Rq,
+    private val tagService: TagService
+) {
+
+    @GetMapping("/mine")
+    @Operation(summary = "내 찜 목록 조회")
+    fun getWishes(): List<BookWithTagDto> {
+        val actor = rq.actorFromDb ?: throw ServiceException("401-1", "로그인이 필요합니다.")
+
+        return wishService
+            .findByMember(actor)
+            .map { BookWithTagDto(it.book, bookService.getBookTags(it.book)) }
+    }
+
+    @PostMapping("/book/{id}")
+    @Operation(summary = "찜 목록 추가")
+    @Transactional
+    fun addWish(
+        @PathVariable @Valid id: Long
+    ): RsData<Void> {
+        val book = bookService.getBook(id)
+
+        val actor = rq.actorFromDb ?: throw ServiceException("401-1", "로그인이 필요합니다.")
+        wishService.addWish(actor, book)
+
+        return RsData("201-1", "찜 추가 성공")
+    }
+
+    @DeleteMapping("/book/{id}")
+    @Transactional
+    @Operation(summary = "찜 목록 삭제")
+    fun deleteWish(
+        @PathVariable @Valid id: Long
+    ): RsData<Void> {
+        val book = bookService.getBook(id)
+
+        val actor = rq.actorFromDb ?: throw ServiceException("401-1", "로그인이 필요합니다.")
+        wishService.deleteWish(actor, book)
+
+        return RsData("200-1", "찜 삭제 성공")
+    }
+}
