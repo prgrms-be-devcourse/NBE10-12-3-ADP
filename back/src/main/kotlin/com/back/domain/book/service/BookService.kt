@@ -68,7 +68,7 @@ class BookService(
 
     @Transactional
     fun incrementViewCount(book: Book) {
-        if (rq.getCookieValue("viewed:%d".format(book.id), "") == "true") {
+        if (rq.getCookieValue("viewed-%d".format(book.id), "") == "true") {
             return
         }
 
@@ -77,7 +77,7 @@ class BookService(
 
         updateBooksViewCountInDb(book, book.viewCount + 1)
 
-        rq.setCookie("viewed:%d".format(book.id), "true", 60)
+        rq.setCookie("viewed-%d".format(book.id), "true", 60)
 
     }
 

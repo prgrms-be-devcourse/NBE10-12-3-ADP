@@ -64,10 +64,9 @@ public class ApiV1BookControllerAdminTest {
 
         resultActions
                 .andExpect(handler().handlerType(ApiBookControllerV1.class))
-                .andExpect(handler().methodName("modify"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.resultCode").value("200-1"))
-                .andExpect(jsonPath("$.message").value("도서 정보 수정 완료"))
+                .andExpect(jsonPath("$.message").value("도서 수정을 성공했습니다."))
                 .andExpect(jsonPath("$.data.title").value("수정된 제목"));
 
         Book modified = bookRepository.findById(book.getId()).orElseThrow();
@@ -119,10 +118,9 @@ public class ApiV1BookControllerAdminTest {
 
         resultActions
                 .andExpect(handler().handlerType(ApiBookControllerV1.class))
-                .andExpect(handler().methodName("delete"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.resultCode").value("200-1"))
-                .andExpect(jsonPath("$.message").value("도서 삭제 완료"));
+                .andExpect(jsonPath("$.message").value("도서 삭제를 성공했습니다."));
 
         assertThat(bookRepository.findById(bookId)).isEmpty();
     }

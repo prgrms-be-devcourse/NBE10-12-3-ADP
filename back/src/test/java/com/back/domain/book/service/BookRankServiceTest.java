@@ -52,7 +52,6 @@ public class BookRankServiceTest {
     @DisplayName("평점 기반 도서 순위 조회")
     void t2(){
 
-
         List<Book> bookRank = bookService.getBooksOrderByRank("rating", 0, 100);
 
         double upperRating = bookService.getBook(bookRank.getFirst().getId()).getAverageRating();
