@@ -1,0 +1,157 @@
+package com.back.global.initData
+
+import com.back.domain.book.repository.BookRepository
+import com.back.domain.book.service.BookService
+import com.back.domain.member.service.MemberService
+import com.back.domain.review.service.ReviewService
+import com.back.domain.wish.service.WishService
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.ApplicationArguments
+import org.springframework.boot.ApplicationRunner
+import org.springframework.context.annotation.Bean
+import org.springframework.context.annotation.Configuration
+import org.springframework.context.annotation.Lazy
+import org.springframework.context.annotation.Profile
+import org.springframework.transaction.annotation.Transactional
+
+@Profile("dev", "test")
+@Configuration
+
+class BaseInitData(
+    private val memberService: MemberService,
+    private val bookRepository: BookRepository,
+    private val wishService: WishService,
+    private val reviewService: ReviewService,
+    private val bookService: BookService
+){
+
+    @Lazy
+    @Autowired
+    private lateinit var self: BaseInitData
+
+    @Bean
+    fun baseInitDataApplicationRunner(): ApplicationRunner {
+        return ApplicationRunner { args: ApplicationArguments ->
+            self.work1()
+        }
+    }
+
+    @Transactional
+    fun work1() {
+        if (memberService.count() > 0) return
+
+        val memberSystem = memberService.join("system", "1234", null, "시스템", null)
+        memberSystem.modifyRefreshToken(memberSystem.username)
+        memberSystem.grantAdmin()
+
+        val memberAdmin = memberService.join("admin", "1234", null, "관리자", null)
+        memberAdmin.modifyRefreshToken(memberAdmin.username)
+        memberAdmin.grantAdmin()
+
+        val memberUser1 = memberService.join("user1", "1234", "githubuser1", null)
+        memberUser1.modifyRefreshToken(memberUser1.username)
+
+        val memberUser2 = memberService.join("user2", "1234", "githubuser2", null)
+        memberUser2.modifyRefreshToken(memberUser2.username)
+
+        val memberUser3 = memberService.join("user3", "1234", "githubuser3", null)
+        memberUser3.modifyRefreshToken(memberUser3.username)
+
+        val book1 = bookRepository.save<com.back.domain.book.entity.Book>(
+            com.back.domain.book.entity.Book(
+                "책제목", "책설명", "isbn1", "작가",
+                java.time.LocalDateTime.now(), "출판사", ""
+            )
+        )
+        val book2 = bookRepository.save<com.back.domain.book.entity.Book>(
+            com.back.domain.book.entity.Book(
+                "책제목2", "책설명", "isbn2", "작가",
+                java.time.LocalDateTime.now(), "출판사", ""
+            )
+        )
+
+        val book3 = bookRepository.save<com.back.domain.book.entity.Book>(
+            com.back.domain.book.entity.Book(
+                "책제목3", "책설명", "isbn3", "작가",
+                java.time.LocalDateTime.now(), "출판사", ""
+            )
+        )
+
+        val book4 = bookRepository.save<com.back.domain.book.entity.Book>(
+            com.back.domain.book.entity.Book(
+                "책제목4", "책설명", "isbn4", "작가",
+                java.time.LocalDateTime.now(), "출판사", ""
+            )
+        )
+
+        wishService.addWish(memberUser1, book1)
+        wishService.addWish(memberUser2, book2)
+        wishService.addWish(memberUser3, book3)
+
+        reviewService.createReview(
+            book1.id,
+            memberUser1.id,
+            4.0f,
+            "comment",
+            listOf("a", "b")
+        )
+        reviewService.createReview(
+            book2.id,
+            memberUser1.id,
+            3.5f,
+            "",
+            listOf("Java", "Spring", "신입 개발자")
+        )
+        reviewService.createReview(
+            book3.id,
+            memberUser1.id,
+            1.5f,
+            "많이 아쉬운 책입니다..",
+            listOf("소설", "감자")
+        )
+        reviewService.createReview(
+            book4.id,
+            memberUser1.id,
+            4.5f,
+            "",
+            listOf("소설")
+        )
+
+        reviewService.createReview(
+            book2.id,
+            memberUser2.id,
+            3.5f,
+            "",
+            listOf("Java", "Spring", "신입 개발자")
+        )
+        reviewService.createReview(
+            book3.id,
+            memberUser2.id,
+            1.5f,
+            "많이 아쉬운 책입니다..",
+            listOf("소설", "감자")
+        )
+        reviewService.createReview(
+            book4.id,
+            memberUser2.id,
+            4.5f,
+            "",
+            listOf("소설")
+        )
+
+        reviewService.createReview(
+            book2.id,
+            memberUser3.id,
+            3.5f,
+            "",
+            listOf("Java", "Spring", "신입 개발자")
+        )
+        reviewService.createReview(
+            book3.id,
+            memberUser3.id,
+            1.5f,
+            "많이 아쉬운 책입니다..",
+            listOf("소설", "감자")
+        )
+    }
+}

@@ -1,6 +1,5 @@
 package com.back.domain.book.service;
 
-import com.back.domain.book.dto.BookDto;
 import com.back.domain.book.entity.Book;
 import com.back.domain.review.service.ReviewService;
 import org.junit.jupiter.api.DisplayName;
@@ -23,8 +22,6 @@ public class BookRankServiceTest {
 
     @Autowired
     private ReviewService reviewService;
-    @Autowired
-    private BookRankService bookRankService;
     @Autowired
     private BookService bookService;
 

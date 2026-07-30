@@ -34,7 +34,9 @@ class BookRecommendService(
             .map { review: Review -> this.reviewToRecommendReview(review) }
     }
 
-    fun getBooksByRecommend(actor: Member): List<Book> {
+    fun getBooksByRecommend(actor: Member?): List<Book> {
+        if (actor == null) return listOf()
+
         val recommendSystem = SimilarityRecommendByRating()
 
         val recentReviews: List<Review> = reviewRepository
