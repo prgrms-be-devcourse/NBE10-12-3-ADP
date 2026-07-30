@@ -41,21 +41,21 @@ class BaseInitData(
         if (memberService.count() > 0) return
 
         val memberSystem = memberService.join("system", "1234", null, "시스템", null)
-        memberSystem.modifyRefreshToken(memberSystem.username)
+        memberSystem.modifyRefreshToken("system")
         memberSystem.grantAdmin()
 
         val memberAdmin = memberService.join("admin", "1234", null, "관리자", null)
-        memberAdmin.modifyRefreshToken(memberAdmin.username)
+        memberAdmin.modifyRefreshToken("admin")
         memberAdmin.grantAdmin()
 
         val memberUser1 = memberService.join("user1", "1234", "githubuser1", null)
-        memberUser1.modifyRefreshToken(memberUser1.username)
+        memberUser1.modifyRefreshToken("user1")
 
         val memberUser2 = memberService.join("user2", "1234", "githubuser2", null)
-        memberUser2.modifyRefreshToken(memberUser2.username)
+        memberUser2.modifyRefreshToken("user2")
 
         val memberUser3 = memberService.join("user3", "1234", "githubuser3", null)
-        memberUser3.modifyRefreshToken(memberUser3.username)
+        memberUser3.modifyRefreshToken("user3")
 
         val book1 = bookRepository.save<com.back.domain.book.entity.Book>(
             com.back.domain.book.entity.Book(
