@@ -31,23 +31,15 @@ class Rq(
     private val cookieDomain: String? = null
 
     val actor: Member?
-        get() = Optional.ofNullable<Authentication>(
-            SecurityContextHolder
-                .getContext()
-                .authentication
-        )
-            .map<Any>(Function { obj: Authentication -> obj.principal })
-            .filter { principal: Any -> principal is SecurityUser }
-            .map(Function { principal: Any? -> principal as SecurityUser })
-            .map(Function { securityUser: SecurityUser ->
-                Member(
-                    securityUser.id,
-                    securityUser.username,
-                    securityUser.name,
-                    if (hasAdminAuthority(securityUser.authorities)) Role.ADMIN else Role.USER
-                )
-            })
-            .orElse(null)
+        get() = SecurityContextHolder
+            .getContext()
+            .authentication
+            ?.principal
+            ?.let {
+                if (it is SecurityUser) { Member(it.id, it.username, it.name)}
+                else null
+            }
+
 
     private fun hasAdminAuthority(authorities: MutableCollection<out GrantedAuthority?>): Boolean {
         return authorities.stream()
