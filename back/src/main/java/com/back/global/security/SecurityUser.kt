@@ -7,10 +7,11 @@ import org.springframework.security.oauth2.core.user.OAuth2User
 class SecurityUser(
     val id: Long,
     username: String,
-    val name: String,
+    name: String,
     authorities: Collection<GrantedAuthority>
 ) : User(username, "", authorities), OAuth2User {
+    private val _name = name
 
     override fun getAttributes() = mapOf<String, Any>()
-    override fun getName() = name
+    override fun getName() = _name
 }
