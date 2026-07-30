@@ -26,7 +26,7 @@ class ApiMemberControllerV1(
     @Operation(summary = "내 정보 조회")
     @SecurityRequirement(name = "bearerAuth")
     fun me(): MemberWithUsernameAndWidgetLinkDto {
-        val actor = memberService.getById(rq.actor.getId())
+        val actor = memberService.getById(rq.actor.id)
         return MemberWithUsernameAndWidgetLinkDto(actor)
     }
 
@@ -48,8 +48,8 @@ class ApiMemberControllerV1(
     @DeleteMapping
     @Operation(summary = "회원 탈퇴")
     @SecurityRequirement(name = "bearerAuth")
-    fun delete(): RsData<Void> {
-        memberService.delete(rq.actor.getId())
+    fun delete(): RsData<Unit> {
+        memberService.delete(rq.actor.id)
 
         rq.deleteCookie("refreshToken")
         rq.deleteCookie("accessToken")
@@ -113,7 +113,7 @@ class ApiMemberControllerV1(
     @DeleteMapping("/logout")
     @Operation(summary = "로그아웃")
     @SecurityRequirement(name = "bearerAuth")
-    fun logout(): RsData<Void> {
+    fun logout(): RsData<Unit> {
         rq.deleteCookie("refreshToken")
         rq.deleteCookie("accessToken")
 
@@ -135,7 +135,7 @@ class ApiMemberControllerV1(
     @SecurityRequirement(name = "bearerAuth")
     fun deleteMember(
         @PathVariable id: Long
-    ): RsData<Void> {
+    ): RsData<Unit> {
         memberService.delete(id)
 
         return RsData("200-1", "회원 강제 탈퇴를 성공했습니다.")
