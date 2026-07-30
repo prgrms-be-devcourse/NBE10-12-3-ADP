@@ -8,13 +8,9 @@ import jakarta.servlet.http.Cookie
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import org.springframework.beans.factory.annotation.Value
-import org.springframework.security.core.Authentication
 import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Component
-import java.util.*
-import java.util.function.Function
-import java.util.function.Predicate
 
 @Component
 class Rq(
@@ -36,21 +32,18 @@ class Rq(
             .authentication
             ?.principal
             ?.let {
-                if (it is SecurityUser) { Member(it.id, it.username, it.name)}
+                if (it is SecurityUser) { Member(it.id, it.username, it.name,
+                    if (hasAdminAuthority(it.authorities)) Role.ADMIN else Role.USER)}
                 else null
             }
 
 
-    private fun hasAdminAuthority(authorities: MutableCollection<out GrantedAuthority?>): Boolean {
-        return authorities.stream()
-            .anyMatch { authority: GrantedAuthority? -> "ROLE_ADMIN" == authority!!.authority }
+    private fun hasAdminAuthority(authorities: Collection<GrantedAuthority>): Boolean {
+        return authorities.any { authority -> "ROLE_ADMIN" == authority.authority }
     }
 
-    fun getHeader(name: String?, defaultValue: String?): String? {
-        return Optional
-            .ofNullable<String?>(req.getHeader(name))
-            .filter(Predicate { headerValue: String? -> !headerValue!!.isBlank() })
-            .orElse(defaultValue)
+    fun getHeader(name: String, defaultValue: String): String {
+        return req.getHeader(name) ?: defaultValue
     }
 
     fun setHeader(name: String?, value: String?) {
@@ -63,16 +56,12 @@ class Rq(
         }
     }
 
-    fun getCookieValue(name: String, defaultValue: String?): String? {
-        return Arrays.stream<Cookie?>(
-            Optional.ofNullable<Array<Cookie?>?>(req.cookies).orElse(arrayOfNulls(0))
-        )
-            .filter { cookie: Cookie? -> name == cookie!!.name }
-            .map { obj: Cookie? -> obj!!.value }
-            .filter { value: String? -> !value.isNullOrBlank() }
-            .findFirst()
-            .orElse(defaultValue)
-    }
+    fun getCookieValue(name: String, defaultValue: String): String =
+        req.cookies
+            ?.firstOrNull {it.name == name}
+            ?.value
+            ?.takeIf {it.isNotBlank()}
+            ?: defaultValue
 
     fun setCookie(name: String?, value: String?, maxAge: Int) {
         var value = value
