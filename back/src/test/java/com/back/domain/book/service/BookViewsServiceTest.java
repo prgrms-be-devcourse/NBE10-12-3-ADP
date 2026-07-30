@@ -20,7 +20,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 public class BookViewsServiceTest {
 
     @Autowired
-    private BookViewsService bookViewsService;
+    private BookService bookService;
 
 //    @Test
 //    @DisplayName("조회수 기반 도서 순위 조회")

@@ -1,6 +1,7 @@
 package com.back.domain.book.service;
 
 import com.back.domain.book.dto.BookDto;
+import com.back.domain.book.entity.Book;
 import com.back.domain.review.service.ReviewService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -31,16 +32,16 @@ public class BookRankServiceTest {
     @DisplayName("리뷰 수 기반 도서 순위 조회")
     void t1() {
 
-        List<BookDto> bookRank = bookRankService.getBooksOrderByReviewCnt(0, 100);
+        List<Book> bookRank = bookService.getBooksOrderByRank("reviewCnt", 0, 100);
 
         for (var book : bookRank) {
             System.out.println("출력: " + book.id);
         }
 
-        int upperCnt = reviewService.findByBookId(bookRank.getFirst().id).size();
+        int upperCnt = reviewService.getReviewsByBookId(bookRank.getFirst().id).size();
 
         for (int i = 1; i < bookRank.size(); i++) {
-            int nowCnt = reviewService.findByBookId(bookRank.get(i).id).size();
+            int nowCnt = reviewService.getReviewsByBookId(bookRank.get(i).id).size();
 
             assertThat(upperCnt).isGreaterThanOrEqualTo(nowCnt);
 
@@ -54,7 +55,9 @@ public class BookRankServiceTest {
     @DisplayName("평점 기반 도서 순위 조회")
     void t2(){
 
-        List<BookDto> bookRank = bookRankService.getBooksOrderByRating(0, 100);
+
+        List<Book> bookRank = bookService.getBooksOrderByRank("rating", 0, 100);
+
         double upperRating = bookService.getBook(bookRank.getFirst().id).getAverageRating();
 
         for (int i = 1; i < bookRank.size(); i++) {
