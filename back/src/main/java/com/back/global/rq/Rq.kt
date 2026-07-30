@@ -31,18 +31,18 @@ class Rq(
     private val cookieDomain: String? = null
 
     val actor: Member?
-        get() = Optional.ofNullable<Authentication?>(
+        get() = Optional.ofNullable<Authentication>(
             SecurityContextHolder
                 .getContext()
                 .authentication
         )
-            .map<Any?>(Function { obj: Authentication? -> obj!!.principal })
-            .filter { principal: Any? -> principal is SecurityUser }
+            .map<Any>(Function { obj: Authentication -> obj.principal })
+            .filter { principal: Any -> principal is SecurityUser }
             .map(Function { principal: Any? -> principal as SecurityUser })
-            .map(Function { securityUser: SecurityUser? ->
+            .map(Function { securityUser: SecurityUser ->
                 Member(
                     securityUser.id,
-                    securityUser!!.username,
+                    securityUser.username,
                     securityUser.name,
                     if (hasAdminAuthority(securityUser.authorities)) Role.ADMIN else Role.USER
                 )
@@ -62,8 +62,7 @@ class Rq(
     }
 
     fun setHeader(name: String?, value: String?) {
-        var value = value
-        if (value == null) value = ""
+        val value = value ?: ""
 
         if (value.isBlank()) {
             req.removeAttribute(name)
@@ -116,6 +115,6 @@ class Rq(
         get() {
             val actor = this.actor ?: return null
 
-            return memberService.findById(actor.id)
+            return memberService.getById(actor.id)
         }
 }

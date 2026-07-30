@@ -22,8 +22,7 @@ import org.springframework.web.servlet.resource.NoResourceFoundException
 class GlobalExceptionHandler {
     @ExceptionHandler(NoSuchElementException::class)
     fun handle(ex: NoSuchElementException): ResponseEntity<RsData<Void?>> {
-        var message = ex.message
-        if (message == null) message = "해당 데이터가 존재하지 않습니다."
+        val message = ex.message ?: "해당 데이터가 존재하지 않습니다."
 
         return ResponseEntity(
             RsData("404-1", message),
@@ -97,8 +96,8 @@ class GlobalExceptionHandler {
     fun handle(
         ex: ServiceException,
         response: HttpServletResponse
-    ): RsData<Void?> {
-        val rsData: RsData<Void?> = ex.rsData
+    ): RsData<Void> {
+        val rsData: RsData<Void> = ex.rsData
         response.status = rsData.statusCode
         return rsData
     }
