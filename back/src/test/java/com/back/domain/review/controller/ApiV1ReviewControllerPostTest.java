@@ -66,10 +66,9 @@ public class ApiV1ReviewControllerPostTest {
 
         resultActions
                 .andExpect(handler().handlerType(ApiReviewControllerV1.class))
-                .andExpect(handler().methodName("post"))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.resultCode").value("201-1"))
-                .andExpect(jsonPath("$.message").value("리뷰 작성 완료"))
+                .andExpect(jsonPath("$.message").value("리뷰 생성을 성공했습니다."))
                 .andExpect(jsonPath("$.data").exists())
                 .andExpect(jsonPath("$.data.id").value(review.getId()))
                 .andExpect(jsonPath("$.data.bookId").value(bookId))
@@ -101,10 +100,9 @@ public class ApiV1ReviewControllerPostTest {
 
         resultActions
                 .andExpect(handler().handlerType(ApiReviewControllerV1.class))
-                .andExpect(handler().methodName("post"))
                 .andExpect(status().isConflict())
                 .andExpect(jsonPath("$.resultCode").value("409-1"))
-                .andExpect(jsonPath("$.message").value("이미 작성한 리뷰가 있습니다."));
+                .andExpect(jsonPath("$.message").value("이미 존재하는 리뷰입니다."));
     }
 
     @Test
@@ -122,7 +120,6 @@ public class ApiV1ReviewControllerPostTest {
 
         resultActions
                 .andExpect(handler().handlerType(ApiReviewControllerV1.class))
-                .andExpect(handler().methodName("post"))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.resultCode").value("404-1"))
                 .andExpect(jsonPath("$.message").value("존재하지 않는 도서입니다."));

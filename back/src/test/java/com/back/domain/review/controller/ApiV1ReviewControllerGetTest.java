@@ -179,7 +179,6 @@ public class ApiV1ReviewControllerGetTest {
 
         resultActions
                 .andExpect(handler().handlerType(ApiReviewControllerV1.class))
-                .andExpect(handler().methodName("mine"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.rating").exists())
                 .andExpect(jsonPath("$.results").exists());

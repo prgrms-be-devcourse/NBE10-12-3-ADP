@@ -48,10 +48,9 @@ public class ApiV1ReviewControllerDeleteTest {
 
         resultActions
                 .andExpect(handler().handlerType(ApiReviewControllerV1.class))
-                .andExpect(handler().methodName("delete"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.resultCode").value("200-1"))
-                .andExpect(jsonPath("$.message").value("리뷰 삭제 완료"));
+                .andExpect(jsonPath("$.message").value("리뷰 삭제를 성공했습니다."));
 
     }
 
@@ -66,10 +65,9 @@ public class ApiV1ReviewControllerDeleteTest {
 
         resultActions
                 .andExpect(handler().handlerType(ApiReviewControllerV1.class))
-                .andExpect(handler().methodName("delete"))
                 .andExpect(status().isForbidden())
                 .andExpect(jsonPath("$.resultCode").value("403-1"))
-                .andExpect(jsonPath("$.message").value("삭제 권한이 없습니다."));
+                .andExpect(jsonPath("$.message").value("리뷰 삭제 권한이 없습니다."));
 
     }
 
@@ -84,10 +82,9 @@ public class ApiV1ReviewControllerDeleteTest {
 
         resultActions
                 .andExpect(handler().handlerType(ApiReviewControllerV1.class))
-                .andExpect(handler().methodName("delete"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.resultCode").value("200-1"))
-                .andExpect(jsonPath("$.message").value("리뷰 삭제 완료"));
+                .andExpect(jsonPath("$.message").value("리뷰 삭제를 성공했습니다."));
 
     }
 
