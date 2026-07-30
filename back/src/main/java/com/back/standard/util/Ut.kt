@@ -12,7 +12,7 @@ import java.util.LinkedHashMap
 object Ut {
     object jwt {
         @JvmStatic
-        fun toString(secret: String, expireSeconds: Int, body: Map<String, Any>): String {
+        fun toString(secret: String, expireSeconds: Int, body: Map<String, Any?>): String {
             val claimsBuilder = Jwts.claims()
 
             for ((key, value) in body) {
