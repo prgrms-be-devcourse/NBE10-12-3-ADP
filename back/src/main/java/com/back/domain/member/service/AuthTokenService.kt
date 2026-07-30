@@ -14,7 +14,7 @@ class AuthTokenService {
     private lateinit var secret: String
 
     fun genAccessToken(member: Member): String {
-        val id = member.getId()
+        val id = member.id
         val username = member.username
         val name = member.name
         val role = member.role.name

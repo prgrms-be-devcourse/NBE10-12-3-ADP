@@ -15,13 +15,13 @@ class AdminMemberDto(
     @field:NotNull val createdDate: LocalDateTime
 ) : MemberDto(id, githubId, githubLink) {
     constructor(member: Member) : this(
-        member.getId(),
+        member.id,
         member.githubId,
         member.githubLink,
         member.username,
         member.nickname,
         member.isAdmin,
         member.isDeleted,
-        member.getCreatedDate()
+        member.createdDate
     )
 }

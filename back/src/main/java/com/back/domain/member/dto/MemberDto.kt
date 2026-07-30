@@ -9,7 +9,7 @@ open class MemberDto(
     val githubLink: String?
 ) {
     constructor(member: Member) : this(
-        member.getId(),
+        member.id,
         member.githubId,
         member.githubLink
     )
