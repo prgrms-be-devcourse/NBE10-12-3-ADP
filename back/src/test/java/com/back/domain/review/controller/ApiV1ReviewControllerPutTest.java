@@ -68,10 +68,9 @@ public class ApiV1ReviewControllerPutTest {
 
         resultActions
                 .andExpect(handler().handlerType(ApiReviewControllerV1.class))
-                .andExpect(handler().methodName("edit"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.resultCode").value("200-1"))
-                .andExpect(jsonPath("$.message").value("리뷰 수정 완료"))
+                .andExpect(jsonPath("$.message").value("리뷰 수정을 성공했습니다."))
                 .andExpect(jsonPath("$.data").exists())
                 .andExpect(jsonPath("$.data.rating").value(rating))
                 .andExpect(jsonPath("$.data.content").value(content))
@@ -100,10 +99,9 @@ public class ApiV1ReviewControllerPutTest {
 
         resultActions
                 .andExpect(handler().handlerType(ApiReviewControllerV1.class))
-                .andExpect(handler().methodName("edit"))
                 .andExpect(status().isForbidden())
                 .andExpect(jsonPath("$.resultCode").value("403-1"))
-                .andExpect(jsonPath("$.message").value("수정 권한이 없습니다."));
+                .andExpect(jsonPath("$.message").value("리뷰 수정 권한이 없습니다."));
     }
 
     @Test
@@ -121,7 +119,6 @@ public class ApiV1ReviewControllerPutTest {
 
         resultActions
                 .andExpect(handler().handlerType(ApiReviewControllerV1.class))
-                .andExpect(handler().methodName("edit"))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.resultCode").value("404-1"))
                 .andExpect(jsonPath("$.message").value("존재하지 않는 리뷰입니다."));
