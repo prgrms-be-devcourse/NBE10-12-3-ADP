@@ -18,10 +18,6 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers.handler
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 import org.springframework.transaction.annotation.Transactional
-import kotlin.Exception
-import kotlin.Float
-import kotlin.Long
-import kotlin.Throws
 
 @ActiveProfiles("test")
 @SpringBootTest
@@ -43,12 +39,12 @@ class ApiV1ReviewControllerPutTest {
                     .content(
                         """
                                         {
-                                            "rating": %.1f,
+                                            "rating": ${String.format("%.1f", rating)},
                                             "content": "$content",
                                             "tags": ["${tags.joinToString("\",\"")}"]
                                         }
                                         
-                                        """.trimIndent().format(rating)
+                                        """.trimIndent()
                     )
             )
             .andDo(MockMvcResultHandlers.print())

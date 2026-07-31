@@ -22,11 +22,11 @@ import org.springframework.transaction.annotation.Transactional
 @AutoConfigureMockMvc
 class ApiV1ReviewControllerDeleteTest {
     @Autowired
-    private val mvc: MockMvc? = null
+    private lateinit var mvc: MockMvc
 
     @Throws(Exception::class)
     private fun deleteReview(id: Long): ResultActions {
-        return mvc!!
+        return mvc
             .perform(
                 delete("/api/v1/reviews/$id")
             )
