@@ -6,8 +6,9 @@ import jakarta.validation.constraints.NotNull
 import jakarta.validation.constraints.Size
 
 class ReviewCreateRequestDto(
+    @field:NotNull
     @field:ValidRating
-    val rating: Float,
+    val rating: Float?,
     @field:Size(max = 500)
     val content: String,
     @field:ValidTags

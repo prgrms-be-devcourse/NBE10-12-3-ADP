@@ -83,9 +83,11 @@ class ApiReviewControllerV1(
         @RequestBody @Valid req: ReviewCreateRequestDto
     ): RsData<ReviewDto> {
 
+        val rating = requireNotNull(req.rating)
+
         val review: Review = reviewService.createReview(
             bookId, rq.actor.id,
-            req.rating, req.content, req.tags
+            rating, req.content, req.tags
         )
 
         return RsData<ReviewDto>(
@@ -102,9 +104,11 @@ class ApiReviewControllerV1(
         @RequestBody @Valid req: ReviewCreateRequestDto
     ): RsData<ReviewDto?> {
 
+        val rating = requireNotNull(req.rating)
+
         val review = reviewService.updateReview(
             id, rq.actor.id,
-            req.rating, req.content, req.tags
+            rating, req.content, req.tags
         )
 
         return RsData<ReviewDto?>(
