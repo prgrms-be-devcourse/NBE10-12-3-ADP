@@ -1,6 +1,7 @@
 # Refactoring Review Rules
 
 이 문서는 `refactor` PR에서 Gemini 코드 리뷰가 추가로 확인해야 하는 리팩토링 규칙입니다.
+이번 리팩토링에서는 @../back/ 애플리케이션의 구조를 @./software-architecture.md를 따르도록 수정합니다.
 
 ## 검토 원칙
 
