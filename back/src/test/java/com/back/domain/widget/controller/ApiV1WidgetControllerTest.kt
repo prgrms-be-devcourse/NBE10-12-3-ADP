@@ -19,7 +19,7 @@ import org.springframework.transaction.annotation.Transactional
 @AutoConfigureMockMvc
 @Transactional
 class ApiV1WidgetControllerTest {
-    
+
     @Autowired
     private lateinit var mvc: MockMvc
 

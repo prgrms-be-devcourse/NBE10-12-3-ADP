@@ -1,6 +1,5 @@
 package com.back.domain.tag.controller
 
-import com.back.domain.tag.service.TagService
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -25,9 +24,6 @@ class ApiV1TagControllerTest {
 
     @Autowired
     private lateinit var mvc: MockMvc
-
-    @Autowired
-    private lateinit var tagService: TagService
 
     @Test
     @DisplayName("태그 생성")
