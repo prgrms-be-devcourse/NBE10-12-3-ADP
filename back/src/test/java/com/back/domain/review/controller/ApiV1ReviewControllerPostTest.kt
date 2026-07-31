@@ -30,7 +30,6 @@ class ApiV1ReviewControllerPostTest {
     @Autowired
     private lateinit var reviewService: ReviewService
 
-
     @Throws(Exception::class)
     private fun postReview(bookId: Long, rating: Float, content: String, tags: List<String>): ResultActions {
         return mvc
