@@ -61,7 +61,7 @@ class ApiReviewControllerV1(
     @Operation(summary = "내 리뷰 다건 조회")
     @SecurityRequirement(name = "bearerAuth")
     fun getReviewsMine(): ReviewsByMemberDto {
-        return getReviewsByMember(rq.actor!!.id)
+        return getReviewsByMember(rq.actor.id)
     }
 
     @GetMapping("/admin")
@@ -86,7 +86,7 @@ class ApiReviewControllerV1(
         val rating = requireNotNull(req.rating)
 
         val review: Review = reviewService.createReview(
-            bookId, rq.actor!!.id,
+            bookId, rq.actor.id,
             rating, req.content, req.tags
         )
 
@@ -107,7 +107,7 @@ class ApiReviewControllerV1(
         val rating = requireNotNull(req.rating)
 
         val review = reviewService.updateReview(
-            id, rq.actor!!.id,
+            id, rq.actor.id,
             rating, req.content, req.tags
         )
 
@@ -123,7 +123,7 @@ class ApiReviewControllerV1(
         @PathVariable id: Long
     ): RsData<Void?> {
 
-        reviewService.deleteReview(id, rq.actor!!.id)
+        reviewService.deleteReview(id, rq.actor.id)
 
         return RsData<Void?>(
             "200-1", "리뷰 삭제를 성공했습니다."
