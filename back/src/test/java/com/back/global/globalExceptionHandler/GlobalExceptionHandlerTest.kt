@@ -79,7 +79,7 @@ class GlobalExceptionHandlerTest {
     @WithUserDetails("user1")
     @Throws(Exception::class)
     fun t3() {
-        val bookId = bookRepository.findAll()[0].id
+        val bookId = bookRepository.findAll().first().id
 
         val resultActions = mvc
             .perform(
