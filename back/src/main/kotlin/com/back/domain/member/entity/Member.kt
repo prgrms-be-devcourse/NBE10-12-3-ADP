@@ -85,6 +85,12 @@ class Member(
         role = Role.ADMIN
     }
 
+    fun reSignup(nickname: String, profileImgUrl: String?) {
+        refreshToken = UUID.randomUUID().toString()
+        deletedDate = null
+        modify(nickname, profileImgUrl)
+    }
+
     fun addWish(book: Book) {
         wishes.add(Wish(this, book))
     }
@@ -93,7 +99,8 @@ class Member(
         wishes.removeAll { it.book == book }
     }
 
-    fun modify(nickname: String) {
+    fun modify(nickname: String, profileImgUrl: String?) {
         this.nickname = nickname
+        this.imgUrl = profileImgUrl
     }
 }

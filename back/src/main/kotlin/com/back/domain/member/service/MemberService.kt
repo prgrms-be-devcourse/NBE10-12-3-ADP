@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
 import java.util.NoSuchElementException
 import java.util.Optional
+import kotlin.jvm.optionals.getOrNull
 
 @Service
 @Transactional(readOnly = true)
@@ -101,19 +102,25 @@ class MemberService(
 
     @Transactional
     fun modifyOrJoin(username: String, password: String, nickname: String, profileImgUrl: String?): RsData<Member> {
-        val member = memberRepository.findByUsername(username)
-        if (member.isEmpty) {
+        val member = memberRepository.findByUsername(username).getOrNull()
+        if (member == null) {
             val m = join(username, password, nickname, profileImgUrl)
             return RsData("201-1", "회원가입이 완료되었습니다.", m)
         }
 
-        modify(member.get(), nickname)
+        if (member.deletedDate != null) {
+            // 재가입 시나리오 실행
+            member.reSignup(nickname, profileImgUrl)
+            return RsData("201-1", "재가입되었습니다.")
+        }
 
-        return RsData("200-1", "회원 정보가 수정되었습니다.", member.get())
+        modify(member, nickname, profileImgUrl)
+
+        return RsData("200-1", "회원 정보가 수정되었습니다.", member)
     }
 
-    private fun modify(member: Member, nickname: String) {
-        member.modify(nickname)
+    private fun modify(member: Member, nickname: String, profileImgUrl: String?) {
+        member.modify(nickname, profileImgUrl)
     }
 
     private fun encodePasswordImplementation(password: String): String =
