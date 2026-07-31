@@ -1,14 +1,12 @@
 package com.back.domain.book.service
 
-import com.back.domain.book.entity.Book
 import com.back.domain.book.repository.BookRepository
-import org.assertj.core.api.Assertions
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
-import java.util.function.Consumer
 
 @ActiveProfiles("test")
 @SpringBootTest
@@ -28,6 +26,6 @@ class BookFetchServiceTest {
         println("저장된 도서 수: " + books.size)
         books.forEach{ b -> println("${b?.title} / ${b?.isbn} / ${b?.authors}") }
 
-        Assertions.assertThat(books).isNotEmpty()
+        assertThat(books).isNotEmpty()
     }
 }

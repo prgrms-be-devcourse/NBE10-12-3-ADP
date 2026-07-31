@@ -1,7 +1,6 @@
 package com.back.domain.book.controller
 
 import com.back.domain.book.repository.BookRepository
-import com.back.domain.book.service.BookService
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired

@@ -3,6 +3,7 @@ package com.back.domain.book.controller
 import com.back.domain.book.repository.BookRepository
 import com.back.domain.review.repository.ReviewRepository
 import org.assertj.core.api.Assertions
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -66,11 +67,11 @@ class ApiV1BookControllerAdminTest {
             .andExpect(jsonPath("$.data.title").value("수정된 제목"))
 
         val modified = bookRepository.findById(book.id).orElseThrow()
-        Assertions.assertThat(modified.title).isEqualTo("수정된 제목")
-        Assertions.assertThat(modified.description).isEqualTo("수정된 설명")
-        Assertions.assertThat(modified.authors).isEqualTo("수정된 작가")
-        Assertions.assertThat(modified.publisher).isEqualTo("수정된 출판사")
-        Assertions.assertThat(modified.imgUrl).isEqualTo("https://example.com/img.png")
+        assertThat(modified.title).isEqualTo("수정된 제목")
+        assertThat(modified.description).isEqualTo("수정된 설명")
+        assertThat(modified.authors).isEqualTo("수정된 작가")
+        assertThat(modified.publisher).isEqualTo("수정된 출판사")
+        assertThat(modified.imgUrl).isEqualTo("https://example.com/img.png")
     }
 
     @Test
@@ -123,7 +124,7 @@ class ApiV1BookControllerAdminTest {
             .andExpect(jsonPath("$.resultCode").value("200-1"))
             .andExpect(jsonPath("$.message").value("도서 삭제를 성공했습니다."))
 
-        Assertions.assertThat(bookRepository.findById(bookId)).isEmpty()
+        assertThat(bookRepository.findById(bookId)).isEmpty()
     }
 
     @Test

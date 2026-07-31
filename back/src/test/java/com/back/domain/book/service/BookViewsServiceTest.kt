@@ -1,7 +1,7 @@
 package com.back.domain.book.service
 
 import com.back.domain.book.entity.Book
-import org.assertj.core.api.AssertionsForClassTypes
+import org.assertj.core.api.AssertionsForClassTypes.assertThat
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -34,8 +34,10 @@ class BookViewsServiceTest {
         for (book in bookRank) {
             val nowCnt = bookService.getBookViewCount(book)
 
-            AssertionsForClassTypes.assertThat(nowCnt).isEqualTo(viewsCount[(book.id - 1).toInt()])
-            AssertionsForClassTypes.assertThat(upperCnt).isGreaterThanOrEqualTo(nowCnt)
+            val expectedViewCount = viewsCount[(book.id - 1).toInt()]
+
+            assertThat(nowCnt).isEqualTo(expectedViewCount)
+            assertThat(upperCnt).isGreaterThanOrEqualTo(nowCnt)
 
             upperCnt = nowCnt
         }
