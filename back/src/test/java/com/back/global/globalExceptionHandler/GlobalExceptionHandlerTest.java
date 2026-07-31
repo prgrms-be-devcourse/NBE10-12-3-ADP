@@ -89,17 +89,17 @@ public class GlobalExceptionHandlerTest {
                 .andExpect(jsonPath("$.message").value("요청 본문이 올바르지 않습니다."));
     }
 
-//    @Test
-//    @DisplayName("ServiceException - 존재하지 않는 도서 조회 시 404-1 응답")
-//    void t4() throws Exception {
-//
-//        ResultActions resultActions = mvc
-//                .perform(get("/api/v1/books/99999"))
-//                .andDo(print());
-//
-//        resultActions
-//                .andExpect(status().isNotFound())
-//                .andExpect(jsonPath("$.resultCode").value("404-1"))
-//                .andExpect(jsonPath("$.message").exists());
-//    }
+    @Test
+    @DisplayName("ServiceException - 존재하지 않는 도서 조회 시 404-1 응답")
+    void t4() throws Exception {
+
+        ResultActions resultActions = mvc
+                .perform(get("/api/v1/books/99999"))
+                .andDo(print());
+
+        resultActions
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.resultCode").value("404-1"))
+                .andExpect(jsonPath("$.message").exists());
+    }
 }
