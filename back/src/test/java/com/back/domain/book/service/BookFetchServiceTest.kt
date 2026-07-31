@@ -26,7 +26,7 @@ class BookFetchServiceTest {
 
         val books = bookRepository.findAll()
         println("저장된 도서 수: " + books.size)
-        books.forEach(Consumer { b: Book? -> println(b!!.title + " / " + b.isbn + " / " + b.authors) })
+        books.forEach{ b -> println("${b?.title} / ${b?.isbn} / ${b?.authors}") }
 
         Assertions.assertThat(books).isNotEmpty()
     }

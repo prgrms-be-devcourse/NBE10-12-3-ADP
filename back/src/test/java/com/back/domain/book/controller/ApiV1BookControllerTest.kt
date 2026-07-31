@@ -26,9 +26,6 @@ class ApiV1BookControllerTest {
     private lateinit var mvc: MockMvc
 
     @Autowired
-    private lateinit var bookService: BookService
-
-    @Autowired
     private lateinit var bookRepository: BookRepository
 
     @Test
