@@ -40,7 +40,7 @@ class WidgetByWidgetServerService(
         val reviewCount = reviewService.getReviewCountByMember(member.id)
         val reviewWithContentCount = reviewService.getReviewWithContentCountByMember(member.id)
 
-        val wishCount = wishService.findByMember(member).size
+        val wishCount = wishService.getWishesByMember(member).size
 
         val startIndex = maxOf(0, reviews.size - VISIBLE_BOOK_MAX_COUNT)
         val books = reviews.subList(startIndex, reviews.size).map { review ->
