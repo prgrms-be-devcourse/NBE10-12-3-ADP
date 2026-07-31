@@ -29,7 +29,6 @@ class BookService(
         val book = bookRepository.findById(bookId)
         return if (book.isPresent) book.get()
             else throw NoSuchElementException("존재하지 않는 도서입니다.")
-
     }
 
     @Transactional
