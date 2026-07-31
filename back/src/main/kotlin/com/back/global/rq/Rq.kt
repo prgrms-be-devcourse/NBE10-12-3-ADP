@@ -27,7 +27,7 @@ class Rq(
     @Value($$"${custom.security.cookieDomain}")
     private val cookieDomain: String? = null
 
-    val actor: Member?
+    val actorOrNull: Member?
         get() {
             val principal = SecurityContextHolder
                 .getContext()
@@ -36,7 +36,6 @@ class Rq(
 
             if (principal == null || principal !is SecurityUser)
                 return null
-//                throw ServiceException("401-1", "로그인이 필요합니다.")
 
             return Member(
                 id = principal.id,
@@ -44,6 +43,11 @@ class Rq(
                 name = principal.name,
                 role = if (hasAdminAuthority(principal.authorities)) Role.ADMIN else Role.USER
             )
+        }
+
+    val actor: Member
+        get() {
+            return actorOrNull ?: throw ServiceException("401-1", "로그인이 필요합니다.")
         }
 
     private fun hasAdminAuthority(authorities: Collection<GrantedAuthority>): Boolean {
