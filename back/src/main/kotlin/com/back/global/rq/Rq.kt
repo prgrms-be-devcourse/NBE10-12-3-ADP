@@ -27,7 +27,7 @@ class Rq(
     @Value($$"${custom.security.cookieDomain}")
     private val cookieDomain: String? = null
 
-    val actor: Member
+    val actor: Member?
         get() {
             val principal = SecurityContextHolder
                 .getContext()
@@ -35,7 +35,8 @@ class Rq(
                 ?.principal
 
             if (principal == null || principal !is SecurityUser)
-                throw ServiceException("401-1", "로그인이 필요합니다.")
+                return null
+//                throw ServiceException("401-1", "로그인이 필요합니다.")
 
             return Member(
                 id = principal.id,
@@ -100,5 +101,5 @@ class Rq(
     }
 
     val actorFromDb: Member
-        get() = memberService.getById(actor.id)
+        get() = memberService.getById(actor!!.id)
 }
