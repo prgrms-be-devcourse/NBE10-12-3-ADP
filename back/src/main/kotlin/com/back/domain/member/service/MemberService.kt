@@ -110,7 +110,7 @@ class MemberService(
 
         if (member.deletedDate != null) {
             // 재가입 시나리오 실행
-            member.reSignup(nickname, profileImgUrl)
+            member.reSignup(password, nickname, profileImgUrl)
             return RsData("201-1", "재가입되었습니다.", member)
         }
 

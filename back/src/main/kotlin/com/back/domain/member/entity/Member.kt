@@ -85,7 +85,8 @@ class Member(
         role = Role.ADMIN
     }
 
-    fun reSignup(nickname: String, profileImgUrl: String?) {
+    fun reSignup(password: String, nickname: String, profileImgUrl: String?) {
+        this.password = password
         refreshToken = UUID.randomUUID().toString()
         deletedDate = null
         modify(nickname, profileImgUrl)
