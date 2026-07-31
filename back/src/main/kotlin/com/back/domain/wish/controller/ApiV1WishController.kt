@@ -21,14 +21,13 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController
 @RequestMapping("/api/v1/wishes")
-@Transactional(readOnly = true)
 @Tag(name = "ApiV1WishController", description = "API 찜 컨트롤러")
 @SecurityRequirement(name = "bearerAuth")
+@Transactional(readOnly = true)
 class ApiV1WishController(
     private val wishService: WishService,
     private val bookService: BookService,
-    private val rq: Rq,
-    private val tagService: TagService
+    private val rq: Rq
 ) {
 
     @GetMapping("/mine")
@@ -37,7 +36,7 @@ class ApiV1WishController(
         val actor = rq.actorFromDb ?: throw ServiceException("401-1", "로그인이 필요합니다.")
 
         return wishService
-            .findByMember(actor)
+            .getWishesByMember(actor)
             .map { BookWithTagDto(it.book, bookService.getBookTags(it.book)) }
     }
 
@@ -56,15 +55,26 @@ class ApiV1WishController(
     }
 
     @DeleteMapping("/book/{id}")
+    @Operation(summary = "찜 목록 삭제 (구형)")
     @Transactional
+    fun oldDeleteWish(
+        @PathVariable @Valid id: Long
+    ): RsData<Void> {
+        val actor = rq.actorFromDb ?: throw ServiceException("401-1", "로그인이 필요합니다.")
+        val book = bookService.getBookById(id)
+        wishService.oldDeleteWish(actor, book)
+
+        return RsData("200-1", "찜 삭제 성공")
+    }
+
+    @DeleteMapping("/{id}")
     @Operation(summary = "찜 목록 삭제")
+    @Transactional
     fun deleteWish(
         @PathVariable @Valid id: Long
     ): RsData<Void> {
-        val book = bookService.getBook(id)
-
         val actor = rq.actorFromDb ?: throw ServiceException("401-1", "로그인이 필요합니다.")
-        wishService.deleteWish(actor, book)
+        wishService.deleteWish(actor, id)
 
         return RsData("200-1", "찜 삭제 성공")
     }

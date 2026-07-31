@@ -4,7 +4,6 @@ import com.back.domain.book.entity.Book;
 import com.back.domain.book.service.BookService;
 import com.back.domain.member.entity.Member;
 import com.back.domain.member.service.MemberService;
-import com.back.domain.wish.controller.ApiV1WishController;
 import com.back.domain.wish.entity.Wish;
 import com.back.domain.wish.service.WishService;
 import org.junit.jupiter.api.BeforeEach;
@@ -56,7 +55,7 @@ public class ApiV1WishControllerTest {
 
         Member actor = memberService.getByUsername("user1");
 
-        List<Wish> wishes = wishService.findByMember(actor);
+        List<Wish> wishes = wishService.getWishesByMember(actor);
         int wishesSize = wishes.size();
 
         ResultActions resultActions = mvc

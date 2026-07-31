@@ -24,7 +24,7 @@ class WidgetService(
 
         val reviewCount = reviewService.getReviewCountByMember(member.id)
         val reviewWithContentCount = reviewService.getReviewWithContentCountByMember(member.id)
-        val wishCount = wishService.findByMember(member).size
+        val wishCount = wishService.getWishesByMember(member).size
 
         val bookComponents = buildString {
             val startIndex = maxOf(0, reviews.size - VISIBLE_BOOK_MAX_COUNT)
