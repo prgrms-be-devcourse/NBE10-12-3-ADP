@@ -52,7 +52,7 @@ class ApiBookControllerV1(
 
         return BookDetailDto(
             book,
-            bookService.getIsWished(book, rq.actor),
+            bookService.getIsWished(book, rq.actorOrNull),
             bookService.getRatingMap(book),
             bookService.getBookTags(book))
     }
@@ -72,7 +72,7 @@ class ApiBookControllerV1(
     @Operation(summary = "도서 추천 다건 조회")
     fun getBooksByRecommend(): List<BookDto> {
         return bookRecommendService
-            .getBooksByRecommend(rq.actor)
+            .getBooksByRecommend(rq.actorOrNull)
             .toList().map {book -> BookDto(book) }
     }
 

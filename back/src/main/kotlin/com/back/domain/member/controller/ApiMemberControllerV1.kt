@@ -26,7 +26,7 @@ class ApiMemberControllerV1(
     @Operation(summary = "내 정보 조회")
     @SecurityRequirement(name = "bearerAuth")
     fun me(): MemberWithUsernameAndWidgetLinkDto {
-        val actor = memberService.getById(rq.actor!!.id)
+        val actor = memberService.getById(rq.actor.id)
         return MemberWithUsernameAndWidgetLinkDto(actor)
     }
 
@@ -49,7 +49,7 @@ class ApiMemberControllerV1(
     @Operation(summary = "회원 탈퇴")
     @SecurityRequirement(name = "bearerAuth")
     fun delete(): RsData<Unit> {
-        memberService.delete(rq.actor!!.id)
+        memberService.delete(rq.actor.id)
 
         rq.deleteCookie("refreshToken")
         rq.deleteCookie("accessToken")
