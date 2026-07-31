@@ -39,7 +39,7 @@ class ApiV1ReviewControllerPutTest {
                     .content(
                         """
                                         {
-                                            "rating": ${String.format("%.1f", rating)},
+                                            "rating": ${String.format(java.util.Locale.US, "%.1f", rating)},
                                             "content": "$content",
                                             "tags": ${tags.joinToString(
                                                 separator = ", ",
@@ -80,7 +80,7 @@ class ApiV1ReviewControllerPutTest {
             .andExpect(jsonPath("$.data.content").value(content))
             .andExpect(
                 jsonPath("$.data.modifiedDate")
-                    .value(Matchers.startsWith(review.modifiedDate.toString().substring(0, 20)))
+                    .value(Matchers.startsWith(review.modifiedDate.toString().take(20)))
             )
             .andExpect(jsonPath("$.data.tags").exists())
 
