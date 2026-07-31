@@ -133,7 +133,7 @@ class ApiV1ReviewControllerGetTest {
         for (i in reviews.indices) {
             val review = reviews[i]
             resultActions
-                .andExpect(jsonPath("$.results.[$i].id").value(review.id))
+                .andExpect(jsonPath("$.results[$i].id").value(review.id))
                 .andExpect(jsonPath("$.results[$i].rating").value(review.rating))
                 .andExpect(jsonPath("$.results[$i].content").value(review.content))
                 .andExpect(jsonPath("$.results[$i].tags").exists())
@@ -201,7 +201,7 @@ class ApiV1ReviewControllerGetTest {
         for (i in reviews.indices) {
             val review = reviews[i]
             resultActions
-                .andExpect(jsonPath("$.results.[$i].id").value(review.id))
+                .andExpect(jsonPath("$.results[$i].id").value(review.id))
                 .andExpect(jsonPath("$.results[$i].rating").value(review.rating))
                 .andExpect(jsonPath("$.results[$i].content").value(review.content))
                 .andExpect(jsonPath("$.results[$i].tags").exists())
