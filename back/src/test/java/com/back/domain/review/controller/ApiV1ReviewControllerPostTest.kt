@@ -41,7 +41,12 @@ class ApiV1ReviewControllerPostTest {
                                         {
                                             "rating": ${String.format("%.1f", rating)},
                                             "content": "$content",
-                                            "tags": ["${tags.joinToString("\", \"")}"]
+                                            "tags": ${tags.joinToString(
+                                                separator = ", ",
+                                                prefix = "[",
+                                                postfix = "]",
+                                                transform = { "\"$it\"" } // Wraps each string in quotes
+                                            )}
                                         }
                                         
                                         """.trimIndent()

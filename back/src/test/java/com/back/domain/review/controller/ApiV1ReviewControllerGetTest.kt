@@ -55,11 +55,11 @@ class ApiV1ReviewControllerGetTest {
                 .andExpect(jsonPath("$[$i].content").value(review.content))
                 .andExpect(
                     jsonPath("$[$i].modifiedDate")
-                        .value(Matchers.startsWith(review.modifiedDate.toString().substring(0, 20)))
+                        .value(Matchers.startsWith(review.modifiedDate.toString().take(20)))
                 )
                 .andExpect(
                     jsonPath("$[$i].createdDate")
-                        .value(Matchers.startsWith(review.createdDate.toString().substring(0, 20)))
+                        .value(Matchers.startsWith(review.createdDate.toString().take(20)))
                 )
                 .andExpect(jsonPath("$[$i].reviewer").exists())
                 .andExpect(jsonPath("$[$i].reviewer.id").value(review.reviewer.id))

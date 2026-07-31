@@ -41,7 +41,12 @@ class ApiV1ReviewControllerPutTest {
                                         {
                                             "rating": ${String.format("%.1f", rating)},
                                             "content": "$content",
-                                            "tags": ["${tags.joinToString("\",\"")}"]
+                                            "tags": ${tags.joinToString(
+                                                separator = ", ",
+                                                prefix = "[",
+                                                postfix = "]",
+                                                transform = { "\"$it\"" } // Wraps each string in quotes
+                                            )}
                                         }
                                         
                                         """.trimIndent()
@@ -86,7 +91,7 @@ class ApiV1ReviewControllerPutTest {
     }
 
     @Test
-    @DisplayName("리뷰 작성 - 실패: 다른 사람이 작성한 리뷰 수정 시도")
+    @DisplayName("리뷰 수정 - 실패: 다른 사람이 작성한 리뷰 수정 시도")
     @WithUserDetails("user2")
     @Throws(Exception::class)
     fun t2() {
@@ -106,7 +111,7 @@ class ApiV1ReviewControllerPutTest {
     }
 
     @Test
-    @DisplayName("리뷰 작성 - 실패: id의 리뷰를 찾을 수 없음")
+    @DisplayName("리뷰 수정 - 실패: id의 리뷰를 찾을 수 없음")
     @WithUserDetails("user2")
     @Throws(Exception::class)
     fun t3() {
@@ -126,7 +131,7 @@ class ApiV1ReviewControllerPutTest {
     }
 
     @Test
-    @DisplayName("리뷰 작성 - 실패: 로그인 하지 않은 사용자의 리뷰 수정 시도")
+    @DisplayName("리뷰 수정 - 실패: 로그인 하지 않은 사용자의 리뷰 수정 시도")
     @Throws(Exception::class)
     fun t4() {
         val id = 1L
@@ -162,7 +167,7 @@ class ApiV1ReviewControllerPutTest {
     }
 
     @Test
-    @DisplayName("리뷰 작성 - 실패: 평점이 0.5 단위의 숫자가 아님")
+    @DisplayName("리뷰 수정 - 실패: 평점이 0.5 단위의 숫자가 아님")
     @WithUserDetails("user2")
     @Throws(Exception::class)
     fun t5() {
@@ -170,7 +175,7 @@ class ApiV1ReviewControllerPutTest {
     }
 
     @Test
-    @DisplayName("리뷰 작성 - 실패: 평점이 5 초과")
+    @DisplayName("리뷰 수정 - 실패: 평점이 5 초과")
     @WithUserDetails("user2")
     @Throws(Exception::class)
     fun t6() {
@@ -178,7 +183,7 @@ class ApiV1ReviewControllerPutTest {
     }
 
     @Test
-    @DisplayName("리뷰 작성 - 실패: 평점이 0 미만")
+    @DisplayName("리뷰 수정 - 실패: 평점이 0 미만")
     @WithUserDetails("user2")
     @Throws(Exception::class)
     fun t7() {
