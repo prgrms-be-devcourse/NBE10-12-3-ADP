@@ -20,7 +20,6 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers.handler
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 import org.springframework.transaction.annotation.Transactional
-import kotlin.jvm.optionals.getOrNull
 
 @ActiveProfiles("test")
 @SpringBootTest
@@ -254,7 +253,10 @@ class ApiMemberControllerV1Test {
             .andExpect(jsonPath("$.resultCode").value("200-1"))
             .andExpect(jsonPath("$.message").value("회원 강제 탈퇴를 성공했습니다."))
 
-        assertThat(memberRepository.findById(member.id).getOrNull()!!.isDeleted).isTrue()
+        val found = memberRepository.findById(member.id)
+
+        assertThat(found).isPresent
+        assertThat(found.get().isDeleted).isTrue()
     }
 
     @Test
