@@ -57,27 +57,27 @@ class BaseInitData(
         val memberUser3 = memberService.join("user3", "1234", "githubuser3", null)
         memberUser3.modifyRefreshToken("user3")
 
-        val book1 = bookRepository.save<com.back.domain.book.entity.Book>(
+        val book1 = bookRepository.save(
             com.back.domain.book.entity.Book(
                 "책제목", "책설명", "isbn1", "작가",
                 java.time.LocalDateTime.now(), "출판사", ""
             )
         )
-        val book2 = bookRepository.save<com.back.domain.book.entity.Book>(
+        val book2 = bookRepository.save(
             com.back.domain.book.entity.Book(
                 "책제목2", "책설명", "isbn2", "작가",
                 java.time.LocalDateTime.now(), "출판사", ""
             )
         )
 
-        val book3 = bookRepository.save<com.back.domain.book.entity.Book>(
+        val book3 = bookRepository.save(
             com.back.domain.book.entity.Book(
                 "책제목3", "책설명", "isbn3", "작가",
                 java.time.LocalDateTime.now(), "출판사", ""
             )
         )
 
-        val book4 = bookRepository.save<com.back.domain.book.entity.Book>(
+        val book4 = bookRepository.save(
             com.back.domain.book.entity.Book(
                 "책제목4", "책설명", "isbn4", "작가",
                 java.time.LocalDateTime.now(), "출판사", ""

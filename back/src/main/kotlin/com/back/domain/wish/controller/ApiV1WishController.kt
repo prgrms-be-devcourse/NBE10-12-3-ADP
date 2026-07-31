@@ -2,9 +2,7 @@ package com.back.domain.wish.controller
 
 import com.back.domain.book.dto.BookWithTagDto
 import com.back.domain.book.service.BookService
-import com.back.domain.tag.service.TagService
 import com.back.domain.wish.service.WishService
-import com.back.global.exception.ServiceException
 import com.back.global.rq.Rq
 import com.back.global.rsData.RsData
 import io.swagger.v3.oas.annotations.Operation
@@ -33,7 +31,7 @@ class ApiV1WishController(
     @GetMapping("/mine")
     @Operation(summary = "내 찜 목록 조회")
     fun getWishes(): List<BookWithTagDto> {
-        val actor = rq.actorFromDb ?: throw ServiceException("401-1", "로그인이 필요합니다.")
+        val actor = rq.actorFromDb
 
         return wishService
             .getWishesByMember(actor)
@@ -48,10 +46,10 @@ class ApiV1WishController(
     ): RsData<Void> {
         val book = bookService.getBook(id)
 
-        val actor = rq.actorFromDb ?: throw ServiceException("401-1", "로그인이 필요합니다.")
+        val actor = rq.actorFromDb
         wishService.addWish(actor, book)
 
-        return RsData("201-1", "찜 추가 성공")
+        return RsData("201-1", "찜 생성을 성공했습니다.")
     }
 
     @DeleteMapping("/book/{id}")
@@ -60,11 +58,11 @@ class ApiV1WishController(
     fun oldDeleteWish(
         @PathVariable @Valid id: Long
     ): RsData<Void> {
-        val actor = rq.actorFromDb ?: throw ServiceException("401-1", "로그인이 필요합니다.")
+        val actor = rq.actorFromDb
         val book = bookService.getBookById(id)
         wishService.oldDeleteWish(actor, book)
 
-        return RsData("200-1", "찜 삭제 성공")
+        return RsData("200-1", "찜 삭제를 성공했습니다.")
     }
 
     @DeleteMapping("/{id}")
@@ -73,9 +71,9 @@ class ApiV1WishController(
     fun deleteWish(
         @PathVariable @Valid id: Long
     ): RsData<Void> {
-        val actor = rq.actorFromDb ?: throw ServiceException("401-1", "로그인이 필요합니다.")
+        val actor = rq.actorFromDb
         wishService.deleteWish(actor, id)
 
-        return RsData("200-1", "찜 삭제 성공")
+        return RsData("200-1", "찜 삭제를 성공했습니다.")
     }
 }
