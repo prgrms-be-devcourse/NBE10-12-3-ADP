@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
@@ -37,52 +38,52 @@ public class ApiV1BookControllerTest {
     @Autowired
     private BookRepository bookRepository;
 
-//    @Test
-//    @DisplayName("도서 단건 조회 - 비인증 사용자")
-//    void t2() throws Exception {
-//
-//        Book book = bookRepository.findAll().get(0);
-//
-//        ResultActions resultActions = mvc
-//                .perform(
-//                        get("/api/v1/books/%d".formatted(book.getId())))
-//                .andDo(print());
-//
-//        resultActions
-//                .andExpect(status().isOk())
-//                .andExpect(jsonPath("$.id").value(book.getId()))
-//                .andExpect(jsonPath("$.title").value(book.getTitle()))
-//                .andExpect(jsonPath("$.description").value(book.getDescription()))
-//                .andExpect(jsonPath("$.isbn").value(book.getIsbn()))
-//                .andExpect(jsonPath("$.publishedDate").exists())
-//                .andExpect(jsonPath("$.publisher").value(book.getPublisher()))
-//                .andExpect(jsonPath("$.imgUrl").value(book.getImgUrl()))
-//                .andExpect(jsonPath("$.authors").isArray())
-//                .andExpect(jsonPath("$.reviewCount").exists())
-//                .andExpect(jsonPath("$.rating").exists())
-//                .andExpect(jsonPath("$.rating.average").exists())
-//                .andExpect(jsonPath("$.tags").isArray())
-//                .andExpect(jsonPath("$.isWished").value(false)); // 비인증 시 isWished 없음
-//    }
+    @Test
+    @DisplayName("도서 단건 조회 - 비인증 사용자")
+    void t2() throws Exception {
 
-//    @Test
-//    @DisplayName("도서 단건 조회 - 인증 사용자 (isWished 포함)")
-//    @WithUserDetails("user1")
-//    void t3() throws Exception {
-//
-//        Book book = bookRepository.findAll().get(0);
-//
-//        ResultActions resultActions = mvc
-//                .perform(
-//                        get("/api/v1/books/%d".formatted(book.getId())))
-//                .andDo(print());
-//
-//        resultActions
-//                .andExpect(status().isOk())
-//                .andExpect(jsonPath("$.id").value(book.getId()))
-//                .andExpect(jsonPath("$.title").value(book.getTitle()))
-//                .andExpect(jsonPath("$.isWished").isBoolean()); // 인증 시 isWished 있음
-//    }
+        Book book = bookRepository.findAll().get(0);
+
+        ResultActions resultActions = mvc
+                .perform(
+                        get("/api/v1/books/%d".formatted(book.getId())))
+                .andDo(print());
+
+        resultActions
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(book.getId()))
+                .andExpect(jsonPath("$.title").value(book.getTitle()))
+                .andExpect(jsonPath("$.description").value(book.getDescription()))
+                .andExpect(jsonPath("$.isbn").value(book.getIsbn()))
+                .andExpect(jsonPath("$.publishedDate").exists())
+                .andExpect(jsonPath("$.publisher").value(book.getPublisher()))
+                .andExpect(jsonPath("$.imgUrl").value(book.getImgUrl()))
+                .andExpect(jsonPath("$.authors").isArray())
+                .andExpect(jsonPath("$.reviewCount").exists())
+                .andExpect(jsonPath("$.rating").exists())
+                .andExpect(jsonPath("$.rating.average").exists())
+                .andExpect(jsonPath("$.tags").isArray())
+                .andExpect(jsonPath("$.isWished").value(false)); // 비인증 시 isWished 없음
+    }
+
+    @Test
+    @DisplayName("도서 단건 조회 - 인증 사용자 (isWished 포함)")
+    @WithUserDetails("user1")
+    void t3() throws Exception {
+
+        Book book = bookRepository.findAll().get(0);
+
+        ResultActions resultActions = mvc
+                .perform(
+                        get("/api/v1/books/%d".formatted(book.getId())))
+                .andDo(print());
+
+        resultActions
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(book.getId()))
+                .andExpect(jsonPath("$.title").value(book.getTitle()))
+                .andExpect(jsonPath("$.isWished").isBoolean()); // 인증 시 isWished 있음
+    }
 
     @Test
     @DisplayName("도서 검색")
@@ -96,19 +97,20 @@ public class ApiV1BookControllerTest {
                                 .param("searchTerm", searchTerm))
                 .andDo(print());
 
-//        List<Book> expectedBooks = bookRepository.findByTitleContaining(searchTerm);
-//
-//        resultActions
-//                .andExpect(status().isOk())
-//                .andExpect(jsonPath("$.length()").value(expectedBooks.size()));
-//
-//        for (int i = 0; i < expectedBooks.size(); i++) {
-//            Book expected = expectedBooks.get(i);
-//            resultActions
-//                    .andExpect(jsonPath("$[%d].id".formatted(i)).value(expected.getId()))
-//                    .andExpect(jsonPath("$[%d].title".formatted(i)).value(expected.getTitle()))
-//                    .andExpect(jsonPath("$[%d].imgUrl".formatted(i)).value(expected.getImgUrl()))
-//                    .andExpect(jsonPath("$[%d].averageRating".formatted(i)).value(expected.getAverageRating()));
-//        }
+        List<Book> expectedBooks = bookRepository.findByTitleContaining(
+                searchTerm, PageRequest.of(0, 10)).toList();
+
+        resultActions
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(expectedBooks.size()));
+
+        for (int i = 0; i < expectedBooks.size(); i++) {
+            Book expected = expectedBooks.get(i);
+            resultActions
+                    .andExpect(jsonPath("$[%d].id".formatted(i)).value(expected.getId()))
+                    .andExpect(jsonPath("$[%d].title".formatted(i)).value(expected.getTitle()))
+                    .andExpect(jsonPath("$[%d].imgUrl".formatted(i)).value(expected.getImgUrl()))
+                    .andExpect(jsonPath("$[%d].averageRating".formatted(i)).value(expected.getAverageRating()));
+        }
     }
 }

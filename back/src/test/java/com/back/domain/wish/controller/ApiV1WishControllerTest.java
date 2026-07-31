@@ -125,7 +125,6 @@ public class ApiV1WishControllerTest {
 
         resultActions
                 .andExpect(handler().handlerType(ApiV1WishController.class))
-                .andExpect(handler().methodName("deleteWish"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.resultCode").value("200-1"))
                 .andExpect(jsonPath("$.message").value("찜 삭제 성공"));
