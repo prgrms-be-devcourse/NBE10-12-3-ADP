@@ -146,6 +146,15 @@ class BookService(
             .toList()
     }
 
+    fun getTagsByBookId(bookId: Long): List<String> {
+        val reviews: List<Review> = reviewRepository.findByBookId(bookId)
+
+        return reviews
+            .flatMap { r: Review -> r.tags }
+            .distinct()
+            .toList()
+    }
+
     fun getBooksBySearch(
         searchTerm: String,
         page: Int,
@@ -166,7 +175,7 @@ class BookService(
 
         if (actor == null) return false
 
-        return wishRepository.findByMemberAndBook(actor, book).isPresent
+        return wishRepository.findByMemberAndBook(actor, book) != null
     }
 
     fun getRatingMap(book: Book): MutableMap<String, Any> {
