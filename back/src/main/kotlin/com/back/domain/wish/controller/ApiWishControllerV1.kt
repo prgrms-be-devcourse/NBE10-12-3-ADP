@@ -7,7 +7,6 @@ import com.back.global.rsData.RsData
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.tags.Tag
-import jakarta.validation.Valid
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -32,7 +31,7 @@ class ApiWishControllerV1(
     @PostMapping("/book/{bookId}")
     @Operation(summary = "찜 생성")
     fun createWish(
-        @PathVariable @Valid bookId: Long
+        @PathVariable bookId: Long
     ): RsData<Unit> {
         wishService.createWish(rq.actor, bookId)
 
@@ -42,7 +41,7 @@ class ApiWishControllerV1(
     @DeleteMapping("/{id}")
     @Operation(summary = "찜 삭제")
     fun deleteWish(
-        @PathVariable @Valid id: Long
+        @PathVariable id: Long
     ): RsData<Unit> {
         wishService.deleteWish(rq.actor, id)
 
