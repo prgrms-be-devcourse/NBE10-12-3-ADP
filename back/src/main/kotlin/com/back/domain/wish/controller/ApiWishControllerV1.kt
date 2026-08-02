@@ -1,6 +1,6 @@
 package com.back.domain.wish.controller
 
-import com.back.domain.book.dto.BookWithTagDto
+import com.back.domain.book.dto.BookWithTagsDto
 import com.back.domain.book.service.BookService
 import com.back.domain.wish.service.WishService
 import com.back.global.rq.Rq
@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.RestController
 @Tag(name = "ApiV1WishController", description = "API 찜 컨트롤러")
 @SecurityRequirement(name = "bearerAuth")
 @Transactional(readOnly = true)
-class ApiV1WishController(
+class ApiWishControllerV1(
     private val wishService: WishService,
     private val bookService: BookService,
     private val rq: Rq
@@ -30,12 +30,10 @@ class ApiV1WishController(
 
     @GetMapping("/mine")
     @Operation(summary = "내 찜 목록 조회")
-    fun getWishes(): List<BookWithTagDto> {
+    fun getWishes(): List<BookWithTagsDto> {
         val actor = rq.actorFromDb
 
-        return wishService
-            .getWishesByMember(actor)
-            .map { BookWithTagDto(it.book, bookService.getBookTags(it.book)) }
+        return wishService.getWishesByMember(actor)
     }
 
     @PostMapping("/book/{id}")

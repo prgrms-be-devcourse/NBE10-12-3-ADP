@@ -1,5 +1,6 @@
 package com.back.domain.wish.service
 
+import com.back.domain.book.dto.BookWithTagsDto
 import com.back.domain.book.entity.Book
 import com.back.domain.member.entity.Member
 import com.back.domain.wish.entity.Wish
@@ -15,7 +16,8 @@ class WishService(
 ) {
     fun findAll(): List<Wish> = wishRepository.findAll()
 
-    fun getWishesByMember(member: Member): List<Wish> = wishRepository.findByMember(member)
+    fun getWishesByMember(member: Member): List<BookWithTagsDto> =
+        wishRepository.findByMember(member).map { BookWithTagsDto(it.book, listOf()) }
 
     fun addWish(member: Member, book: Book): Wish {
         if (wishRepository.findByMemberAndBook(member, book).isPresent) {

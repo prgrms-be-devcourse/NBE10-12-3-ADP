@@ -1,9 +1,8 @@
 package com.back.domain.book.dto
 
 import com.back.domain.book.entity.Book
-import jakarta.validation.constraints.NotNull
 
-class BookDto(
+open class BookDto(
     @JvmField
     val id: Long,
     val title: String,
