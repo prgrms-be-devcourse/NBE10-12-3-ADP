@@ -42,7 +42,7 @@ class ApiWishControllerV1Test {
     @WithUserDetails("user1")
     fun t1() {
         val actor = memberService.getMemberByUsername("user1")
-        val wishes = wishService.getWishesByMember(actor)
+        val wishes = wishService.getMyWishes(actor)
 
         val resultActions = mvc
             .perform(
@@ -56,6 +56,7 @@ class ApiWishControllerV1Test {
 
         for (i in 0..<wishes.size) {
             val wish = wishes[i]
+            val tags = bookService.getTagsByBookId(wish.id)
 
             resultActions
                 .andExpect(jsonPath("$.[$i].id").value(wish.id))
@@ -63,8 +64,8 @@ class ApiWishControllerV1Test {
                 .andExpect(jsonPath("$.[$i].imgUrl").value(wish.imgUrl))
                 .andExpect(jsonPath("$.[$i].averageRating").value(wish.averageRating))
 
-            for (j in 0..<wish.tags.size) {
-                val tag = wish.tags[j]
+            for (j in 0..<tags.size) {
+                val tag = tags[j]
 
                 resultActions
                     .andExpect(jsonPath("$[$i].tags[$j]").value(tag))
