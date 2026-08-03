@@ -8,8 +8,6 @@ import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.query.Param
-import java.time.LocalDateTime
-import java.util.*
 
 interface ReviewRepository : JpaRepository<Review, Long> {
 
@@ -38,18 +36,4 @@ interface ReviewRepository : JpaRepository<Review, Long> {
     fun countByBookAndRating(book: Book?, rating: Float): Int
 
     fun findFirstByBookAndReviewer(book: Book, reviewer: Member): Review?
-
-    @Query(
-        """
-            SELECT r.book AS book, count(*) as CNT
-            FROM Review r
-            WHERE r.modifiedDate >= :cutoffDate
-            GROUP BY r.book
-            ORDER BY CNT DESC
-           """
-    )
-    fun findBookByOrderByReviewCnt(
-        @Param("cutoffDate") cutoffDate: LocalDateTime?,
-        pageable: Pageable?
-    ): Page<BookInterface>
 }
