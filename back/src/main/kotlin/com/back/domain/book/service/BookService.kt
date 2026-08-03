@@ -124,12 +124,12 @@ class BookService(
         authors: String?,
         publisher: String?,
         imgUrl: String?
-    ): Book {
+    ): BookDto {
         val book = getBookById(id)
 
         book.update(title, description, authors, publisher, imgUrl)
 
-        return book
+        return BookDto(book)
     }
 
     @Transactional

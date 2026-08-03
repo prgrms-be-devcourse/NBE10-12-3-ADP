@@ -78,7 +78,7 @@ class ApiBookControllerV1(
             id, req.title, req.description, req.authors, req.publisher, req.imgUrl
         )
 
-        return RsData("200-1", "도서 수정을 성공했습니다.", BookDto(book))
+        return RsData("200-1", "도서 수정을 성공했습니다.", book)
     }
 
     @DeleteMapping("/{id}")
