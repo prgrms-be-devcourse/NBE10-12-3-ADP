@@ -1,20 +1,21 @@
 package com.back.domain.member.service
 
+import com.back.domain.member.dto.AdminMemberDto
+import com.back.domain.member.dto.MemberDto
+import com.back.domain.member.dto.MemberWithUsernameAndWidgetLinkDto
 import com.back.domain.member.entity.Member
 import com.back.domain.member.repository.MemberRepository
 import com.back.global.exception.ServiceException
-import com.back.global.rsData.RsData
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.security.core.userdetails.UsernameNotFoundException
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
 import java.util.NoSuchElementException
-import java.util.Optional
-import kotlin.jvm.optionals.getOrNull
 
 @Service
 @Transactional(readOnly = true)
@@ -23,9 +24,10 @@ class MemberService(
     private val authTokenService: AuthTokenService,
     private val passwordEncoder: PasswordEncoder
 ) {
-    fun getById(id: Long): Member {
-        val member = memberRepository.findById(id)
-            .orElseThrow { NoSuchElementException("존재하지 않는 회원입니다.") }
+    fun getMemberById(id: Long): Member {
+
+        val member = memberRepository.findByIdOrNull(id)
+            ?: throw NoSuchElementException("존재하지 않는 회원입니다.")
 
         if (member.isDeleted) {
             throw NoSuchElementException("존재하지 않는 회원입니다.")
@@ -34,25 +36,31 @@ class MemberService(
         return member
     }
 
-    fun getByUsername(username: String): Member {
-        val member = memberRepository.findByUsername(username)
-            .orElseThrow { UsernameNotFoundException("존재하지 않는 회원입니다.") }
-
-        if (member.isDeleted) {
-            throw ServiceException("404-1", "존재하지 않는 회원입니다.")
-        }
-        return member
-    }
-
     fun getMemberByUsername(username: String): Member {
         val member = memberRepository.findByUsername(username)
-            .orElseThrow { UsernameNotFoundException("존재하지 않는 회원입니다.") }
+            ?: throw UsernameNotFoundException("존재하지 않는 회원입니다.")
 
         if (member.isDeleted) {
             throw ServiceException("404-1", "존재하지 않는 회원입니다.")
         }
+
         return member
     }
+
+    fun getById(id: Long): MemberDto {
+        return MemberDto(getMemberById(id))
+    }
+
+    fun getMy(member: Member): MemberWithUsernameAndWidgetLinkDto {
+        return MemberWithUsernameAndWidgetLinkDto(getMemberById(member.id))
+    }
+
+    fun getByUsername(username: String): MemberDto {
+        return MemberDto(getMemberByUsername(username))
+    }
+
+    fun getByRefreshToken(apiKey: String): Member? =
+        memberRepository.findByRefreshToken(apiKey)
 
     @Transactional
     fun join(username: String, password: String, githubId: String, imgUrl: String?): Member =
@@ -60,12 +68,13 @@ class MemberService(
 
     @Transactional
     fun join(username: String, password: String, githubId: String?, nickname: String, imgUrl: String?): Member {
-        memberRepository.findByUsername(username).ifPresent {
+
+        memberRepository.findByUsername(username)?.let{
             throw ServiceException("409-1", "이미 존재하는 아이디입니다.")
         }
 
-        if (githubId != null) {
-            memberRepository.findByGithubId(githubId).ifPresent {
+        githubId?.let {
+            memberRepository.findByGithubId(githubId)?.let {
                 throw ServiceException("409-2", "이미 존재하는 githubId입니다.")
             }
         }
@@ -83,15 +92,21 @@ class MemberService(
 
     @Transactional
     fun delete(id: Long) {
-        val member = getById(id)
+        val member = getMemberById(id)
         member.deletedDate = LocalDateTime.now()
     }
 
-    fun getMembers(page: Int, size: Int): Page<Member> =
-        memberRepository.findAll(PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "id")))
+    fun getMembers(page: Int, size: Int): Page<AdminMemberDto> {
+        return memberRepository.findAll(
+            PageRequest.of(
+                page,
+                size,
+                Sort.by(Sort.Direction.DESC, "id")
+            )
+        )
+            .map { m -> AdminMemberDto(m) }
+    }
 
-    fun getByRefreshToken(apiKey: String): Optional<Member> =
-        memberRepository.findByRefreshToken(apiKey)
 
     fun genAccessToken(member: Member): String =
         authTokenService.genAccessToken(member)
@@ -108,25 +123,24 @@ class MemberService(
 
     fun getByGithubId(githubId: String): Member =
         memberRepository.findByGithubId(githubId)
-            .orElseThrow { NoSuchElementException("존재하지 않는 회원입니다.") }
+            ?: throw NoSuchElementException("존재하지 않는 회원입니다.")
 
     @Transactional
-    fun modifyOrJoin(username: String, password: String, nickname: String, profileImgUrl: String?): RsData<Member> {
-        val member = memberRepository.findByUsername(username).getOrNull()
+    fun modifyOrJoin(username: String, password: String, nickname: String, profileImgUrl: String?): Member {
+        val member = memberRepository.findByUsername(username)
         if (member == null) {
-            val m = join(username, password, nickname, profileImgUrl)
-            return RsData("201-1", "회원가입이 완료되었습니다.", m)
+            return join(username, password, nickname, profileImgUrl)
         }
 
         if (member.deletedDate != null) {
             // 재가입 시나리오 실행
             member.reSignup(encodePasswordImplementation(password), nickname, profileImgUrl)
-            return RsData("201-1", "재가입되었습니다.", member)
+            return member
         }
 
         modify(member, nickname, profileImgUrl)
 
-        return RsData("200-1", "회원 정보가 수정되었습니다.", member)
+        return member
     }
 
     private fun modify(member: Member, nickname: String, profileImgUrl: String?) {

@@ -29,7 +29,7 @@ class CustomOAuth2UserService(
         val profileImgUrl = attributes["avatar_url"] as String?
         val username = providerTypeCode + "__%s".format(oauthUserId)
         val password = ""
-        val member = memberService.modifyOrJoin(username, password, nickname, profileImgUrl).data
+        val member = memberService.modifyOrJoin(username, password, nickname, profileImgUrl)
 
         return SecurityUser(
             member.id,

@@ -14,12 +14,12 @@ class CustomUserDetailsService(
 
     @Throws(UsernameNotFoundException::class)
     override fun loadUserByUsername(username: String): UserDetails {
-        val member: Member = memberService.getByUsername(username)
+        val member: Member = memberService.getMemberByUsername(username)
 
         return SecurityUser(
             member.id,
             member.username!!,
-            member.nickname!!,
+            member.nickname,
             member.authorities
         )
     }

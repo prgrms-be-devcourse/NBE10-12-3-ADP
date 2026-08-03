@@ -105,5 +105,5 @@ class Rq(
     }
 
     val actorFromDb: Member
-        get() = memberService.getById(actor!!.id)
+        get() = memberService.getMemberById(actor!!.id)
 }
