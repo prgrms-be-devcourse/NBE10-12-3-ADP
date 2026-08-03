@@ -20,7 +20,7 @@ import org.springframework.transaction.annotation.Transactional
 @SpringBootTest
 @Transactional
 @AutoConfigureMockMvc
-class ApiV1ReviewControllerDeleteTest {
+class ApiReviewControllerV1DeleteTest {
     @Autowired
     private lateinit var mvc: MockMvc
 

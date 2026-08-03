@@ -1,11 +1,11 @@
-package com.back.domain.review.dto
+package com.back.domain.review.controller.request
 
 import com.back.domain.review.validation.ValidRating
 import com.back.domain.review.validation.ValidTags
 import jakarta.validation.constraints.NotNull
 import jakarta.validation.constraints.Size
 
-class ReviewCreateRequestDto(
+class ReviewCreateRequest(
     @field:NotNull
     @field:ValidRating
     val rating: Float?,

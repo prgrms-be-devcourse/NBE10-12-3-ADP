@@ -1,8 +1,9 @@
 package com.back.domain.widget.service
 
 import com.back.domain.member.service.MemberService
-import com.back.domain.review.service.ReviewService
+import com.back.domain.review.repository.ReviewRepository
 import com.back.domain.wish.repository.WishRepository
+import org.springframework.data.domain.PageRequest
 import org.springframework.http.MediaType
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -13,7 +14,7 @@ import java.time.Duration
 @Transactional(readOnly = true)
 class WidgetByWidgetServerService(
     private val memberService: MemberService,
-    private val reviewService: ReviewService,
+    private val reviewRepository: ReviewRepository,
     private val widgetRendererWebClient: WebClient,
     private val wishRepository: WishRepository,
 ) {
@@ -36,9 +37,9 @@ class WidgetByWidgetServerService(
 
     fun createWidget(githubId: String): String? {
         val member = memberService.getMemberByGithubId(githubId)
-        val reviews = reviewService.getByMember(member.id, 0, VISIBLE_BOOK_MAX_COUNT).content
-        val reviewCount = reviewService.getReviewCountByMember(member.id)
-        val reviewWithContentCount = reviewService.getReviewWithContentCountByMember(member.id)
+        val reviews = reviewRepository.findByReviewer(member, PageRequest.of(0, VISIBLE_BOOK_MAX_COUNT)).content
+        val reviewCount = reviewRepository.countByReviewer(member).toLong()
+        val reviewWithContentCount = reviewRepository.countByReviewerAndContentNot(member, "").toLong()
 
         val wishCount = wishRepository.findByMember(member).size
 
