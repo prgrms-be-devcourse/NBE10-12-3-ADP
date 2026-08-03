@@ -34,13 +34,15 @@ class BookRecommendService(
             .map { review: Review -> this.reviewToRecommendReview(review) }
     }
 
-    fun getBooksByRecommend(actor: Member?): List<BookDto> {
+    fun getBooksByRecommend(actor: Member?, maxCount: Int): List<BookDto> {
         if (actor == null) return listOf()
 
         val recommendSystem = SimilarityRecommendByRating()
 
         val recentReviews: List<Review> = reviewRepository
-            .findByReviewer(actor, PageRequest.of(0, 5))
+            .findByReviewer(
+                actor,
+                PageRequest.of(0, 5))
             .toList()
 
         recommendSystem.setData(
@@ -63,7 +65,9 @@ class BookRecommendService(
             )
         }
 
-        return recommendSystem.getRecommendList(actor.id, 5, 10)
-            .map { bookId -> BookDto(bookRepository.findByIdOrNull(bookId)!!) }
+        return recommendSystem.getRecommendList(actor.id, 5, maxCount)
+            .mapNotNull { bookId ->
+                bookRepository.findByIdOrNull(bookId)?.let { BookDto(it) }
+            }
     }
 }

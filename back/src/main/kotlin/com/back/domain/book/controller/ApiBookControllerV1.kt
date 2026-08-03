@@ -68,9 +68,11 @@ class ApiBookControllerV1(
 
     @GetMapping("/recommend")
     @Operation(summary = "도서 추천 다건 조회")
-    fun getBooksByRecommend(): List<BookDto> {
+    fun getBooksByRecommend(
+        @RequestParam(defaultValue = "10") maxCount: Int
+    ): List<BookDto> {
         return bookRecommendService
-            .getBooksByRecommend(rq.actorOrNull)
+            .getBooksByRecommend(rq.actorOrNull, maxCount)
     }
 
     @GetMapping("/rank")
