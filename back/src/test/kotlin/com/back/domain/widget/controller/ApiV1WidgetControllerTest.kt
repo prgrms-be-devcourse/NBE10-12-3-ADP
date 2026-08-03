@@ -35,7 +35,7 @@ class ApiV1WidgetControllerTest {
             .andDo(print())
 
         resultActions
-            .andExpect(handler().handlerType(ApiV1WidgetController::class.java))
+            .andExpect(handler().handlerType(ApiWidgetControllerV1::class.java))
             .andExpect(status().isOk)
             .andExpect(content().contentTypeCompatibleWith("image/svg+xml"))
     }

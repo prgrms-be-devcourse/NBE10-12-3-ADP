@@ -44,9 +44,9 @@ class ApiV1TagControllerTest {
             .andDo(print())
 
         resultActions
-            .andExpect(handler().handlerType(ApiV1TagController::class.java))
+            .andExpect(handler().handlerType(ApiTagControllerV1::class.java))
             .andExpect(status().isCreated)
             .andExpect(jsonPath("$.resultCode").value("201-1"))
-            .andExpect(jsonPath("$.message").value("태그 생성 성공"))
+            .andExpect(jsonPath("$.message").value("태그 생성을 성공했습니다."))
     }
 }
