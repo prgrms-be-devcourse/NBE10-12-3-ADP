@@ -47,7 +47,7 @@ class BookDetailDto(
 
         private fun parseAuthors(book: Book): List<String> {
             if (book.authors.isNullOrBlank()) return listOf()
-            return book.authors!!.split(",\\s*")
+            return book.authors?.split(Regex(",\\s*")).orEmpty()
         }
     }
 }
