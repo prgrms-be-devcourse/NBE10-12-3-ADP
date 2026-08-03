@@ -1,5 +1,6 @@
 package com.back.domain.book.service
 
+import com.back.domain.book.dto.BookDetailDto
 import com.back.domain.book.dto.BookDto
 import com.back.domain.book.entity.Book
 import com.back.domain.book.repository.BookRepository
@@ -101,6 +102,18 @@ class BookService(
         val book = getBookById(id)
         incrementViewCount(book)
         return book
+    }
+
+    fun getBookDetail(id: Long, actor :Member?): BookDetailDto {
+
+        val book = getBook(id)
+
+        return BookDetailDto(
+            book,
+            getIsWished(book, actor),
+            getRatingMap(book),
+            getBookTags(book))
+
     }
 
     @Transactional

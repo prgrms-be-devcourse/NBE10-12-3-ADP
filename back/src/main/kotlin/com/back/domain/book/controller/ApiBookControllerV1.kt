@@ -1,7 +1,6 @@
 package com.back.domain.book.controller
 
 import com.back.domain.book.controller.request.BookUpdateRequest
-import com.back.domain.book.dto.BookDetailDto
 import com.back.domain.book.dto.BookDto
 import com.back.domain.book.service.BookRecommendService
 import com.back.domain.book.service.BookService
@@ -12,7 +11,6 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.validation.Valid
 import jakarta.validation.constraints.NotBlank
-import org.springframework.data.domain.Page
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
@@ -39,22 +37,12 @@ class ApiBookControllerV1(
     fun getBooks(
         @RequestParam(defaultValue = "0") page: Int,
         @RequestParam(defaultValue = "10") size: Int
-    ): Page<BookDto> {
-        return bookService.getBooks(page, size)
-    }
+    ) = bookService.getBooks(page, size)
 
     @GetMapping("/{id}")
     @Operation(summary = "도서 단건 조회")
-    fun getBook(@PathVariable id: Long): BookDetailDto {
-
-        val book = bookService.getBook(id)
-
-        return BookDetailDto(
-            book,
-            bookService.getIsWished(book, rq.actorOrNull),
-            bookService.getRatingMap(book),
-            bookService.getBookTags(book))
-    }
+    fun getBook(@PathVariable id: Long)
+        = bookService.getBookDetail(id, rq.actorOrNull)
 
     @GetMapping("/search")
     @Operation(summary = "도서 검색 다건 조회")
@@ -62,28 +50,22 @@ class ApiBookControllerV1(
         @RequestParam @NotBlank searchTerm: @NotBlank String,
         @RequestParam(defaultValue = "0") page: Int,
         @RequestParam(defaultValue = "10") size: Int
-    ): List<BookDto> {
-        return bookService.getBooksBySearch(searchTerm, page, size)
-    }
+    ) = bookService.getBooksBySearch(searchTerm, page, size)
 
     @GetMapping("/recommend")
     @Operation(summary = "도서 추천 다건 조회")
     fun getBooksByRecommend(
         @RequestParam(defaultValue = "10") maxCount: Int
-    ): List<BookDto> {
-        return bookRecommendService
+    ) = bookRecommendService
             .getBooksByRecommend(rq.actorOrNull, maxCount)
-    }
 
     @GetMapping("/rank")
-    @Operation(summary = "도서 인기순 다건 조회")
+    @Operation(summary = "도서 순위 다건 조회")
     fun getBooksOrderByRank(
         @RequestParam(defaultValue = "") type: String,
         @RequestParam(defaultValue = "0") page: Int,
         @RequestParam(defaultValue = "10") size: Int
-    ): List<BookDto> {
-        return bookService.getBooksOrderByRank(type, page, size)
-    }
+    ) = bookService.getBooksOrderByRank(type, page, size)
 
     @PutMapping("/{id}")
     @Operation(summary = "도서 수정 (관리자)")
@@ -91,7 +73,7 @@ class ApiBookControllerV1(
     fun updateBook(
         @PathVariable id: Long,
         @RequestBody @Valid req: BookUpdateRequest
-    ): RsData<BookDto?> {
+    ): RsData<BookDto> {
         val book = bookService.updateBook(
             id, req.title, req.description, req.authors, req.publisher, req.imgUrl
         )
@@ -104,7 +86,7 @@ class ApiBookControllerV1(
     @SecurityRequirement(name = "bearerAuth")
     fun deleteBook(
         @PathVariable id: Long
-    ): RsData<Void?> {
+    ): RsData<Unit> {
         bookService.deleteBook(id)
 
         return RsData("200-1", "도서 삭제를 성공했습니다.")

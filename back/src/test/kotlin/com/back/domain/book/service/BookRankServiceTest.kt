@@ -1,5 +1,6 @@
 package com.back.domain.book.service
 
+import com.back.domain.book.dto.BookDto
 import com.back.domain.book.entity.Book
 import com.back.domain.review.service.ReviewService
 import org.assertj.core.api.AssertionsForClassTypes
@@ -24,7 +25,7 @@ class BookRankServiceTest {
     @Test
     @DisplayName("도서 인기순(리뷰수) 다건 조회")
     fun t1() {
-        val bookRank: List<Book> = bookService.getBooksOrderByRank("reviewCnt", 0, 100)
+        val bookRank = bookService.getBooksOrderByRank("reviewCnt", 0, 100)
 
         if (bookRank.isEmpty()) return
 
@@ -42,7 +43,7 @@ class BookRankServiceTest {
     @Test
     @DisplayName("도서 인기순(평점) 다건 조회")
     fun t2() {
-        val bookRank: List<Book> = bookService.getBooksOrderByRank("rating", 0, 100)
+        val bookRank = bookService.getBooksOrderByRank("rating", 0, 100)
 
         if (bookRank.isEmpty()) return
 
