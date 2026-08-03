@@ -10,6 +10,8 @@ interface WishRepository : JpaRepository<Wish, Long> {
     fun deleteAllByBook(book: Book)
 
     fun findByMember(member: Member): List<Wish>
+    fun countByMember(member: Member): Int
 
     fun findByMemberAndBook(member: Member, book: Book): Wish?
+
 }

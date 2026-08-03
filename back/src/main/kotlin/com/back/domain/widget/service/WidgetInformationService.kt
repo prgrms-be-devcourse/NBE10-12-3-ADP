@@ -7,8 +7,10 @@ import com.back.domain.widget.dto.WidgetInformationDto
 import com.back.domain.wish.repository.WishRepository
 import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 
 @Service
+@Transactional(readOnly = true)
 class WidgetInformationService(
     private val memberRepository: MemberRepository,
     private val reviewRepository: ReviewRepository,
@@ -38,7 +40,7 @@ class WidgetInformationService(
                      },
             reviewRepository.countByReviewer(member),
             reviewRepository.countByReviewerAndContentNot(member, ""),
-            wishRepository.findByMember(member).size
+            wishRepository.countByMember(member)
         )
 
     }

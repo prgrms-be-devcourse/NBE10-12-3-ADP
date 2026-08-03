@@ -1,6 +1,8 @@
 package com.back.domain.widget.controller
 
 import com.back.domain.widget.service.WidgetService
+import io.swagger.v3.oas.annotations.Operation
+import io.swagger.v3.oas.annotations.tags.Tag
 import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
@@ -12,11 +14,13 @@ import org.springframework.web.bind.annotation.RequestMapping
 
 @Controller
 @RequestMapping("/api/v1/widgets")
+@Tag(name = "ApiWidgetControllerV2", description = "API 위젯 컨트롤러 V2")
 class ApiWidgetControllerV1(
     private val widgetService: WidgetService
 ) {
 
     @GetMapping("{githubId}")
+    @Operation(summary = "위젯 단건 조회")
     fun getWidget(
         @PathVariable githubId: String
     ): ResponseEntity<String> {
