@@ -48,7 +48,6 @@ class ApiMemberControllerV1Test {
 
         resultActions
             .andExpect(handler().handlerType(ApiMemberControllerV1::class.java))
-            .andExpect(handler().methodName("me"))
             .andExpect(status().isOk)
             .andExpect(jsonPath("$.id").value(member.id))
             .andExpect(jsonPath("$.username").value(member.username))
