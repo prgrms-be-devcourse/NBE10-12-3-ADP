@@ -1,89 +1,62 @@
 package com.back.domain.widget.service
 
-import com.back.domain.member.service.MemberService
-import com.back.domain.review.service.ReviewService
-import com.back.domain.wish.repository.WishRepository
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 @Service
 @Transactional(readOnly = true)
 class WidgetService(
-    private val memberService: MemberService,
-    private val reviewService: ReviewService,
-    private val wishRepository: WishRepository,
+    private val widgetInformationService: WidgetInformationService
 ) {
 
-    private companion object {
-        const val VISIBLE_BOOK_MAX_COUNT = 5
-    }
-
     fun createWidget(githubId: String): String {
-        val member = memberService.getMemberByGithubId(githubId)
-        val reviews = reviewService.getByMember(member.id, 0, VISIBLE_BOOK_MAX_COUNT).content
 
-        val reviewCount = reviewService.getReviewCountByMember(member.id)
-        val reviewWithContentCount = reviewService.getReviewWithContentCountByMember(member.id)
-        val wishCount = wishRepository.findByMember(member).size
+        val info = widgetInformationService.getWidgetInformation(githubId)
 
         val bookComponents = buildString {
-            val startIndex = maxOf(0, reviews.size - VISIBLE_BOOK_MAX_COUNT)
-            for (i in startIndex until reviews.size) {
-                val currentReview = reviews[i]
-                val x = 250 - (reviews.size - 1 - i) * 16
-                val y = 260 + (reviews.size - 1 - i) * 75
+
+            for (i in 0 until info.recentReadBooks.size) {
+                val currentReview = info.recentReadBooks[i]
+                val x = 250 - (info.recentReadBooks.size - 1 - i) * 16
+                val y = 260 + (info.recentReadBooks.size - 1 - i) * 75
                 val w = 400
                 val h = 56
                 val color = "pink"
-                val title = currentReview.book.title
-                val hasContent = currentReview.content.isNotBlank()
 
                 val lineComponents = buildString {
                     for (j in 0 until 8) {
                         append(
                             """
-                            <line x1="%d" y1="0" x2="%d" y2="%d" stroke="#fff" stroke-width="2" />
-                            """.trimIndent().format(j * 3, j * 3, h - 12),
+                            <line x1="${j * 3}" y1="0" x2="${j * 3}" y2="${h - 12}" stroke="#fff" stroke-width="2" />
+                            """.trimIndent(),
                         )
                     }
                 }
 
-                val ribbonComponent = if (hasContent)
+                val ribbonComponent = if (currentReview.withReview)
                     """
                     <path d="
-                        M %d %d
-                        H %d
-                        L %d %d
-                        L %d %d
-                        H %d
+                        M ${x + w - 18} ${y + 18}
+                        H ${x + w + 38}
+                        L ${x + w + 22} ${y + 30}
+                        L ${x + w + 38} ${y + 42}
+                        H ${x + w - 18}
                         Z
                         " fill="yellow" />
-                    """.trimIndent().format(
-                        x + w - 18, y + 18,
-                        x + w + 38,
-                        x + w + 22, y + 30,
-                        x + w + 38, y + 42,
-                        x + w - 18,
-                    )
+                    """.trimIndent()
                 else ""
 
                 append(
                     """
                     <g>
-                      <rect x="%d" y="%d" width="%d" height="%d" rx="10" fill="%s" filter="url(#shadow)" />
-                      <text x="%d" y="%d" class="book-title">%s</text>
-                        <g transform="translate(%d, %d)">
-                          %s
+                      <rect x="$x" y="$y" width="$w" height="$h" rx="10" fill="$color" filter="url(#shadow)" />
+                      <text x="${x + 30}" y="${y + 36}" class="book-title">${currentReview.title}</text>
+                        <g transform="translate(${x + w - 18}, ${y + 6})">
+                          $lineComponents
                         </g>
-                        %s
+                        $ribbonComponent
                     </g>
-                    """.trimIndent().format(
-                        x, y, w, h, color,
-                        x + 30, y + 36, title,
-                        x + w - 18, y + 6,
-                        lineComponents,
-                        ribbonComponent,
-                    ),
+                    """.trimIndent(),
                 )
             }
         }
@@ -120,7 +93,7 @@ class WidgetService(
               </g>
             
               <!-- books -->
-              %s
+              $bookComponents
             
               <!-- right text -->
               <text x="810" y="205" class="main-title">나의 작은 책장</text>
@@ -128,17 +101,17 @@ class WidgetService(
             
               <g transform="translate(810 335)">
                 <rect width="140" height="150" rx="30" fill="#fff" stroke="#ffc68c" stroke-width="5"/>
-                <text x="70" y="75" text-anchor="middle" class="num orange">%d</text>
+                <text x="70" y="75" text-anchor="middle" class="num orange">${info.readCount}</text>
                 <text x="70" y="112" text-anchor="middle" class="label">읽은 책</text>
               </g>
             
               <g transform="translate(980 335)">
                 <rect width="140" height="150" rx="30" fill="#fff" stroke="#a6dfbd" stroke-width="5"/>
-                <text x="70" y="75" text-anchor="middle" class="num green">%d</text>
+                <text x="70" y="75" text-anchor="middle" class="num green">${info.reviewCount}</text>
                 <text x="70" y="112" text-anchor="middle" class="label">쓴 리뷰</text>
               </g>
             
-              <text x="815" y="545" class="bottom">+ %d권이 더 책장에서 기다리는 중 🐾</text>
+              <text x="815" y="545" class="bottom">+ ${info.wishCount}권이 더 책장에서 기다리는 중 🐾</text>
             
               <text x="1325" y="395" class="star pink">✦</text>
               <text x="1455" y="265" class="star peach">✦</text>
@@ -197,11 +170,6 @@ class WidgetService(
                 .peach { fill: #ffd79f; }
               </style>
             </svg>
-            """.trimIndent().format(
-            bookComponents,
-            reviewCount,
-            reviewWithContentCount,
-            wishCount,
-        )
+            """.trimIndent()
     }
 }

@@ -1,30 +1,22 @@
 package com.back.domain.widget.service
 
-import com.back.domain.member.service.MemberService
-import com.back.domain.review.service.ReviewService
-import com.back.domain.wish.repository.WishRepository
 import org.springframework.http.MediaType
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.reactive.function.client.WebClient
+import org.springframework.web.reactive.function.client.bodyToMono
 import java.time.Duration
 
 @Service
 @Transactional(readOnly = true)
 class WidgetByWidgetServerService(
-    private val memberService: MemberService,
-    private val reviewService: ReviewService,
+    private val widgetInformationService: WidgetInformationService,
     private val widgetRendererWebClient: WebClient,
-    private val wishRepository: WishRepository,
 ) {
 
-    private companion object {
-        const val VISIBLE_BOOK_MAX_COUNT = 5
-    }
-
-    private class WidgetRenderRequest(
-        val reviewCount: Long,
-        val reviewWithContentCount: Long,
+    data class WidgetRenderRequest(
+        val reviewCount: Int,
+        val reviewWithContentCount: Int,
         val wishCount: Int,
         val books: List<BookItem>
     ) {
@@ -34,26 +26,21 @@ class WidgetByWidgetServerService(
         )
     }
 
-    fun createWidget(githubId: String): String? {
-        val member = memberService.getMemberByGithubId(githubId)
-        val reviews = reviewService.getByMember(member.id, 0, VISIBLE_BOOK_MAX_COUNT).content
-        val reviewCount = reviewService.getReviewCountByMember(member.id)
-        val reviewWithContentCount = reviewService.getReviewWithContentCountByMember(member.id)
+    fun createWidget(githubId: String): String {
 
-        val wishCount = wishRepository.findByMember(member).size
+        val widgetInfo = widgetInformationService.getWidgetInformation(githubId)
 
-        val startIndex = maxOf(0, reviews.size - VISIBLE_BOOK_MAX_COUNT)
-        val books = reviews.subList(startIndex, reviews.size).map { review ->
+        val books = widgetInfo.recentReadBooks.map { review ->
             WidgetRenderRequest.BookItem(
-                title = review.book.title,
-                hasContent = review.content.isNotBlank()
+                review.title,
+                review.withReview
             )
         }
 
         val request = WidgetRenderRequest(
-            reviewCount = reviewCount,
-            reviewWithContentCount = reviewWithContentCount,
-            wishCount = wishCount,
+            widgetInfo.readCount,
+            widgetInfo.reviewCount,
+            widgetInfo.wishCount,
             books = books
         )
 
@@ -63,7 +50,7 @@ class WidgetByWidgetServerService(
             .accept(MediaType.valueOf("image/svg+xml"))
             .bodyValue(request)
             .retrieve()
-            .bodyToMono(String::class.java)
-            .block(Duration.ofSeconds(3))
+            .bodyToMono<String>()
+            .block(Duration.ofSeconds(3)) ?: ""
     }
 }
