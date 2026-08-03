@@ -24,7 +24,7 @@ class ApiWidgetControllerV2(
     fun getWidget(
         @PathVariable githubId: String
     ): ResponseEntity<String> {
-        val widgetString = widgetByWidgetServerService.createWidget(githubId)
+        val widgetString = widgetByWidgetServerService.getWidget(githubId)
         val httpHeaders = HttpHeaders().apply {
             contentType = MediaType.parseMediaType("image/svg+xml")
         }

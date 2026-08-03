@@ -5,6 +5,7 @@ import com.back.domain.review.repository.ReviewRepository
 import com.back.domain.widget.dto.WidgetBookDto
 import com.back.domain.widget.dto.WidgetInformationDto
 import com.back.domain.wish.repository.WishRepository
+import com.back.global.exception.ServiceException
 import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -24,7 +25,7 @@ class WidgetInformationService(
     fun getWidgetInformation(githubId: String) : WidgetInformationDto {
 
         val member = memberRepository.findByGithubId(githubId)
-            ?: throw NoSuchElementException("존재하지 않는 회원입니다.")
+            ?: throw ServiceException("404-1", "존재하지 않는 회원입니다.")
 
         return WidgetInformationDto(
             reviewRepository.findByReviewer(

@@ -25,7 +25,7 @@ class WidgetByWidgetServerService(
             val hasContent: Boolean
         )
     }
-    fun createWidget(githubId: String): String {
+    fun getWidget(githubId: String): String {
 
         val widgetInfo = widgetInformationService.getWidgetInformation(githubId)
 

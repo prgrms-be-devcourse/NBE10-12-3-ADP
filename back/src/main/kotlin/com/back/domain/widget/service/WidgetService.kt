@@ -9,7 +9,7 @@ class WidgetService(
     private val widgetInformationService: WidgetInformationService
 ) {
 
-    fun createWidget(githubId: String): String {
+    fun getWidget(githubId: String): String {
 
         val info = widgetInformationService.getWidgetInformation(githubId)
         val bookComponents = buildString {

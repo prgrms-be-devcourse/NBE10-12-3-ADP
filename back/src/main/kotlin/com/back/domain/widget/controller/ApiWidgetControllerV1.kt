@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping
 
 @Controller
 @RequestMapping("/api/v1/widgets")
-@Tag(name = "ApiWidgetControllerV2", description = "API 위젯 컨트롤러 V2")
+@Tag(name = "ApiWidgetControllerV1", description = "API 위젯 컨트롤러 V1")
 class ApiWidgetControllerV1(
     private val widgetService: WidgetService
 ) {
@@ -24,7 +24,7 @@ class ApiWidgetControllerV1(
     fun getWidget(
         @PathVariable githubId: String
     ): ResponseEntity<String> {
-        val widgetString = widgetService.createWidget(githubId)
+        val widgetString = widgetService.getWidget(githubId)
         val httpHeaders = HttpHeaders().apply {
             contentType = MediaType.parseMediaType("image/svg+xml")
         }
