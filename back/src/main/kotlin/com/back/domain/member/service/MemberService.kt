@@ -47,7 +47,7 @@ class MemberService(
         return member
     }
 
-    fun getById(id: Long): MemberDto {
+    fun getMember(id: Long): MemberDto {
         return MemberDto(getMemberById(id))
     }
 
@@ -55,11 +55,7 @@ class MemberService(
         return MemberWithUsernameAndWidgetLinkDto(getMemberById(member.id))
     }
 
-    fun getByUsername(username: String): MemberDto {
-        return MemberDto(getMemberByUsername(username))
-    }
-
-    fun getByRefreshToken(apiKey: String): Member? =
+    fun getMemberByRefreshToken(apiKey: String): Member? =
         memberRepository.findByRefreshToken(apiKey)
 
     @Transactional
@@ -121,7 +117,7 @@ class MemberService(
             throw ServiceException("401-1", "비밀번호가 일치하지 않습니다.")
     }
 
-    fun getByGithubId(githubId: String): Member =
+    fun getMemberByGithubId(githubId: String): Member =
         memberRepository.findByGithubId(githubId)
             ?: throw NoSuchElementException("존재하지 않는 회원입니다.")
 

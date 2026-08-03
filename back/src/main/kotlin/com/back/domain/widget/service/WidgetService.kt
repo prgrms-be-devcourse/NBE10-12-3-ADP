@@ -19,7 +19,7 @@ class WidgetService(
     }
 
     fun createWidget(githubId: String): String {
-        val member = memberService.getByGithubId(githubId)
+        val member = memberService.getMemberByGithubId(githubId)
         val reviews = reviewService.getByMember(member.id, 0, VISIBLE_BOOK_MAX_COUNT).content
 
         val reviewCount = reviewService.getReviewCountByMember(member.id)

@@ -26,7 +26,7 @@ class ApiMemberControllerV1(
     @GetMapping("/me")
     @Operation(summary = "내 정보 조회")
     @SecurityRequirement(name = "bearerAuth")
-    fun me(): MemberWithUsernameAndWidgetLinkDto {
+    fun getMy(): MemberWithUsernameAndWidgetLinkDto {
         return memberService.getMy(rq.actor)
     }
 
@@ -35,7 +35,7 @@ class ApiMemberControllerV1(
     fun getMember(
         @PathVariable @Valid id: Long
     ): MemberDto {
-        return memberService.getById(id)
+        return memberService.getMember(id)
     }
 
     @DeleteMapping
@@ -75,7 +75,7 @@ class ApiMemberControllerV1(
     }
 
     @PostMapping
-    @Operation(summary = "회원 가입")
+    @Operation(summary = "회원가입")
     fun join(
         @RequestBody @Valid reqBody: MemberJoinRequest
     ): RsData<TokenDto> {

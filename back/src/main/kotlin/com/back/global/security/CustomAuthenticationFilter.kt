@@ -118,7 +118,7 @@ class CustomAuthenticationFilter(
 
         if (member == null) {
             member = memberService
-                .getByRefreshToken(refreshToken)
+                .getMemberByRefreshToken(refreshToken)
                 ?: throw ServiceException("401-3", "API 키가 유효하지 않습니다.")
         }
 

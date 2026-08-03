@@ -240,7 +240,7 @@ class ApiMemberControllerV1Test {
     @DisplayName("회원 삭제 - 관리자")
     @WithUserDetails("admin")
     fun t9() {
-        val member = memberService.getByUsername("user2")
+        val member = memberService.getMemberByUsername("user2")
 
         val resultActions = mvc
             .perform(delete("/api/v1/members/admin/${member.id}"))
@@ -263,7 +263,7 @@ class ApiMemberControllerV1Test {
     @DisplayName("회원 삭제 - 실패: 관리자가 아님")
     @WithUserDetails("user1")
     fun t10() {
-        val member = memberService.getByUsername("user2")
+        val member = memberService.getMemberByUsername("user2")
 
         val resultActions = mvc
             .perform(delete("/api/v1/members/admin/${member.id}"))

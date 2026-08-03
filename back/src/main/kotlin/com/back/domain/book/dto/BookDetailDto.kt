@@ -42,7 +42,7 @@ class BookDetailDto(
 
     companion object {
         private fun formatPublishedDate(book: Book): String {
-            return book.publishedDate?.toLocalDate().toString()
+            return book.publishedDate?.toLocalDate().toString() ?: ""
         }
 
         private fun parseAuthors(book: Book): List<String> {
