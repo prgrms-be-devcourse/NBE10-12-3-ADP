@@ -87,7 +87,7 @@ class MemberService(
     }
 
     @Transactional
-    fun delete(id: Long) {
+    fun deleteMember(id: Long) {
         val member = getMemberById(id)
         member.deletedDate = LocalDateTime.now()
     }
@@ -99,8 +99,7 @@ class MemberService(
                 size,
                 Sort.by(Sort.Direction.DESC, "id")
             )
-        )
-            .map { m -> AdminMemberDto(m) }
+        ).map { m -> AdminMemberDto(m) }
     }
 
 

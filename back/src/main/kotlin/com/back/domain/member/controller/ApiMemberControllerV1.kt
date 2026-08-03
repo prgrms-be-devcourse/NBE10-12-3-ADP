@@ -42,7 +42,7 @@ class ApiMemberControllerV1(
     @Operation(summary = "회원 탈퇴")
     @SecurityRequirement(name = "bearerAuth")
     fun delete(): RsData<Unit> {
-        memberService.delete(rq.actor.id)
+        memberService.deleteMember(rq.actor.id)
 
         rq.deleteCookie("refreshToken")
         rq.deleteCookie("accessToken")
@@ -129,7 +129,7 @@ class ApiMemberControllerV1(
     fun deleteMember(
         @PathVariable id: Long
     ): RsData<Unit> {
-        memberService.delete(id)
+        memberService.deleteMember(id)
 
         return RsData("200-1", "회원 강제 탈퇴를 성공했습니다.")
     }
