@@ -49,7 +49,7 @@ class ApiReviewControllerV1(
     @Operation(summary = "내 리뷰 다건 조회")
     @SecurityRequirement(name = "bearerAuth")
     fun getMyReviews(): ReviewsByMemberDto =
-        getReviewsByMemberId(rq.actor.id)
+        reviewService.getReviewsByMemberId(rq.actor.id)
 
     @GetMapping("/admin")
     @Operation(summary = "리뷰 다건 조회 (관리자)")
