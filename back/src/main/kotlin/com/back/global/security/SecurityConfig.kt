@@ -40,6 +40,7 @@ class SecurityConfig(
             authorizeHttpRequests {
                 authorize(HttpMethod.GET, "/api/*/members/{id:\\d+}", permitAll)
                 authorize(HttpMethod.GET, "/api/*/widgets/{githubId}", permitAll)
+                authorize(HttpMethod.GET, "/api/*/widgets/{githubId}/raw", permitAll)
                 authorize(HttpMethod.GET, "/api/*/reviews/book/{id:\\d+}", permitAll)
                 authorize(HttpMethod.GET, "/api/*/reviews/member/{id:\\d+}", permitAll)
                 authorize(HttpMethod.GET, "/api/*/books/{id:\\d+}", permitAll)
@@ -92,7 +93,7 @@ class SecurityConfig(
                     response.status = 401
                     response.writer.write(
                         Ut.json.toString(
-                            RsData<Void>("401-1", "로그인 후 이용해주세요.")
+                            RsData<Unit>("401-1", "로그인 후 이용해주세요.")
                         )
                     )
                 }
@@ -101,7 +102,7 @@ class SecurityConfig(
                     response.status = 403
                     response.writer.write(
                         Ut.json.toString(
-                            RsData<Void>("403-1", "권한이 없습니다.")
+                            RsData<Unit>("403-1", "권한이 없습니다.")
                         )
                     )
                 }
