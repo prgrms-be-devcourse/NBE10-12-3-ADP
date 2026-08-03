@@ -84,9 +84,9 @@ class BaseInitData(
             )
         )
 
-        wishService.addWish(memberUser1, book1)
-        wishService.addWish(memberUser2, book2)
-        wishService.addWish(memberUser3, book3)
+        wishService.createWish(memberUser1, book1.id)
+        wishService.createWish(memberUser2, book2.id)
+        wishService.createWish(memberUser3, book3.id)
 
         reviewService.createReview(
             book1.id,

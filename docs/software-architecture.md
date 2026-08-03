@@ -88,7 +88,7 @@ GET /reviews/member/{memberId} → 회원별 리뷰 다건 조회
 
 - 액션 메서드명은 호출하는 Service 메서드명과 동일하게 작성한다.
 - Controller에는 `@Transactional`을 선언하지 않는다.
-- Swagger 문서 정보가 실제 API와 일치하는지 확인한다. Tag의 도메인명과 Operation(summary = "...")의 API 요약명은 이 문서의 용어 및 API 명명 규칙을 따른다.
+- Swagger 문서 정보가 실제 API와 일치하는지 확인한다. Tag(name = "...")은 클래스명으로, Operation(summary = "...")는 API 명으로 작성한다.
 
 ## 4. Service
 

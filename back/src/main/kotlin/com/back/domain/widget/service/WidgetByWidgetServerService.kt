@@ -2,7 +2,7 @@ package com.back.domain.widget.service
 
 import com.back.domain.member.service.MemberService
 import com.back.domain.review.service.ReviewService
-import com.back.domain.wish.service.WishService
+import com.back.domain.wish.repository.WishRepository
 import org.springframework.http.MediaType
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -14,8 +14,8 @@ import java.time.Duration
 class WidgetByWidgetServerService(
     private val memberService: MemberService,
     private val reviewService: ReviewService,
-    private val wishService: WishService,
-    private val widgetRendererWebClient: WebClient
+    private val widgetRendererWebClient: WebClient,
+    private val wishRepository: WishRepository,
 ) {
 
     private companion object {
@@ -40,7 +40,7 @@ class WidgetByWidgetServerService(
         val reviewCount = reviewService.getReviewCountByMember(member.id)
         val reviewWithContentCount = reviewService.getReviewWithContentCountByMember(member.id)
 
-        val wishCount = wishService.getWishesByMember(member).size
+        val wishCount = wishRepository.findByMember(member).size
 
         val startIndex = maxOf(0, reviews.size - VISIBLE_BOOK_MAX_COUNT)
         val books = reviews.subList(startIndex, reviews.size).map { review ->

@@ -44,6 +44,16 @@ class MemberService(
         return member
     }
 
+    fun getMemberByUsername(username: String): Member {
+        val member = memberRepository.findByUsername(username)
+            .orElseThrow { UsernameNotFoundException("존재하지 않는 회원입니다.") }
+
+        if (member.isDeleted) {
+            throw ServiceException("404-1", "존재하지 않는 회원입니다.")
+        }
+        return member
+    }
+
     @Transactional
     fun join(username: String, password: String, githubId: String, imgUrl: String?): Member =
         join(username, password, githubId, githubId, imgUrl)

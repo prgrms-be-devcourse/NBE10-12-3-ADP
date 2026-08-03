@@ -16,6 +16,8 @@ interface ReviewRepository : JpaRepository<Review, Long> {
     fun findByBook(book: Book): List<Review>
     fun findByBook(book: Book, pageable: Pageable): Page<Review>
 
+    fun findByBookId(bookId: Long): List<Review>
+
     fun findByReviewer(member: Member): List<Review>
     fun findByReviewer(member: Member, pageable: Pageable): Page<Review>
 
