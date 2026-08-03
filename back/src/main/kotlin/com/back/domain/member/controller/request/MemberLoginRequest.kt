@@ -1,9 +1,9 @@
-package com.back.domain.member.dto
+package com.back.domain.member.controller.request
 
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.Size
 
-class MemberLoginRequestDto(
+class MemberLoginRequest(
     @NotBlank
     @Size(min = 2, max = 30)
     val username: String,

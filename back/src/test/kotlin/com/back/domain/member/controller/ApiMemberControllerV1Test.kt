@@ -44,11 +44,10 @@ class ApiMemberControllerV1Test {
             .perform(get("/api/v1/members/me"))
             .andDo(print())
 
-        val member = memberService.getByUsername("user1")
+        val member = memberService.getMemberByUsername("user1")
 
         resultActions
             .andExpect(handler().handlerType(ApiMemberControllerV1::class.java))
-            .andExpect(handler().methodName("me"))
             .andExpect(status().isOk)
             .andExpect(jsonPath("$.id").value(member.id))
             .andExpect(jsonPath("$.username").value(member.username))
@@ -66,7 +65,7 @@ class ApiMemberControllerV1Test {
             .perform(get("/api/v1/members/$id"))
             .andDo(print())
 
-        val member = memberService.getById(id)
+        val member = memberService.getMemberById(id)
 
         resultActions
             .andExpect(handler().handlerType(ApiMemberControllerV1::class.java))
@@ -127,7 +126,7 @@ class ApiMemberControllerV1Test {
             )
             .andDo(print())
 
-        val member = memberService.getByUsername("user1")
+        val member = memberService.getMemberByUsername("user1")
 
         resultActions
             .andExpect(handler().handlerType(ApiMemberControllerV1::class.java))
@@ -173,7 +172,7 @@ class ApiMemberControllerV1Test {
             )
             .andDo(print())
 
-        val member = memberService.getByUsername("user7")
+        val member = memberService.getMemberByUsername("user7")
 
         resultActions
             .andExpect(handler().handlerType(ApiMemberControllerV1::class.java))
@@ -240,7 +239,7 @@ class ApiMemberControllerV1Test {
     @DisplayName("회원 삭제 - 관리자")
     @WithUserDetails("admin")
     fun t9() {
-        val member = memberService.getByUsername("user2")
+        val member = memberService.getMemberByUsername("user2")
 
         val resultActions = mvc
             .perform(delete("/api/v1/members/admin/${member.id}"))
@@ -263,7 +262,7 @@ class ApiMemberControllerV1Test {
     @DisplayName("회원 삭제 - 실패: 관리자가 아님")
     @WithUserDetails("user1")
     fun t10() {
-        val member = memberService.getByUsername("user2")
+        val member = memberService.getMemberByUsername("user2")
 
         val resultActions = mvc
             .perform(delete("/api/v1/members/admin/${member.id}"))

@@ -106,7 +106,7 @@ class ApiV1ReviewControllerGetTest {
     @Throws(Exception::class)
     fun t2() {
         val memberId = 3L
-        val member = memberService.getById(memberId)
+        val member = memberService.getMemberById(memberId)
         val ratings: Map<String, Any> = reviewService.getRatingMap(member.id)
         val reviews: List<Review> = reviewService.getByMemberId(member.id)
 
@@ -180,7 +180,7 @@ class ApiV1ReviewControllerGetTest {
             )
             .andDo(print())
 
-        val member = memberService.getByUsername("user1")
+        val member = memberService.getMemberByUsername("user1")
         val ratings: Map<String, Any> = reviewService.getRatingMap(member.id)
         val reviews: List<Review> = reviewService.getByMemberId(member.id)
 
