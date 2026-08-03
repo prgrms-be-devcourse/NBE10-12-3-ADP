@@ -13,7 +13,7 @@ class TagService(
 ) {
 
     @Transactional
-    fun post(name: String) {
+    fun createTag(name: String) {
         if (tagRepository.findByName(name) != null)
             throw ServiceException("409-1", "이미 존재하는 태그입니다.")
 

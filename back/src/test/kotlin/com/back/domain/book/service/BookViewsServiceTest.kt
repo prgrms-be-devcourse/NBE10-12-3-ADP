@@ -27,12 +27,13 @@ class BookViewsServiceTest {
                 bookService.incrementViewCount(book)
             }
 
-        val bookRank: List<Book> = bookService.getBooksOrderByRank("views", 0, 10)
+        val bookRank = bookService.getBooksOrderByRank("views", 0, 10)
 
         var upperCnt = Int.MAX_VALUE
 
         for (book in bookRank) {
-            val nowCnt = bookService.getBookViewCount(book)
+            val b = bookService.getBookById(book.id)
+            val nowCnt = bookService.getBookViewCount(b)
 
             val expectedViewCount = viewsCount[(book.id - 1).toInt()]
 
