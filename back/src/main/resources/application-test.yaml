@@ -22,3 +22,5 @@ custom:
     api-keys: dummy
   security:
     allowedOrigins: dummy
+  kakao:
+    api-key: dummy

@@ -63,3 +63,6 @@ custom:
   widget:
     renderer:
       base-url: ${CUSTOM__WIDGET__RENDERER__BASE_URL:http://localhost:3001}
+  kakao:
+    api-key: ${CUSTOM__KAKAO__API_KEY}
+    base-url: https://dapi.kakao.com
