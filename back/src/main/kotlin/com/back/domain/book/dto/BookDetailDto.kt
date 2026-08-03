@@ -41,13 +41,16 @@ class BookDetailDto(
     )
 
     companion object {
+
+        private val AUTHOR_REGEX = Regex(",\\s*")
+
         private fun formatPublishedDate(book: Book): String {
             return book.publishedDate?.toLocalDate().toString() ?: ""
         }
 
         private fun parseAuthors(book: Book): List<String> {
             if (book.authors.isNullOrBlank()) return listOf()
-            return book.authors?.split(Regex(",\\s*")).orEmpty()
+            return book.authors?.split(AUTHOR_REGEX).orEmpty()
         }
     }
 }

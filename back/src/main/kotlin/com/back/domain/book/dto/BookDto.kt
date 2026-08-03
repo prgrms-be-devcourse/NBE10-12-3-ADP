@@ -7,7 +7,7 @@ open class BookDto(
     title: String,
     imgUrl: String?,
     val averageRating: Double
-) : BookDtoBase(id, title, imgUrl){
+) : BookDtoBase(id, title, imgUrl) {
     constructor(book: Book) : this(
         book.id,
         book.title,
