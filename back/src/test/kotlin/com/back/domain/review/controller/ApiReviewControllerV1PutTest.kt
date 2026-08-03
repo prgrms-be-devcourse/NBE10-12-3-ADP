@@ -23,7 +23,7 @@ import org.springframework.transaction.annotation.Transactional
 @SpringBootTest
 @Transactional
 @AutoConfigureMockMvc
-class ApiV1ReviewControllerPutTest {
+class ApiReviewControllerV1PutTest {
     @Autowired
     private lateinit var mvc: MockMvc
 
@@ -48,7 +48,7 @@ class ApiV1ReviewControllerPutTest {
                                                 transform = { "\"$it\"" } // Wraps each string in quotes
                                             )}
                                         }
-                                        
+
                                         """.trimIndent()
                     )
             )
@@ -68,7 +68,7 @@ class ApiV1ReviewControllerPutTest {
 
         val resultActions = putReview(id, rating, content, tags)
 
-        val review = reviewService.getById(id)
+        val review = reviewService.getReview(id)
 
         resultActions
             .andExpect(handler().handlerType(ApiReviewControllerV1::class.java))
