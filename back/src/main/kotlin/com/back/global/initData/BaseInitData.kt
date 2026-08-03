@@ -89,66 +89,66 @@ class BaseInitData(
         wishService.createWish(memberUser3, book3.id)
 
         reviewService.createReview(
+            memberUser1,
             book1.id,
-            memberUser1.id,
             4.0f,
             "comment",
             listOf("a", "b")
         )
         reviewService.createReview(
+            memberUser1,
             book2.id,
-            memberUser1.id,
             3.5f,
             "",
             listOf("Java", "Spring", "신입 개발자")
         )
         reviewService.createReview(
+            memberUser1,
             book3.id,
-            memberUser1.id,
             1.5f,
             "많이 아쉬운 책입니다..",
             listOf("소설", "감자")
         )
         reviewService.createReview(
+            memberUser1,
             book4.id,
-            memberUser1.id,
             4.5f,
             "",
             listOf("소설")
         )
 
         reviewService.createReview(
+            memberUser2,
             book2.id,
-            memberUser2.id,
             3.5f,
             "",
             listOf("Java", "Spring", "신입 개발자")
         )
         reviewService.createReview(
+            memberUser2,
             book3.id,
-            memberUser2.id,
             1.5f,
             "많이 아쉬운 책입니다..",
             listOf("소설", "감자")
         )
         reviewService.createReview(
+            memberUser2,
             book4.id,
-            memberUser2.id,
             4.5f,
             "",
             listOf("소설")
         )
 
         reviewService.createReview(
+            memberUser3,
             book2.id,
-            memberUser3.id,
             3.5f,
             "",
             listOf("Java", "Spring", "신입 개발자")
         )
         reviewService.createReview(
+            memberUser3,
             book3.id,
-            memberUser3.id,
             1.5f,
             "많이 아쉬운 책입니다..",
             listOf("소설", "감자")
