@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController
 @RequestMapping("/api/v1/tags")
-@Tag(name = "ApiTagControllerV1", description = "API 태그 컨트롤러")
+@Tag(name = "ApiTagControllerV1", description = "API 태그 컨트롤러 V1")
 class ApiTagControllerV1(
     private val tagService: TagService
 ) {
