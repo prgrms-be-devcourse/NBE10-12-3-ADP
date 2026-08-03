@@ -5,20 +5,20 @@ import com.fasterxml.jackson.annotation.JsonInclude
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 class BookDetailDto(
-    val id: Long,
-    val title: String,
+    id: Long,
+    title: String,
+    imgUrl: String?,
     val description: String?,
     val isbn: String,
     val publishedDate: String,
     val authors: List<String>,
     val publisher: String?,
     val translators: List<String>,
-    val imgUrl: String?,
     val reviewCount: Int,
     val rating: Map<String, Any>,
     val tags: List<String>,
     val isWished: Boolean
-) {
+) : BookDtoBase(id, title, imgUrl) {
     constructor(
         book: Book,
         isWished: Boolean,
@@ -27,13 +27,13 @@ class BookDetailDto(
     ) : this(
         book.id,
         book.title,
+        book.imgUrl,
         book.description,
         book.isbn,
         formatPublishedDate(book),
         parseAuthors(book),
         book.publisher,
         listOf<String>(),
-        book.imgUrl,
         book.reviewCount,
         ratingMap,
         tags,
@@ -41,13 +41,17 @@ class BookDetailDto(
     )
 
     companion object {
+
+        private val AUTHOR_REGEX = Regex(",\\s*")
+
         private fun formatPublishedDate(book: Book): String {
             return book.publishedDate?.toLocalDate().toString() ?: ""
         }
 
         private fun parseAuthors(book: Book): List<String> {
-            if (book.authors == null || book.authors!!.isBlank()) return listOf()
-            return book.authors!!.split(",\\s*")
+            val authors = book.authors
+            if (authors.isNullOrBlank()) return listOf()
+            return authors.split(AUTHOR_REGEX)
         }
     }
 }

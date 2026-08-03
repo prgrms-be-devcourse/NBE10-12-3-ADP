@@ -1,15 +1,15 @@
 package com.back.domain.book.service
 
-import com.back.domain.book.entity.Book
+import com.back.domain.book.dto.BookDto
 import com.back.domain.book.repository.BookRepository
 import com.back.domain.member.entity.Member
 import com.back.domain.review.entity.Review
 import com.back.domain.review.repository.ReviewRepository
-import com.back.domain.review.service.ReviewService
 
 import com.back.standard.recommend.byRating.SimilarityRecommendByRating
 import com.back.standard.recommend.byRating.SimilarityRecommendByRating.Rating
 import org.springframework.data.domain.PageRequest
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -34,13 +34,15 @@ class BookRecommendService(
             .map { review: Review -> this.reviewToRecommendReview(review) }
     }
 
-    fun getBooksByRecommend(actor: Member?): List<Book> {
+    fun getBooksByRecommend(actor: Member?, maxCount: Int): List<BookDto> {
         if (actor == null) return listOf()
 
         val recommendSystem = SimilarityRecommendByRating()
 
         val recentReviews: List<Review> = reviewRepository
-            .findByReviewer(actor, PageRequest.of(0, 5))
+            .findByReviewer(
+                actor,
+                PageRequest.of(0, 5))
             .toList()
 
         recommendSystem.setData(
@@ -50,11 +52,10 @@ class BookRecommendService(
         val members: MutableSet<Member> = mutableSetOf()
 
         for (review in recentReviews) {
-            val book = bookRepository.findById(review.book.id)
-            if (book.isEmpty) continue;
+            val book = bookRepository.findByIdOrNull(review.book.id) ?: continue
 
             reviewRepository
-                .findByBook(book.get(),PageRequest.of(0, 10))
+                .findByBook(book, PageRequest.of(0, 10))
                 .forEach { r -> members.add(r.reviewer) }
         }
 
@@ -64,7 +65,9 @@ class BookRecommendService(
             )
         }
 
-        return recommendSystem.getRecommendList(actor.id, 5, 10)
-            .map { bookId -> bookRepository.findById(bookId).get() }
+        return recommendSystem.getRecommendList(actor.id, 5, maxCount)
+            .mapNotNull { bookId ->
+                bookRepository.findByIdOrNull(bookId)?.let { BookDto(it) }
+            }
     }
 }

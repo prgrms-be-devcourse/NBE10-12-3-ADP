@@ -1,6 +1,6 @@
-package com.back.domain.book.dto
+package com.back.domain.book.controller.request
 
-class BookUpdateRequestDto(
+class BookUpdateRequest(
     val title: String,
     val description: String?,
     val authors: String?,

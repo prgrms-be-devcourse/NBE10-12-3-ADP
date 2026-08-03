@@ -1,5 +1,7 @@
 package com.back.domain.book.service
 
+import com.back.domain.book.dto.BookDetailDto
+import com.back.domain.book.dto.BookDto
 import com.back.domain.book.entity.Book
 import com.back.domain.book.repository.BookRepository
 import com.back.domain.book.repository.BookViewCountRedisRepository
@@ -10,6 +12,7 @@ import com.back.domain.wish.repository.WishRepository
 import com.back.global.rq.Rq
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import kotlin.collections.iterator
@@ -26,9 +29,9 @@ class BookService(
 ) {
 
     fun getBookById(bookId: Long) : Book {
-        val book = bookRepository.findById(bookId)
-        return if (book.isPresent) book.get()
-            else throw NoSuchElementException("존재하지 않는 도서입니다.")
+
+        return bookRepository.findByIdOrNull(bookId) ?:
+            throw NoSuchElementException("존재하지 않는 도서입니다.")
 
     }
 
@@ -47,13 +50,13 @@ class BookService(
         return book.viewCount
     }
 
-    fun getBooksOrderByTopViewedInLastHour(page: Int, size: Int): List<Book> {
+    fun getBooksOrderByTopViewedInLastHour(page: Int, size: Int): List<BookDto> {
         val books = bookViewCountRedisRepository.findBookIdOrderByTopViewedInLastHout(page, size) ?: return listOf()
 
-        return books.map { bookId: Long -> getBookById(bookId) }
+        return books.map { bookId: Long -> BookDto(getBookById(bookId)) }
     }
 
-    fun getBooksOrderByRank(type: String, page: Int, size: Int): List<Book> {
+    fun getBooksOrderByRank(type: String, page: Int, size: Int): List<BookDto> {
 
         if (type == "views")
             return getBooksOrderByTopViewedInLastHour(page, size)
@@ -62,8 +65,11 @@ class BookService(
 
         if (type == "rating")
             return bookRepository.findAllByOrderByAverageRatingDesc(pageable).toList()
+                .map { book -> BookDto(book)}
 
-        return bookRepository.findAllByOrderByReviewCountDesc(pageable).toList()
+        return bookRepository.findAllByOrderByReviewCountDesc(pageable)
+            .toList()
+            .map { book -> BookDto(book)}
     }
 
     @Transactional
@@ -87,9 +93,8 @@ class BookService(
         val viewMap = bookViewCountRedisRepository.findAllBookViews()
 
         for (tuple in viewMap) {
-            val book = bookRepository.findById(tuple.key)
-            if (book.isEmpty) continue
-            updateBooksViewCountInDb(book.get(), tuple.value)
+            val book = bookRepository.findByIdOrNull(tuple.key) ?: continue
+            updateBooksViewCountInDb(book, tuple.value)
         }
     }
 
@@ -97,6 +102,18 @@ class BookService(
         val book = getBookById(id)
         incrementViewCount(book)
         return book
+    }
+
+    fun getBookDetail(id: Long, actor :Member?): BookDetailDto {
+
+        val book = getBook(id)
+
+        return BookDetailDto(
+            book,
+            getIsWished(book, actor),
+            getRatingMap(book),
+            getBookTags(book))
+
     }
 
     @Transactional
@@ -107,12 +124,12 @@ class BookService(
         authors: String?,
         publisher: String?,
         imgUrl: String?
-    ): Book {
+    ): BookDto {
         val book = getBookById(id)
 
         book.update(title, description, authors, publisher, imgUrl)
 
-        return book
+        return BookDto(book)
     }
 
     @Transactional
@@ -125,7 +142,7 @@ class BookService(
         bookRepository.delete(book)
     }
 
-    fun getBooks(page: Int, size: Int): Page<Book> {
+    fun getBooks(page: Int, size: Int): Page<BookDto> {
         return bookRepository
             .findAll(
                 PageRequest.of(
@@ -134,6 +151,7 @@ class BookService(
                     org.springframework.data.domain.Sort.by(org.springframework.data.domain.Sort.Direction.DESC, "id")
                 )
             )
+            .map { book -> BookDto(book) }
     }
 
 
@@ -159,16 +177,19 @@ class BookService(
         searchTerm: String,
         page: Int,
         size: Int
-    ): Page<Book> {
+    ): List<BookDto> {
         val pageable = PageRequest.of(page, size)
 
         try {
             return bookRepository.searchByKeyword(searchTerm, pageable)
+                .toList().map { book -> BookDto(book) }
+
         } catch (_: java.lang.Exception) {
             // handler();
         }
 
         return bookRepository.findByTitleContaining(searchTerm, pageable)
+            .toList().map { book -> BookDto(book) }
     }
 
     fun getIsWished(book: Book, actor: Member?) : Boolean {
