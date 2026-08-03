@@ -41,7 +41,7 @@ class ApiBookControllerV1(
 
     @GetMapping("/{id}")
     @Operation(summary = "도서 단건 조회")
-    fun getBook(@PathVariable id: Long)
+    fun getBookDetail(@PathVariable id: Long)
         = bookService.getBookDetail(id, rq.actorOrNull)
 
     @GetMapping("/search")

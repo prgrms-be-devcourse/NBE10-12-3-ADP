@@ -23,7 +23,7 @@ class BookRankServiceTest {
     private lateinit var bookService: BookService
 
     @Test
-    @DisplayName("도서 인기순(리뷰수) 다건 조회")
+    @DisplayName("도서 순위(리뷰수) 다건 조회")
     fun t1() {
         val bookRank = bookService.getBooksOrderByRank("reviewCnt", 0, 100)
 
@@ -41,7 +41,7 @@ class BookRankServiceTest {
     }
 
     @Test
-    @DisplayName("도서 인기순(평점) 다건 조회")
+    @DisplayName("도서 순위(평점) 다건 조회")
     fun t2() {
         val bookRank = bookService.getBooksOrderByRank("rating", 0, 100)
 
