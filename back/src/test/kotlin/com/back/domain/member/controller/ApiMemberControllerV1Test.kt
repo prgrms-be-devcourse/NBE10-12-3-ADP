@@ -44,7 +44,7 @@ class ApiMemberControllerV1Test {
             .perform(get("/api/v1/members/me"))
             .andDo(print())
 
-        val member = memberService.getByUsername("user1")
+        val member = memberService.getMemberByUsername("user1")
 
         resultActions
             .andExpect(handler().handlerType(ApiMemberControllerV1::class.java))
@@ -66,7 +66,7 @@ class ApiMemberControllerV1Test {
             .perform(get("/api/v1/members/$id"))
             .andDo(print())
 
-        val member = memberService.getById(id)
+        val member = memberService.getMemberById(id)
 
         resultActions
             .andExpect(handler().handlerType(ApiMemberControllerV1::class.java))
@@ -127,7 +127,7 @@ class ApiMemberControllerV1Test {
             )
             .andDo(print())
 
-        val member = memberService.getByUsername("user1")
+        val member = memberService.getMemberByUsername("user1")
 
         resultActions
             .andExpect(handler().handlerType(ApiMemberControllerV1::class.java))
@@ -173,7 +173,7 @@ class ApiMemberControllerV1Test {
             )
             .andDo(print())
 
-        val member = memberService.getByUsername("user7")
+        val member = memberService.getMemberByUsername("user7")
 
         resultActions
             .andExpect(handler().handlerType(ApiMemberControllerV1::class.java))

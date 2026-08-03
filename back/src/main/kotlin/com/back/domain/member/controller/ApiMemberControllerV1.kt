@@ -2,9 +2,10 @@ package com.back.domain.member.controller
 
 import com.back.domain.member.dto.AdminMemberDto
 import com.back.domain.member.dto.MemberDto
-import com.back.domain.member.dto.MemberJoinRequestDto
-import com.back.domain.member.dto.MemberLoginRequestDto
+import com.back.domain.member.controller.request.MemberJoinRequest
+import com.back.domain.member.controller.request.MemberLoginRequest
 import com.back.domain.member.dto.MemberWithUsernameAndWidgetLinkDto
+import com.back.domain.member.dto.TokenDto
 import com.back.domain.member.service.MemberService
 import com.back.global.rq.Rq
 import com.back.global.rsData.RsData
@@ -26,8 +27,7 @@ class ApiMemberControllerV1(
     @Operation(summary = "내 정보 조회")
     @SecurityRequirement(name = "bearerAuth")
     fun me(): MemberWithUsernameAndWidgetLinkDto {
-        val actor = memberService.getById(rq.actor.id)
-        return MemberWithUsernameAndWidgetLinkDto(actor)
+        return memberService.getMy(rq.actor)
     }
 
     @GetMapping("/{id}")
@@ -35,15 +35,8 @@ class ApiMemberControllerV1(
     fun getMember(
         @PathVariable @Valid id: Long
     ): MemberDto {
-        val member = memberService.getById(id)
-
-        return MemberDto(member)
+        return memberService.getById(id)
     }
-
-    data class MemberLoginResBody(
-        val accessToken: String,
-        val refreshToken: String?
-    )
 
     @DeleteMapping
     @Operation(summary = "회원 탈퇴")
@@ -60,9 +53,9 @@ class ApiMemberControllerV1(
     @PostMapping("/login")
     @Operation(summary = "로그인")
     fun login(
-        @RequestBody @Valid reqBody: MemberLoginRequestDto
-    ): RsData<MemberLoginResBody> {
-        val member = memberService.getByUsername(reqBody.username)
+        @RequestBody @Valid reqBody: MemberLoginRequest
+    ): RsData<TokenDto> {
+        val member = memberService.getMemberByUsername(reqBody.username)
 
         memberService.checkPassword(member, reqBody.password)
 
@@ -74,7 +67,7 @@ class ApiMemberControllerV1(
         return RsData(
             "200-1",
             "로그인을 성공했습니다.",
-            MemberLoginResBody(
+            TokenDto(
                 accessToken,
                 member.refreshToken
             )
@@ -84,8 +77,8 @@ class ApiMemberControllerV1(
     @PostMapping
     @Operation(summary = "회원 가입")
     fun join(
-        @RequestBody @Valid reqBody: MemberJoinRequestDto
-    ): RsData<MemberLoginResBody> {
+        @RequestBody @Valid reqBody: MemberJoinRequest
+    ): RsData<TokenDto> {
         val member = memberService.join(
             reqBody.username,
             reqBody.password,
@@ -103,7 +96,7 @@ class ApiMemberControllerV1(
         return RsData(
             "200-1",
             "회원가입을 성공했습니다.",
-            MemberLoginResBody(
+            TokenDto(
                 accessToken,
                 member.refreshToken
             )
@@ -127,7 +120,7 @@ class ApiMemberControllerV1(
         @RequestParam(defaultValue = "0") page: Int,
         @RequestParam(defaultValue = "10") size: Int
     ): Page<AdminMemberDto> {
-        return memberService.getMembers(page, size).map { AdminMemberDto(it) }
+        return memberService.getMembers(page, size)
     }
 
     @DeleteMapping("/admin/{id}")
