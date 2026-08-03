@@ -52,4 +52,8 @@ class Book(
         this.publisher = publisher
         this.imgUrl = imgUrl
     }
+
+    fun updateImgUrl(imgUrl: String) {
+        this.imgUrl = imgUrl
+    }
 }
