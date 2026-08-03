@@ -55,7 +55,7 @@ class BookRecommendService(
             val book = bookRepository.findByIdOrNull(review.book.id) ?: continue
 
             reviewRepository
-                .findByBook(book,PageRequest.of(0, 10))
+                .findByBook(book, PageRequest.of(0, 10))
                 .forEach { r -> members.add(r.reviewer) }
         }
 

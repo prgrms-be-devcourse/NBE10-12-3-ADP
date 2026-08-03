@@ -49,8 +49,9 @@ class BookDetailDto(
         }
 
         private fun parseAuthors(book: Book): List<String> {
-            if (book.authors.isNullOrBlank()) return listOf()
-            return book.authors?.split(AUTHOR_REGEX).orEmpty()
+            val authors = book.authors
+            if (authors.isNullOrBlank()) return listOf()
+            return authors.split(AUTHOR_REGEX)
         }
     }
 }
