@@ -3,12 +3,11 @@ package com.back.domain.book.dto
 import com.back.domain.book.entity.Book
 
 open class BookDto(
-    @JvmField
-    val id: Long,
-    val title: String,
-    val imgUrl: String?,
+    id: Long,
+    title: String,
+    imgUrl: String?,
     val averageRating: Double
-) {
+) : BookDtoBase(id, title, imgUrl){
     constructor(book: Book) : this(
         book.id,
         book.title,
