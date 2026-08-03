@@ -24,8 +24,6 @@ import kotlin.math.roundToInt
 @Service
 @Transactional(readOnly = true)
 class ReviewService(
-@Transactional(readOnly = true)
-class ReviewService(
     private val reviewRepository: ReviewRepository,
     private val bookRepository: BookRepository,
     private val memberRepository: MemberRepository,
