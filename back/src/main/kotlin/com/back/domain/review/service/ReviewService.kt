@@ -4,6 +4,9 @@ import com.back.domain.book.entity.Book
 import com.back.domain.book.repository.BookRepository
 import com.back.domain.member.entity.Member
 import com.back.domain.member.repository.MemberRepository
+import com.back.domain.review.dto.AdminReviewDto
+import com.back.domain.review.dto.ReviewDto
+import com.back.domain.review.dto.ReviewsByMemberDto
 import com.back.domain.review.entity.Review
 import com.back.domain.review.repository.ReviewRepository
 import com.back.domain.tag.entity.Tag
@@ -13,11 +16,9 @@ import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
 import org.springframework.data.domain.Sort
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import java.util.*
-import java.util.function.Supplier
-import kotlin.jvm.optionals.getOrElse
 import kotlin.math.roundToInt
 
 @Service
@@ -29,22 +30,17 @@ class ReviewService(
     private val tagRepository: TagRepository
 ) {
 
-    private fun getBookById(bookId: Long): Book {
+    private fun getBookById(bookId: Long): Book =
+        bookRepository.findByIdOrNull(bookId)
+            ?: throw ServiceException("404-1", "존재하지 않는 도서입니다.")
 
-        val book = bookRepository.findById(bookId).getOrElse {
-            throw ServiceException("404-1", "존재하지 않는 도서입니다.")
-        }
-        return book
-    }
+    private fun getMemberById(memberId: Long): Member =
+        memberRepository.findByIdOrNull(memberId)
+            ?: throw ServiceException("404-1", "존재하지 않는 회원입니다.")
 
-    private fun getMemberById(memberId: Long): Member {
-
-        val member = memberRepository.findById(memberId).getOrElse {
-            throw ServiceException("404-1", "존재하지 않는 회원입니다.")
-        }
-
-        return member
-    }
+    fun getReview(reviewId: Long): Review =
+        reviewRepository.findByIdOrNull(reviewId)
+            ?: throw ServiceException("404-1", "존재하지 않는 리뷰입니다.")
 
     private fun getOrCreateTag(tagName: String): Tag =
         tagRepository.findByName(tagName) ?: tagRepository.save(Tag(tagName))
@@ -55,48 +51,8 @@ class ReviewService(
         book.updateRating(averageRating, reviewCount)
     }
 
-
-    fun getReviewsByBookId(bookId: Long): List<Review> {
-
-        return reviewRepository.findByBook(getBookById(bookId))
-    }
-
-    fun getReviewsByBookId(bookId: Long, page: Int, size: Int): Page<Review> {
-
-        val pageable: Pageable = PageRequest.of(page, size)
-
-        return reviewRepository.findByBook(getBookById(bookId), pageable)
-    }
-
-    fun getByMemberId(memberId: Long): List<Review> {
-        val member = getMemberById(memberId)
-        return reviewRepository.findByReviewer(member)
-    }
-
-    fun getReviews(page: Int, size: Int): Page<Review> {
-        val pageable: Pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "id"))
-        return reviewRepository.findAll(pageable)
-    }
-
-    fun getByMember(memberId: Long, page: Int, size: Int): Page<Review> {
-        val pageable: Pageable = PageRequest.of(page, size)
-        val member = getMemberById(memberId)
-        return reviewRepository.findByReviewer(member, pageable)
-    }
-
-    fun getReviewCountByMember(memberId: Long): Long {
-        val member = getMemberById(memberId)
-        return reviewRepository.countByReviewer(member).toLong()
-    }
-
-    fun getReviewWithContentCountByMember(memberId: Long): Long {
-        val member = getMemberById(memberId)
-        return reviewRepository.countByReviewerAndContentNot(member, "").toLong()
-    }
-
-    fun getRatingMap(memberId: Long): MutableMap<String, Any> {
+    private fun getRatingMap(member: Member): Map<String, Any> {
         val ratings = mutableMapOf<String, Any>()
-        val member = getMemberById(memberId)
 
         ratings["average"] = (reviewRepository.getAverageRatingByMember(member) * 10.0f).roundToInt() / 10.0f
 
@@ -108,73 +64,71 @@ class ReviewService(
         return ratings
     }
 
-    fun getLatest(): Review? {
-        return reviewRepository.findFirstByOrderByIdDesc()
-    }
+    fun getReviewsByBookId(bookId: Long): List<ReviewDto> =
+        reviewRepository.findByBook(getBookById(bookId)).map { ReviewDto(it) }
 
-    fun getById(id: Long): Review {
-        return reviewRepository.findById(id).orElseThrow(
-            Supplier { NoSuchElementException("존재하지 않는 리뷰입니다.") }
+    fun getReviewsByMemberId(memberId: Long): ReviewsByMemberDto {
+        val member = getMemberById(memberId)
+
+        return ReviewsByMemberDto(
+            getRatingMap(member),
+            reviewRepository.findByReviewer(member).map { ReviewDto(it) }
         )
     }
 
+    fun getReviews(page: Int, size: Int): Page<AdminReviewDto> {
+        val pageable: Pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "id"))
+        return reviewRepository.findAll(pageable).map { AdminReviewDto(it) }
+    }
+
+    fun getLatestReview(): Review? = reviewRepository.findFirstByOrderByIdDesc()
+
     @Transactional
-    @Throws(ServiceException::class)
     fun createReview(
-        bookId: Long, actorId: Long,
-        rating: Float, comment: String, tags: List<String>
-    ): Review {
+        actor: Member, bookId: Long,
+        rating: Float, content: String, tags: List<String>
+    ): ReviewDto {
         val book = getBookById(bookId)
-        val actor = getMemberById(actorId)
 
         if (reviewRepository.findFirstByBookAndReviewer(book, actor) != null)
             throw ServiceException("409-1", "이미 존재하는 리뷰입니다.")
 
-        val review: Review = reviewRepository.save<Review>(
-            Review(
-                book, actor, rating, comment,
-                tags.stream().map { name: String -> getOrCreateTag(name) }.toList()
-            )
+        val review = reviewRepository.save(
+            Review(book, actor, rating, content, tags.map { getOrCreateTag(it) }.toMutableList())
         )
 
         refreshBookRating(book)
 
-        return review
+        return ReviewDto(review)
     }
 
     @Transactional
     fun updateReview(
-        reviewId: Long, reviewerId: Long,
+        actor: Member, reviewId: Long,
         rating: Float, content: String, tags: List<String>
-    ): Review {
+    ): ReviewDto {
+        val review = getReview(reviewId)
 
-        val review = getById(reviewId)
-        val reviewer = getMemberById(reviewerId)
-
-        if (review.reviewer != reviewer) {
+        if (review.reviewer != actor) {
             throw ServiceException("403-1", "리뷰 수정 권한이 없습니다.")
         }
 
-        review.modify(
-            rating, content,
-            tags.stream().map { name: String -> getOrCreateTag(name) }.toList()
-        )
+        review.modify(rating, content, tags.map { getOrCreateTag(it) }.toMutableList())
 
         refreshBookRating(review.book)
 
-        return review
+        return ReviewDto(review)
     }
 
     @Transactional
-    fun deleteReview(reviewId: Long, reviewerId: Long) {
-        val review = getById(reviewId)
-        val reviewer = getMemberById(reviewerId)
+    fun deleteReview(actor: Member, reviewId: Long) {
+        val review = getReview(reviewId)
 
-        if (review.reviewer != reviewer && !reviewer.isAdmin) {
+        if (review.reviewer != actor && !actor.isAdmin) {
             throw ServiceException("403-1", "리뷰 삭제 권한이 없습니다.")
         }
 
-        val book: Book = review.book
+        val book = review.book
         reviewRepository.delete(review)
 
         refreshBookRating(book)

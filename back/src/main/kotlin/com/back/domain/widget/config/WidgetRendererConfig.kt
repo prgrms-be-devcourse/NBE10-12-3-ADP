@@ -10,7 +10,8 @@ class WidgetRendererConfig {
 
     @Bean
     fun widgetRendererWebClient(
-        @Value("\${custom.widget.renderer.base-url}") baseUrl: String,
+        @Value($$"${custom.widget.renderer.base-url}")
+        baseUrl: String,
     ): WebClient = WebClient.builder()
         .baseUrl(baseUrl)
         .build()

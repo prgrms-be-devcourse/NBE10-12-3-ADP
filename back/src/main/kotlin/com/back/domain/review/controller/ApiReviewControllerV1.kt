@@ -1,10 +1,10 @@
 package com.back.domain.review.controller
 
-import com.back.domain.review.dto.ReviewCreateRequestDto
-import com.back.domain.review.dto.ReviewsByMemberDto
+import com.back.domain.review.controller.request.ReviewCreateRequest
+import com.back.domain.review.controller.request.ReviewUpdateRequest
 import com.back.domain.review.dto.AdminReviewDto
 import com.back.domain.review.dto.ReviewDto
-import com.back.domain.review.entity.Review
+import com.back.domain.review.dto.ReviewsByMemberDto
 import com.back.domain.review.service.ReviewService
 import com.back.global.rq.Rq
 import com.back.global.rsData.RsData
@@ -22,7 +22,6 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
-import kotlin.collections.map
 
 @RestController
 @RequestMapping("/api/v1/reviews")
@@ -33,36 +32,24 @@ class ApiReviewControllerV1(
 ) {
 
     @GetMapping("/book/{bookId}")
-    @Operation(summary = "리뷰 다건 조회")
-    fun getReviewsByBook(
+    @Operation(summary = "도서별 리뷰 다건 조회")
+    fun getReviewsByBookId(
         @PathVariable bookId: Long
-    ): List<ReviewDto> {
-        return reviewService
-            .getReviewsByBookId(bookId)
-            .map { review: Review -> ReviewDto(review) }
-            .toList()
-    }
+    ): List<ReviewDto> =
+        reviewService.getReviewsByBookId(bookId)
 
     @GetMapping("/member/{memberId}")
     @Operation(summary = "회원별 리뷰 다건 조회")
-    fun getReviewsByMember(
+    fun getReviewsByMemberId(
         @PathVariable memberId: Long
-    ): ReviewsByMemberDto {
-
-        return ReviewsByMemberDto(
-            reviewService.getRatingMap(memberId),
-            reviewService
-                .getByMemberId(memberId)
-                .map {review: Review -> ReviewDto(review)}
-                .toList())
-    }
+    ): ReviewsByMemberDto =
+        reviewService.getReviewsByMemberId(memberId)
 
     @GetMapping("/member/mine")
     @Operation(summary = "내 리뷰 다건 조회")
     @SecurityRequirement(name = "bearerAuth")
-    fun getReviewsMine(): ReviewsByMemberDto {
-        return getReviewsByMember(rq.actor.id)
-    }
+    fun getMyReviews(): ReviewsByMemberDto =
+        reviewService.getReviewsByMemberId(rq.actor.id)
 
     @GetMapping("/admin")
     @Operation(summary = "리뷰 다건 조회 (관리자)")
@@ -70,50 +57,41 @@ class ApiReviewControllerV1(
     fun getReviews(
         @RequestParam(defaultValue = "0") page: Int,
         @RequestParam(defaultValue = "10") size: Int
-    ): Page<AdminReviewDto> {
-        return reviewService.getReviews(page, size)
-            .map{ review: Review -> AdminReviewDto(review) }
-    }
+    ): Page<AdminReviewDto> =
+        reviewService.getReviews(page, size)
 
     @PostMapping("/book/{bookId}")
     @Operation(summary = "리뷰 생성")
     @SecurityRequirement(name = "bearerAuth")
     fun createReview(
         @PathVariable bookId: Long,
-        @RequestBody @Valid req: ReviewCreateRequestDto
+        @RequestBody @Valid req: ReviewCreateRequest
     ): RsData<ReviewDto> {
-
         val rating = requireNotNull(req.rating)
 
-        val review: Review = reviewService.createReview(
-            bookId, rq.actor.id,
+        val review = reviewService.createReview(
+            rq.actor, bookId,
             rating, req.content, req.tags
         )
 
-        return RsData<ReviewDto>(
-            "201-1", "리뷰 생성을 성공했습니다.", ReviewDto(review)
-        )
+        return RsData("201-1", "리뷰 생성을 성공했습니다.", review)
     }
-
 
     @PutMapping("/{id}")
     @Operation(summary = "리뷰 수정")
     @SecurityRequirement(name = "bearerAuth")
     fun updateReview(
         @PathVariable id: Long,
-        @RequestBody @Valid req: ReviewCreateRequestDto
-    ): RsData<ReviewDto?> {
-
+        @RequestBody @Valid req: ReviewUpdateRequest
+    ): RsData<ReviewDto> {
         val rating = requireNotNull(req.rating)
 
         val review = reviewService.updateReview(
-            id, rq.actor.id,
+            rq.actor, id,
             rating, req.content, req.tags
         )
 
-        return RsData<ReviewDto?>(
-            "200-1", "리뷰 수정을 성공했습니다.", ReviewDto(review)
-        )
+        return RsData("200-1", "리뷰 수정을 성공했습니다.", review)
     }
 
     @DeleteMapping("/{id}")
@@ -121,12 +99,9 @@ class ApiReviewControllerV1(
     @SecurityRequirement(name = "bearerAuth")
     fun deleteReview(
         @PathVariable id: Long
-    ): RsData<Void?> {
+    ): RsData<Unit> {
+        reviewService.deleteReview(rq.actor, id)
 
-        reviewService.deleteReview(id, rq.actor.id)
-
-        return RsData<Void?>(
-            "200-1", "리뷰 삭제를 성공했습니다."
-        )
+        return RsData("200-1", "리뷰 삭제를 성공했습니다.")
     }
 }

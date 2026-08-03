@@ -1,7 +1,7 @@
 package com.back.domain.review.controller
 
 import com.back.domain.member.service.MemberService
-import com.back.domain.review.entity.Review
+import com.back.domain.review.dto.ReviewDto
 import com.back.domain.review.service.ReviewService
 import org.hamcrest.Matchers
 import org.junit.jupiter.api.DisplayName
@@ -21,7 +21,7 @@ import org.springframework.transaction.annotation.Transactional
 @SpringBootTest
 @Transactional
 @AutoConfigureMockMvc
-class ApiV1ReviewControllerGetTest {
+class ApiReviewControllerV1GetTest {
     @Autowired
     private lateinit var mvc: MockMvc
 
@@ -36,7 +36,7 @@ class ApiV1ReviewControllerGetTest {
     @Throws(Exception::class)
     fun t1() {
         val bookId = 1L
-        val reviews: List<Review> = reviewService.getReviewsByBookId(bookId)
+        val reviews: List<ReviewDto> = reviewService.getReviewsByBookId(bookId)
 
         val resultActions = mvc
             .perform(
@@ -106,9 +106,7 @@ class ApiV1ReviewControllerGetTest {
     @Throws(Exception::class)
     fun t2() {
         val memberId = 3L
-        val member = memberService.getMemberById(memberId)
-        val ratings: Map<String, Any> = reviewService.getRatingMap(member.id)
-        val reviews: List<Review> = reviewService.getByMemberId(member.id)
+        val expected = reviewService.getReviewsByMemberId(memberId)
 
         val resultActions = mvc
             .perform(
@@ -118,20 +116,20 @@ class ApiV1ReviewControllerGetTest {
 
         resultActions
             .andExpect(handler().handlerType(ApiReviewControllerV1::class.java))
-            .andExpect(handler().methodName("getReviewsByMember"))
+            .andExpect(handler().methodName("getReviewsByMemberId"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.rating").exists())
             .andExpect(jsonPath("$.results").exists())
 
-        for (rating in ratings.entries) {
+        for (rating in expected.rating.entries) {
             resultActions
                 .andExpect(
                     jsonPath("$.rating.[\"${rating.key}\"]").value(rating.value)
                 )
         }
 
-        for (i in reviews.indices) {
-            val review = reviews[i]
+        for (i in expected.results.indices) {
+            val review = expected.results[i]
             resultActions
                 .andExpect(jsonPath("$.results[$i].id").value(review.id))
                 .andExpect(jsonPath("$.results[$i].rating").value(review.rating))
@@ -163,7 +161,7 @@ class ApiV1ReviewControllerGetTest {
 
         resultActions
             .andExpect(handler().handlerType(ApiReviewControllerV1::class.java))
-            .andExpect(handler().methodName("getReviewsByMember"))
+            .andExpect(handler().methodName("getReviewsByMemberId"))
             .andExpect(status().isNotFound())
             .andExpect(jsonPath("$.resultCode").value("404-1"))
             .andExpect(jsonPath("$.message").value("존재하지 않는 회원입니다."))
@@ -181,8 +179,7 @@ class ApiV1ReviewControllerGetTest {
             .andDo(print())
 
         val member = memberService.getMemberByUsername("user1")
-        val ratings: Map<String, Any> = reviewService.getRatingMap(member.id)
-        val reviews: List<Review> = reviewService.getByMemberId(member.id)
+        val expected = reviewService.getReviewsByMemberId(member.id)
 
         resultActions
             .andExpect(handler().handlerType(ApiReviewControllerV1::class.java))
@@ -191,15 +188,15 @@ class ApiV1ReviewControllerGetTest {
             .andExpect(jsonPath("$.results").exists())
 
 
-        for (rating in ratings.entries) {
+        for (rating in expected.rating.entries) {
             resultActions
                 .andExpect(
                     jsonPath("$.rating.[\"${rating.key}\"]").value(rating.value)
                 )
         }
 
-        for (i in reviews.indices) {
-            val review = reviews[i]
+        for (i in expected.results.indices) {
+            val review = expected.results[i]
             resultActions
                 .andExpect(jsonPath("$.results[$i].id").value(review.id))
                 .andExpect(jsonPath("$.results[$i].rating").value(review.rating))
