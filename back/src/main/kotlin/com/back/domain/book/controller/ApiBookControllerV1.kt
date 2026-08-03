@@ -1,6 +1,6 @@
 package com.back.domain.book.controller
 
-import com.back.domain.book.dto.BookUpdateRequestDto
+import com.back.domain.book.controller.request.BookUpdateRequest
 import com.back.domain.book.dto.BookDetailDto
 import com.back.domain.book.dto.BookDto
 import com.back.domain.book.service.BookRecommendService
@@ -41,7 +41,6 @@ class ApiBookControllerV1(
         @RequestParam(defaultValue = "10") size: Int
     ): Page<BookDto> {
         return bookService.getBooks(page, size)
-            .map { book -> BookDto(book) }
     }
 
     @GetMapping("/{id}")
@@ -65,7 +64,6 @@ class ApiBookControllerV1(
         @RequestParam(defaultValue = "10") size: Int
     ): List<BookDto> {
         return bookService.getBooksBySearch(searchTerm, page, size)
-            .toList().map { book -> BookDto(book) }
     }
 
     @GetMapping("/recommend")
@@ -73,7 +71,6 @@ class ApiBookControllerV1(
     fun getBooksByRecommend(): List<BookDto> {
         return bookRecommendService
             .getBooksByRecommend(rq.actorOrNull)
-            .toList().map {book -> BookDto(book) }
     }
 
     @GetMapping("/rank")
@@ -84,7 +81,6 @@ class ApiBookControllerV1(
         @RequestParam(defaultValue = "10") size: Int
     ): List<BookDto> {
         return bookService.getBooksOrderByRank(type, page, size)
-            .map { book -> BookDto(book)}
     }
 
     @PutMapping("/{id}")
@@ -92,7 +88,7 @@ class ApiBookControllerV1(
     @SecurityRequirement(name = "bearerAuth")
     fun updateBook(
         @PathVariable id: Long,
-        @RequestBody @Valid req: BookUpdateRequestDto
+        @RequestBody @Valid req: BookUpdateRequest
     ): RsData<BookDto?> {
         val book = bookService.updateBook(
             id, req.title, req.description, req.authors, req.publisher, req.imgUrl
