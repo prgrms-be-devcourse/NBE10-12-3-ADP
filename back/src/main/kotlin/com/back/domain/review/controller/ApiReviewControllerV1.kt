@@ -32,7 +32,7 @@ class ApiReviewControllerV1(
 ) {
 
     @GetMapping("/book/{bookId}")
-    @Operation(summary = "리뷰 다건 조회")
+    @Operation(summary = "도서별 리뷰 다건 조회")
     fun getReviewsByBookId(
         @PathVariable bookId: Long
     ): List<ReviewDto> =
