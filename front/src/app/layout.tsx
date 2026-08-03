@@ -9,7 +9,7 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "READTHEM.md",
-  description: "스프링부트, Next.js 연동",
+  description: "개발자의 도서 리뷰 공유 플랫폼",
 };
 
 const themeScript = `
