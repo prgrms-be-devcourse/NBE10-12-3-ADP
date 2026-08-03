@@ -69,10 +69,9 @@ jobs:
           INSTANCE_ID: ${{ secrets.AWS_EC2_INSTANCE_ID }}
         run: |
           SCRIPT=$(cat <<DEPLOY
-          docker pull $IMAGE
           docker stop application || true
           docker rm application || true
-          docker rmi application || true
+          docker rmi $IMAGE || true
           docker run -d \
             --name application \
             --env-file .env \
