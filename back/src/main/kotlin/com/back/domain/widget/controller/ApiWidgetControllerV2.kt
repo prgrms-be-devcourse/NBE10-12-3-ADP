@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping
 
 @Controller
 @RequestMapping("/api/v2/widgets")
-class WidgetControllerV2(
+class ApiWidgetControllerV2(
     private val widgetByWidgetServerService: WidgetByWidgetServerService
 ) {
 
