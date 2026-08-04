@@ -279,7 +279,7 @@ function BookDetail() {
 
   if (book == null || reviews == null) return <div>로딩중...</div>;
 
-  const isBookWished = book.wishId != null || book.isWished || book.wished;
+  const isBookWished = book.wishId != null;
   const average = book.rating?.["average"];
   const averageNumber = typeof average === "number" ? average : null;
   const authors = book.authors ?? [];
