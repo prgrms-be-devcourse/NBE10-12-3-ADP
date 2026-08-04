@@ -57,7 +57,7 @@ class WishService(
     fun deleteWish(actor: Member, id: Long) {
         val wish = wishRepository.findByIdOrNull(id) ?: throw ServiceException("404-1", "존재하지 않는 찜입니다.")
 
-        if (actor != wish.member)
+        if (actor.id != wish.member.id)
             throw ServiceException("403-1", "찜 삭제 권한이 없습니다.")
 
         wishRepository.delete(wish)
