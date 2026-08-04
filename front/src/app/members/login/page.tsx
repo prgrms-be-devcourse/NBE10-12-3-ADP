@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { apiFetch } from "@/lib/backend/client";
 
 import { useAuth } from "@/lib/auth/AuthProvider";
+import { consumeAuthReturnPath } from "@/lib/auth/authReturnPath";
 import { useToast } from "@/lib/toast/ToastProvider";
 
 import RoughButton from "@/app/_components/RoughButton";
@@ -67,7 +68,7 @@ export default function Page() {
         return refresh();
       })
       .then(() => {
-        router.replace(`/`);
+        router.replace(consumeAuthReturnPath());
       })
       .catch(showErrorToast);
   };

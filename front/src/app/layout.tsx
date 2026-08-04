@@ -4,6 +4,7 @@ import { AuthProvider } from "@/lib/auth/AuthProvider";
 import { ThemeProvider } from "@/lib/theme/ThemeProvider";
 import { ToastProvider } from "@/lib/toast/ToastProvider";
 
+import AuthReturnPathRestorer from "@/app/_components/AuthReturnPathRestorer";
 import Header from "@/app/_components/Header";
 import RoughBar from "@/app/_components/RoughBar";
 
@@ -47,6 +48,7 @@ export default function RootLayout({
         <ThemeProvider>
           <ToastProvider>
             <AuthProvider>
+              <AuthReturnPathRestorer />
               <Header />
               <main className="relative z-0 mx-auto flex w-full max-w-4xl flex-grow flex-col p-4">
                 <div className="relative flex flex-1 flex-col">{children}</div>

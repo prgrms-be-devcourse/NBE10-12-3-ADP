@@ -8,6 +8,10 @@ import { useEffect, useState } from "react";
 import { API_BASE_URL, apiFetch } from "@/lib/backend/client";
 
 import { useAuth } from "@/lib/auth/AuthProvider";
+import {
+  consumeAuthReturnPath,
+  saveCurrentAuthReturnPath,
+} from "@/lib/auth/authReturnPath";
 import type { components } from "@/lib/backend/apiV1/schema";
 import { goToErrorPage } from "@/lib/error/goToErrorPage";
 import { ratingColor } from "@/lib/ratingColor";
@@ -120,8 +124,10 @@ export default function Page() {
   };
 
   const handleLogout = () => {
+    saveCurrentAuthReturnPath();
+
     apiFetch(`/api/v1/members/logout`, { method: "DELETE" }).then(() => {
-      refresh().then(() => router.replace(`/`));
+      refresh().then(() => router.replace(consumeAuthReturnPath()));
     });
   };
 

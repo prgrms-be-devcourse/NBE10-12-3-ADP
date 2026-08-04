@@ -6,6 +6,11 @@ import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 
 import { useAuth } from "@/lib/auth/AuthProvider";
+import {
+  buildGitHubLoginUrl,
+  consumeAuthReturnPath,
+  saveCurrentAuthReturnPath,
+} from "@/lib/auth/authReturnPath";
 import { useTheme } from "@/lib/theme/ThemeProvider";
 
 import RoughBar from "@/app/_components/RoughBar";
@@ -194,9 +199,17 @@ export default function Header() {
   }, []);
 
   const handleLogout = () => {
+    saveCurrentAuthReturnPath();
+
     logout().then(() => {
-      router.replace(`/`);
+      router.replace(consumeAuthReturnPath());
     });
+  };
+
+  const handleGitHubLogin = (
+    e: React.MouseEvent<HTMLAnchorElement, MouseEvent>,
+  ) => {
+    e.currentTarget.href = buildGitHubLoginUrl();
   };
 
   const handleSearch = (e: React.SyntheticEvent<HTMLFormElement>) => {
@@ -317,6 +330,7 @@ export default function Header() {
               <a
                 href={`${process.env.NEXT_PUBLIC_API_BASE_URL}/oauth2/authorization/github?redirectUrl=${process.env.NEXT_PUBLIC_FRONTEND_BASE_URL}`}
                 className="theme-nav-link theme-nav-control gap-1.5"
+                onClick={handleGitHubLogin}
                 aria-label="GitHub로 로그인"
               >
                 <GitHubIcon />
@@ -327,10 +341,7 @@ export default function Header() {
 
           {!isLoginMemberPending && isLogin && (
             <div className="auth-action-enter flex min-w-0 items-center gap-2 whitespace-nowrap">
-              <Link
-                href="/mypage"
-                className="theme-nav-link theme-nav-control"
-              >
+              <Link href="/mypage" className="theme-nav-link theme-nav-control">
                 <LibraryIcon />
                 <span className="theme-nav-label">내 서재</span>
               </Link>
