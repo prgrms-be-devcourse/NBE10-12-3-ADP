@@ -16,6 +16,36 @@ interface BookRepository : JpaRepository<Book, Long> {
     fun findByTitleContaining(searchTerm: String, pageable: Pageable): Page<Book>
 
     @Query(
+        """
+            SELECT b
+            FROM Book b
+            LEFT JOIN BookOperational bo ON bo.isbn = b.isbn
+            ORDER BY COALESCE(bo.averageRating, 0.0) DESC, b.id DESC
+        """
+    )
+    fun findAllOrderByAverageRatingDesc(pageable: Pageable): Page<Book>
+
+    @Query(
+        """
+            SELECT b
+            FROM Book b
+            LEFT JOIN BookOperational bo ON bo.isbn = b.isbn
+            ORDER BY COALESCE(bo.reviewCount, 0) DESC, b.id DESC
+        """
+    )
+    fun findAllOrderByReviewCountDesc(pageable: Pageable): Page<Book>
+
+    @Query(
+        """
+            SELECT b
+            FROM Book b
+            LEFT JOIN BookOperational bo ON bo.isbn = b.isbn
+            ORDER BY COALESCE(bo.viewCount, 0) DESC, b.id DESC
+        """
+    )
+    fun findAllOrderByViewCountDesc(pageable: Pageable): Page<Book>
+
+    @Query(
         value = """
             SELECT * FROM Book 
             WHERE MATCH(title, authors, publisher) AGAINST(:keyword IN BOOLEAN MODE)

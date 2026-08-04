@@ -13,11 +13,4 @@ interface BookOperationalRepository : JpaRepository<BookOperational, Long> {
     fun findByIsbnIn(isbns: Collection<String>): List<BookOperational>
     fun deleteByIsbn(isbn: String)
 
-    fun findAllByOrderByAverageRatingDesc(pageable: Pageable): Page<BookOperational>
-
-    fun findAllByOrderByReviewCountDesc(pageable: Pageable): Page<BookOperational>
-
-    fun findAllByOrderByViewCountDesc(pageable: Pageable): Page<BookOperational>
-
-
 }

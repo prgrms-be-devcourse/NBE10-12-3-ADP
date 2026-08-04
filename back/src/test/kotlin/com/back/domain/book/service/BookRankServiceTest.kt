@@ -1,11 +1,12 @@
 package com.back.domain.book.service
 
+import com.back.domain.book.entity.Book
 import com.back.domain.book.repository.BookOperationalRepository
 import com.back.domain.book.repository.BookRepository
 import com.back.domain.review.service.ReviewService
 import com.back.global.exception.ServiceException
+import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.AssertionsForClassTypes
-import org.assertj.core.api.AssertionsForClassTypes.assertThat
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -13,6 +14,7 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.transaction.annotation.Transactional
+import java.time.LocalDateTime
 
 @ActiveProfiles("test")
 @SpringBootTest
@@ -68,5 +70,26 @@ class BookRankServiceTest(@Autowired private val bookRepository: BookRepository)
 
             upperRating = nowRating
         }
+    }
+
+    @Test
+    @DisplayName("도서 순위는 운영 정보가 없는 도서도 0값으로 포함한다")
+    fun t3() {
+        val bookWithoutOperational = bookRepository.save(
+            Book(
+                "운영 정보 없는 책",
+                "운영 정보가 없어도 랭킹에 포함되어야 한다",
+                "isbn-rank-without-operational",
+                "작가",
+                LocalDateTime.now(),
+                "출판사",
+                ""
+            )
+        )
+
+        val bookRank = bookService.getBooksOrderByRank("reviewCnt", 0, 100)
+
+        assertThat(bookOperationalRepository.findByIsbn(bookWithoutOperational.isbn)).isNull()
+        assertThat(bookRank.map { it.id }).contains(bookWithoutOperational.id)
     }
 }
