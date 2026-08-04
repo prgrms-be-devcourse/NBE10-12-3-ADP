@@ -179,7 +179,7 @@ class BookQueryService(
         val ratingMap: MutableMap<String, Any> = mutableMapOf()
 
         ratingMap["average"] =
-            getBookOperational(book)?.averageRating ?: 0
+            getBookOperational(book)?.averageRating ?: 0.0
 
         for (i in 1..10) {
             val rating = i * 0.5f
