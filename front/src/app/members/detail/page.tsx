@@ -25,6 +25,59 @@ type ReviewWithBookImgUrl = NonNullable<
   bookImgUrl?: string | null;
 };
 
+function MemberDetailSkeleton() {
+  return (
+    <div className="flex gap-8">
+      <aside className="flex w-48 shrink-0 flex-col items-center gap-1 pt-6">
+        <div className="book-skeleton h-24 w-24 rounded-full" />
+        <div className="mt-6 w-full space-y-2">
+          <div className="book-skeleton h-5 w-28 rounded" />
+          <div className="book-skeleton h-5 w-24 rounded" />
+          <div className="book-skeleton h-5 w-32 rounded" />
+        </div>
+        <div className="mt-3 w-full space-y-2">
+          <div className="book-skeleton h-4 w-20 rounded" />
+          <div className="book-skeleton h-24 w-full rounded" />
+        </div>
+      </aside>
+
+      <div className="flex-1 flex flex-col gap-4">
+        <div>
+          <div className="flex items-center justify-between gap-2">
+            <div className="book-skeleton h-6 w-28 rounded" />
+          </div>
+          <div className="rough-panel-border relative mt-1 min-h-24 p-2">
+            <div className="book-skeleton h-20 w-full rounded" />
+          </div>
+        </div>
+
+        <div className="flex gap-2">
+          <div className="book-skeleton h-10 w-28 rounded" />
+        </div>
+
+        <ul className="flex w-full flex-col">
+          {Array.from({ length: 3 }).map((_, index) => (
+            <li
+              key={index}
+              className="relative flex items-start gap-3 py-3"
+            >
+              {index < 2 && <RoughDivider fullWidth />}
+              <div className="book-skeleton h-20 w-14 shrink-0 rounded-lg" />
+              <div className="min-w-0 flex-1 space-y-2">
+                <div className="book-skeleton h-5 w-40 rounded" />
+                <div className="book-skeleton h-4 w-24 rounded" />
+                <div className="book-skeleton h-4 w-full rounded" />
+                <div className="book-skeleton h-4 w-28 rounded" />
+              </div>
+              <div className="book-skeleton h-6 w-14 shrink-0 rounded" />
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
+  );
+}
+
 function MemberDetail() {
   const searchParams = useSearchParams();
   const id = searchParams.get("id");
@@ -52,10 +105,10 @@ function MemberDetail() {
   }, [id]);
 
   if (id == null) {
-    return <div>로딩중...</div>;
+    return <MemberDetailSkeleton />;
   }
 
-  if (member == null || reviewData == null) return <div>로딩중...</div>;
+  if (member == null || reviewData == null) return <MemberDetailSkeleton />;
 
   const average = reviewData.rating?.["average"];
   const averageNumber = typeof average === "number" ? average : null;
@@ -162,7 +215,7 @@ function MemberDetail() {
 }
 export default function Page() {
   return (
-    <Suspense fallback={<div>로딩중...</div>}>
+    <Suspense fallback={<MemberDetailSkeleton />}>
       <MemberDetail />
     </Suspense>
   );

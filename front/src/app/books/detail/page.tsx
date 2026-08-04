@@ -15,6 +15,7 @@ import { ratingFillColor } from "@/lib/ratingColor";
 import { useToast } from "@/lib/toast/ToastProvider";
 
 import Avatar from "@/app/_components/Avatar";
+import BookGrid from "@/app/_components/BookGrid";
 import LoginRequiredModal from "@/app/_components/LoginRequiredModal";
 import RatingHistogram from "@/app/_components/RatingHistogram";
 import RatingValue from "@/app/_components/RatingValue";
@@ -34,6 +35,76 @@ type BookDetailWithWishId = BookDetailDto & {
 };
 type BookDto = components["schemas"]["BookDto"];
 type ReviewDto = components["schemas"]["ReviewDto"];
+
+function BookDetailSkeleton() {
+  return (
+    <div className="mx-auto flex w-full max-w-3xl flex-col gap-6 p-4">
+      <div className="flex gap-6">
+        <div className="flex w-40 shrink-0 flex-col gap-2">
+          <div className="book-skeleton h-56 w-full rounded-xl" />
+          <div className="book-skeleton h-9 w-full rounded" />
+        </div>
+
+        <div className="grid flex-1 gap-4 md:grid-cols-[minmax(0,1fr)_10rem]">
+          <div className="flex min-w-0 flex-col gap-2">
+            <div className="book-skeleton h-9 w-3/4 rounded" />
+            <div className="book-skeleton h-5 w-2/3 rounded" />
+            <div className="mt-1 space-y-2">
+              <div className="book-skeleton h-4 w-full rounded" />
+              <div className="book-skeleton h-4 w-11/12 rounded" />
+              <div className="book-skeleton h-4 w-4/5 rounded" />
+            </div>
+            <div className="mt-2 flex flex-wrap gap-2">
+              <div className="book-skeleton h-6 w-16 rounded" />
+              <div className="book-skeleton h-6 w-20 rounded" />
+              <div className="book-skeleton h-6 w-14 rounded" />
+            </div>
+          </div>
+
+          <div className="flex min-w-0 flex-col gap-2">
+            <div className="ml-auto book-skeleton h-12 w-24 rounded" />
+            <div className="ml-auto book-skeleton h-4 w-20 rounded" />
+            <div className="mt-1 book-skeleton h-24 w-full max-w-40 rounded" />
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div className="flex items-center gap-2">
+          <div className="book-skeleton h-7 w-24 rounded" />
+          <div className="book-skeleton h-5 w-10 rounded" />
+        </div>
+        <div className="mt-3">
+          <BookGrid isLoading layout="horizontal" />
+        </div>
+      </div>
+
+      <div>
+        <div className="flex items-center gap-2">
+          <div className="book-skeleton h-7 w-24 rounded" />
+          <div className="book-skeleton h-9 w-28 rounded" />
+        </div>
+        <ul className="mt-2 flex w-full flex-col">
+          {Array.from({ length: 3 }).map((_, index) => (
+            <li key={index} className="relative py-3">
+              <div className="flex items-start gap-3">
+                <div className="book-skeleton h-10 w-10 shrink-0 rounded-full" />
+                <div className="min-w-0 flex-1 space-y-2">
+                  <div className="book-skeleton h-5 w-32 rounded" />
+                  <div className="book-skeleton h-4 w-24 rounded" />
+                  <div className="book-skeleton h-4 w-full rounded" />
+                  <div className="book-skeleton h-4 w-28 rounded" />
+                </div>
+                <div className="book-skeleton h-6 w-14 shrink-0 rounded" />
+              </div>
+              {index < 2 && <RoughDivider />}
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
+  );
+}
 
 function WishIcon() {
   return (
@@ -274,10 +345,10 @@ function BookDetail() {
   };
 
   if (id == null) {
-    return <div>로딩중...</div>;
+    return <BookDetailSkeleton />;
   }
 
-  if (book == null || reviews == null) return <div>로딩중...</div>;
+  if (book == null || reviews == null) return <BookDetailSkeleton />;
 
   const isBookWished = book.wishId != null;
   const average = book.rating?.["average"];
@@ -626,7 +697,7 @@ function BookDetail() {
 
 export default function Page() {
   return (
-    <Suspense fallback={<div>로딩중...</div>}>
+    <Suspense fallback={<BookDetailSkeleton />}>
       <BookDetail />
     </Suspense>
   );

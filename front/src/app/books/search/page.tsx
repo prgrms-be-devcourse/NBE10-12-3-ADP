@@ -26,6 +26,24 @@ function searchLoadingChanged(isLoading: boolean) {
   );
 }
 
+function SearchResultsSkeleton({ searchTerm }: { searchTerm?: string }) {
+  return (
+    <>
+      <div className="px-1">
+        <div className="book-skeleton h-9 w-56 max-w-full rounded" />
+        {searchTerm && (
+          <div className="mt-2 text-sm theme-muted">
+            &apos;{searchTerm}&apos; 검색 결과를 불러오는 중...
+          </div>
+        )}
+      </div>
+      <div className="mt-4">
+        <BookGrid isLoading />
+      </div>
+    </>
+  );
+}
+
 function SearchResultsContent({ searchTerm }: { searchTerm: string }) {
   const sentinelRef = useRef<HTMLDivElement | null>(null);
   const loadingRef = useRef(false);
@@ -138,7 +156,9 @@ function SearchResultsContent({ searchTerm }: { searchTerm: string }) {
     <>
       <h1>&apos;{searchTerm}&apos; 검색 결과</h1>
       {isInitialLoading ? (
-        <BookGrid isLoading />
+        <div className="mt-4">
+          <BookGrid isLoading />
+        </div>
       ) : (
         <>
           <BookGrid books={books} />
@@ -169,7 +189,7 @@ function SearchResults() {
 
 export default function Page() {
   return (
-    <Suspense fallback={<div>검색중...</div>}>
+    <Suspense fallback={<SearchResultsSkeleton />}>
       <SearchResults />
     </Suspense>
   );
