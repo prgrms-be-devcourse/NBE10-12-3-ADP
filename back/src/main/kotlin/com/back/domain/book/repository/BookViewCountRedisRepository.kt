@@ -1,6 +1,5 @@
 package com.back.domain.book.repository
 
-import com.back.domain.book.entity.Book
 import org.springframework.data.redis.core.RedisTemplate
 import org.springframework.data.redis.core.ZSetOperations
 import org.springframework.stereotype.Repository
@@ -16,7 +15,9 @@ class BookViewCountRedisRepository(
 
     private val minuteKey: String
         get() = "viewCount:minute:%s".format(
-            LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmm"))
+            LocalDateTime.now().format(
+                DateTimeFormatter.ofPattern("yyyyMMddHHmm")
+            )
         )
 
     fun findBookViewCountById(bookId: Long): Int? {
@@ -81,11 +82,13 @@ class BookViewCountRedisRepository(
         }
     }
 
-    fun increase(bookId: Long, lambda: () -> Int) : Boolean{
+    fun tryIncreaseViewAtRedis(bookId: Long, lambda: () -> Int): Boolean {
         try {
 
             if (redisTemplate.opsForZSet().score("viewCount", bookId.toString()) == null) {
-                redisTemplate.opsForZSet().add("viewCount", bookId.toString(), lambda().toDouble())
+                redisTemplate.opsForZSet().add(
+                    "viewCount", bookId.toString(), lambda().toDouble()
+                )
             }
 
             redisTemplate.opsForZSet().incrementScore("viewCount", bookId.toString(), 1.0)

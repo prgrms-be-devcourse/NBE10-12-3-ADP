@@ -4,30 +4,30 @@ import com.back.standard.recommend.util.CosineSimilarityCalcer
 import com.back.standard.recommend.util.SimilarityCalcer
 import com.back.standard.recommend.util.Vector
 
-class SimilarityRecommendByRating(
-    private val calcer: SimilarityCalcer = CosineSimilarityCalcer()
+class SimilarityRecommendByRating<R, S>(
+    private val calcer: SimilarityCalcer<R, S> = CosineSimilarityCalcer()
 ) {
 
-    data class Rating(
-        val reviewerId: Long,
-        val subjectId: Long,
+    data class Rating<R, S>(
+        val reviewerId: R,
+        val subjectId: S,
         val rating: Float
     )
 
-    private val ratingMatrix = HashMap<Long, Vector>()
+    private val ratingMatrix = mutableMapOf<R, Vector<S>>()
 
     fun clear() {
         ratingMatrix.clear()
     }
 
-    fun setData(reviews: List<Rating>) {
+    fun setData(reviews: List<Rating<R, S>>) {
         reviews.forEach { review ->
             ratingMatrix.getOrPut(review.reviewerId) { Vector() }
                 .putValue(review.subjectId, review.rating.toDouble())
         }
     }
 
-    fun getRecommendList(targetUserId: Long, referenceCnt: Int, maxRecommend: Int): List<Long> {
+    fun getRecommendList(targetUserId: R, referenceCnt: Int, maxRecommend: Int): List<S> {
         val targetUser = ratingMatrix[targetUserId] ?: return emptyList()
         if (targetUser.isEmpty()) return emptyList()
 
@@ -35,7 +35,7 @@ class SimilarityRecommendByRating(
 
         val similarList = calcer.getSimilarList(targetUser, ratingMatrix)
 
-        val recommends = HashMap<Long, Double>()
+        val recommends = mutableMapOf<S, Double>()
         val alreadyRead = targetUser.getLabels()
 
         for (i in 0 until minOf(referenceCnt, similarList.size)) {

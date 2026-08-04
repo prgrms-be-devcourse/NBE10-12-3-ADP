@@ -20,4 +20,13 @@ class BookThumbnailWriter(
 
         book.updateImgUrl(thumbnail)
     }
+
+    // 카카오 API에 표지가 없는 도서는 조회할 때마다 재호출하지 않도록 시도 이력만 기록
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    fun markFetchAttempted(bookId: Long) {
+        val book = bookRepository.findByIdOrNull(bookId) ?: return
+        if (!book.imgUrl.isNullOrBlank()) return
+
+        book.markImgUrlFetchAttempted()
+    }
 }

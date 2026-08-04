@@ -1,11 +1,14 @@
 package com.back.domain.review.service
 
 import com.back.domain.book.entity.Book
+import com.back.domain.book.entity.BookOperational
+import com.back.domain.book.repository.BookOperationalRepository
 import com.back.domain.book.repository.BookRepository
 import com.back.domain.member.entity.Member
 import com.back.domain.member.repository.MemberRepository
 import com.back.domain.review.dto.AdminReviewDto
 import com.back.domain.review.dto.ReviewDto
+import com.back.domain.review.dto.ReviewWithBookImgUrlDto
 import com.back.domain.review.dto.ReviewsByMemberDto
 import com.back.domain.review.entity.Review
 import com.back.domain.review.repository.ReviewRepository
@@ -26,6 +29,7 @@ import kotlin.math.roundToInt
 class ReviewService(
     private val reviewRepository: ReviewRepository,
     private val bookRepository: BookRepository,
+    private val bookOperationalRepository: BookOperationalRepository,
     private val memberRepository: MemberRepository,
     private val tagRepository: TagRepository
 ) {
@@ -48,7 +52,12 @@ class ReviewService(
     private fun refreshBookRating(book: Book) {
         val averageRating = reviewRepository.getAverageRatingByBook(book)
         val reviewCount = reviewRepository.countByBook(book)
-        book.updateRating(averageRating, reviewCount)
+
+        val bookOperational =
+            bookOperationalRepository.findByIsbn(book.isbn)
+                ?: bookOperationalRepository.save(BookOperational(book.isbn))
+
+        bookOperational.updateRating(averageRating, reviewCount)
     }
 
     private fun getRatingMap(member: Member): Map<String, Any> {
@@ -64,7 +73,14 @@ class ReviewService(
         return ratings
     }
 
-    fun getReviewsByBookId(bookId: Long): List<ReviewDto> =
+    fun getReviewsOrderByLatest(page: Int, size: Int)
+        = reviewRepository
+            .findAllByOrderByIdDesc(
+                PageRequest.of(page, size))
+            .toList()
+            .map { ReviewWithBookImgUrlDto(it) }
+
+    fun getReviewsByBookId(bookId: Long) =
         reviewRepository.findByBook(getBookById(bookId)).map { ReviewDto(it) }
 
     fun getReviewsByMemberId(memberId: Long): ReviewsByMemberDto {
@@ -72,7 +88,7 @@ class ReviewService(
 
         return ReviewsByMemberDto(
             getRatingMap(member),
-            reviewRepository.findByReviewer(member).map { ReviewDto(it) }
+            reviewRepository.findByReviewer(member).map { ReviewWithBookImgUrlDto(it) }
         )
     }
 

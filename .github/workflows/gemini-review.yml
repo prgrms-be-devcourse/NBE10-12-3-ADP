@@ -33,8 +33,8 @@ jobs:
           output_config_path: .github/gemini-review.generated.yml
           heading: 프로젝트 리팩토링 규칙
           document_paths: |
-            docs/refactoring-rules.md
-            docs/software-architecture.md
+            docs/review-rules/refactoring-rules.md
+            docs/review-ruels/software-architecture.md
 
       # 4. 선택하신 Gemini 리뷰 봇 실행
       - name: Gemini code review
