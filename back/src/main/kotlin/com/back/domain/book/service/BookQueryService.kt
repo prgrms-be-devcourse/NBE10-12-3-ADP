@@ -46,7 +46,9 @@ class BookQueryService(
         return book
     }
 
-    fun getBookDetailDto(book: Book, actor: Member?): BookDetailDto {
+    fun getBookDetailDto(bookId: Long, actor: Member?): BookDetailDto {
+        val book = getBookById(bookId)
+
         return BookDetailDto(
             book,
             getBookOperational(book)?.reviewCount ?: 0,

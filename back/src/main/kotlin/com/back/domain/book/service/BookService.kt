@@ -49,7 +49,7 @@ class BookService(
         val viewCountIncreased = bookViewCountService.incrementViewCount(book, alreadyViewed)
 
         return BookDetailResult(
-            bookQueryService.getBookDetailDto(book, actor),
+            bookQueryService.getBookDetailDto(id, actor),
             viewCountIncreased
         )
     }
