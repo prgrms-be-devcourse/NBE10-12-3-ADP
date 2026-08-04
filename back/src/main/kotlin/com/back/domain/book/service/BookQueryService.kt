@@ -38,9 +38,16 @@ class BookQueryService(
     fun getBook(id: Long): Book {
         val book = getBookById(id)
 
-        if (book.imgUrl.isNullOrBlank()) {
-            bookThumbnailService.fillMissingImgUrl(book.id, book.isbn)
-            return getBookById(id)
+        // 재조회 대신 이미 들고 있는 book을 직접 갱신함
+        // (findById는 1차 캐시에 book이 이미 올라가 있으면 DB를 다시 읽지 않고 캐시된 객체를 그대로 반환하므로,
+        //  REQUIRES_NEW로 커밋된 최신 imgUrl이 재조회 결과에 반영되지 않을 수 있음)
+        if (book.imgUrl.isNullOrBlank() && book.imgUrlFetchedAt == null) {
+            val thumbnail = bookThumbnailService.fillMissingImgUrl(book.id, book.isbn)
+            if (thumbnail != null) {
+                book.updateImgUrl(thumbnail)
+            } else {
+                book.markImgUrlFetchAttempted()
+            }
         }
 
         return book
