@@ -2,7 +2,7 @@ name: 🚀 배포!
 
 on:
   push:
-    branches: [dev]
+    branches: [dev, ci/ADP-205]
     paths:
       - ".github/workflows/deploy.yml"
       - "src/**"
@@ -23,7 +23,7 @@ concurrency:
 jobs:
   build-and-push-docker-image:
     name: 1. 도커 이미지 빌드 및 푸시
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04-arm
     permissions:
       contents: read
       packages: write
