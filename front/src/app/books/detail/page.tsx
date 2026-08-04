@@ -481,7 +481,7 @@ function BookDetail() {
         )}
 
         <ul className="mt-2 flex w-full flex-col">
-          {reviews.map((review) => (
+          {reviews.map((review, index) => (
             <li key={review.id ?? review.createdDate} className="relative py-3">
               {editingReviewId === review.id && review.id != null ? (
                 <form
@@ -615,7 +615,7 @@ function BookDetail() {
                   </span>
                 </div>
               )}
-              <RoughDivider />
+              {index < reviews.length - 1 && <RoughDivider />}
             </li>
           ))}
         </ul>

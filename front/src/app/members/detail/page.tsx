@@ -97,12 +97,12 @@ function MemberDetail() {
           )}
 
           <ul className="flex w-full flex-col">
-            {reviewResults.map((review) => (
+            {reviewResults.map((review, index) => (
               <li
                 key={review.id ?? review.bookId}
                 className="relative flex items-start gap-3 py-3"
               >
-                <RoughDivider fullWidth />
+                {index < reviewResults.length - 1 && <RoughDivider fullWidth />}
                 <Link
                   href={`/books/detail?id=${review.bookId}`}
                   className="rough-book-card review-book-thumbnail relative flex h-20 w-14 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-white"
