@@ -11,8 +11,8 @@ class KakaoBookApiConfig {
 
     @Bean
     fun kakaoBookApiWebClient(
-        @Value($$"${custom.kakao.base-url}") baseUrl: String,
-        @Value($$"${custom.kakao.api-key}") apiKey: String,
+        @Value("\${custom.kakao.base-url}") baseUrl: String,
+        @Value("\${custom.kakao.api-key}") apiKey: String,
     ): WebClient = WebClient.builder()
         .baseUrl(baseUrl)
         .defaultHeader(HttpHeaders.AUTHORIZATION, "KakaoAK $apiKey")
