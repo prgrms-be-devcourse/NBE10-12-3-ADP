@@ -3,17 +3,9 @@ package com.back.domain.book.entity
 import com.back.global.jpa.entity.BaseEntity
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
-import jakarta.persistence.Index
-import jakarta.persistence.Table
 import java.time.LocalDateTime
-import kotlin.math.roundToInt
 
 @Entity
-@Table(
-    indexes = [
-        Index(name = "idx_book_average_rating", columnList = "averageRating"),
-        Index(name = "idx_book_review_count", columnList = "reviewCount")]
-)
 class Book(
     @field:Column(nullable = false, columnDefinition = "LONGTEXT")
     var title: String,
