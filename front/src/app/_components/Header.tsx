@@ -209,7 +209,8 @@ export default function Header() {
   const handleGitHubLogin = (
     e: React.MouseEvent<HTMLAnchorElement, MouseEvent>,
   ) => {
-    e.currentTarget.href = buildGitHubLoginUrl();
+    e.preventDefault();
+    window.location.href = buildGitHubLoginUrl();
   };
 
   const handleSearch = (e: React.SyntheticEvent<HTMLFormElement>) => {

@@ -36,7 +36,17 @@ const parseJsonBody = (res: Response) => {
       return null;
     }
 
-    return JSON.parse(text);
+    try {
+      return JSON.parse(text);
+    } catch {
+      return {
+        message: res.ok
+          ? "서버 응답을 해석할 수 없습니다."
+          : "서버에서 올바르지 않은 오류 응답을 받았습니다.",
+        status: res.status,
+        statusText: res.statusText,
+      };
+    }
   });
 };
 
