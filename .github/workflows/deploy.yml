@@ -2,14 +2,15 @@ name: 🚀 배포!
 
 on:
   push:
-    branches: [dev]
+    branches: [dev, ci/ADP-205]
     paths:
       - ".github/workflows/deploy.yml"
-      - "src/**"
-      - ".env.example"
-      - "build.gradle.kts"
-      - "settings.gradle.kts"
-      - "Dockerfile"
+      - "back/src/**"
+      - "back/.env.example"
+      - "back/build.gradle.kts"
+      - "back/settings.gradle.kts"
+      - "back/Dockerfile"
+      - "terraform/**"
 
 env:
   CONTAINER_REGISTRY: ghcr.io
@@ -23,7 +24,7 @@ concurrency:
 jobs:
   build-and-push-docker-image:
     name: 1. 도커 이미지 빌드 및 푸시
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04-arm
     permissions:
       contents: read
       packages: write
@@ -74,6 +75,7 @@ jobs:
           docker rmi $IMAGE || true
           docker run -d \
             --name application \
+            --network common \
             --env-file .env \
             -p 8080:8080 \
             $IMAGE
