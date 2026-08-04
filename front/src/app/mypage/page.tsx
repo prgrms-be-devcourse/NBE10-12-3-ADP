@@ -22,7 +22,8 @@ import RoughFrame from "@/app/_components/RoughFrame";
 import WidgetGuideModal from "@/app/_components/WidgetGuideModal";
 
 type ReviewsByMemberDto = components["schemas"]["ReviewsByMemberDto"];
-type BookDto = components["schemas"]["BookDto"];
+type BookWithWishIdAndTagsDto =
+  components["schemas"]["BookWithWishIdAndTagsDto"];
 type ReviewWithBookImgUrl = NonNullable<
   ReviewsByMemberDto["results"]
 >[number] & {
@@ -45,14 +46,13 @@ function WishIcon() {
     </svg>
   );
 }
-
 export default function Page() {
   const router = useRouter();
   const { loginMember, isLogin, isLoginMemberPending, refresh } = useAuth();
   const { showToast, showErrorToast } = useToast();
 
   const [reviewData, setReviewData] = useState<ReviewsByMemberDto | null>(null);
-  const [wishes, setWishes] = useState<BookDto[] | null>(null);
+  const [wishes, setWishes] = useState<BookWithWishIdAndTagsDto[] | null>(null);
   const [tab, setTab] = useState<"reviews" | "wishes">("reviews");
   const [isWidgetGuideOpen, setIsWidgetGuideOpen] = useState(false);
   const [copiedWidgetLink, setCopiedWidgetLink] = useState(false);
@@ -96,10 +96,10 @@ export default function Page() {
       .catch(showErrorToast);
   };
 
-  const handleRemoveWish = (bookId: number) => {
-    apiFetch(`/api/v1/wishes/book/${bookId}`, { method: "DELETE" })
+  const handleRemoveWish = (wishId: number) => {
+    apiFetch(`/api/v1/wishes/${wishId}`, { method: "DELETE" })
       .then((data) => {
-        showToast(data.message);
+        showToast(data?.message ?? "보고 싶어요를 취소했습니다.");
         loadWishes();
       })
       .catch(showErrorToast);
@@ -323,37 +323,61 @@ export default function Page() {
             )}
 
             <ul className="flex w-full flex-col">
-              {wishes.map((book) => (
-                <li
-                  key={book.id}
-                  className="relative flex items-center justify-between gap-3 py-3"
-                >
-                  <RoughDivider fullWidth />
-                  <Link
-                    href={`/books/detail?id=${book.id}`}
-                    className="font-semibold"
+              {wishes.map((book, index) => {
+                const averageRating =
+                  typeof book.averageRating === "number"
+                    ? book.averageRating
+                    : null;
+                const title = book.title ?? "제목 없음";
+
+                return (
+                  <li
+                    key={book.wishId ?? book.id ?? index}
+                    className="relative flex items-center justify-between gap-3 py-3"
                   >
-                    {book.title}
-                  </Link>
-                  <div className="flex items-center gap-3">
-                    <span
-                      className={`font-bold ${ratingColor(book.averageRating)}`}
-                    >
-                      <RatingValue rating={book.averageRating} />
-                    </span>
-                    <RoughButton
-                      className="px-2"
-                      roughSize="sm"
-                      tone="wishActive"
-                      type="button"
-                      onClick={() => handleRemoveWish(book.id)}
-                    >
-                      <WishIcon />
-                      보고 싶어요 취소
-                    </RoughButton>
-                  </div>
-                </li>
-              ))}
+                    <RoughDivider fullWidth />
+                    {book.id != null ? (
+                      <Link
+                        href={`/books/detail?id=${book.id}`}
+                        className="font-semibold"
+                      >
+                        {title}
+                      </Link>
+                    ) : (
+                      <span className="font-semibold">{title}</span>
+                    )}
+                    <div className="flex items-center gap-3">
+                      <span
+                        className={`font-bold ${
+                          averageRating != null
+                            ? ratingColor(averageRating)
+                            : ""
+                        }`}
+                      >
+                        {averageRating != null ? (
+                          <RatingValue rating={averageRating} />
+                        ) : (
+                          "-"
+                        )}
+                      </span>
+                      <RoughButton
+                        className="px-2"
+                        roughSize="sm"
+                        tone="wishActive"
+                        type="button"
+                        disabled={book.wishId == null}
+                        onClick={() => {
+                          if (book.wishId == null) return;
+                          handleRemoveWish(book.wishId);
+                        }}
+                      >
+                        <WishIcon />
+                        보고 싶어요 취소
+                      </RoughButton>
+                    </div>
+                  </li>
+                );
+              })}
             </ul>
           </>
         )}

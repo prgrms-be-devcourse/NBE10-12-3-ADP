@@ -457,12 +457,21 @@ export interface components {
             message?: string;
             data?: components["schemas"]["BookDto"];
         };
-        RsDataUnit: {
+        RsDataWishDto: {
             resultCode?: string;
             message?: string;
+            data?: components["schemas"]["WishDto"];
+        };
+        WishDto: {
+            /** Format: int64 */
+            id?: number;
         };
         TagCreateRequest: {
             name: string;
+        };
+        RsDataUnit: {
+            resultCode?: string;
+            message?: string;
         };
         ReviewCreateRequest: {
             /** Format: float */
@@ -488,13 +497,15 @@ export interface components {
             username: string;
             password: string;
         };
-        BookWithTagsDto: {
+        BookWithWishIdAndTagsDto: {
             /** Format: int64 */
             id?: number;
             title?: string;
             imgUrl?: string | null;
             /** Format: double */
             averageRating?: number;
+            /** Format: int64 */
+            wishId?: number;
             tags?: string[];
         };
         ReviewWithBookImgUrlDto: {
@@ -558,6 +569,7 @@ export interface components {
             pageSize?: number;
             sort?: components["schemas"]["SortObject"];
             unpaged?: boolean;
+            sort?: components["schemas"]["SortObject"];
             /** Format: int64 */
             offset?: number;
         };
@@ -621,7 +633,8 @@ export interface components {
                 [key: string]: unknown;
             };
             tags?: string[];
-            wished?: boolean;
+            /** Format: int64 */
+            wishId?: number | null;
         };
         PageBookDto: {
             /** Format: int64 */
@@ -785,7 +798,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json;charset=UTF-8": components["schemas"]["RsDataUnit"];
+                    "application/json;charset=UTF-8": components["schemas"]["RsDataWishDto"];
                 };
             };
         };
@@ -945,7 +958,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json;charset=UTF-8": components["schemas"]["BookWithTagsDto"][];
+                    "application/json;charset=UTF-8": components["schemas"]["BookWithWishIdAndTagsDto"][];
                 };
             };
         };

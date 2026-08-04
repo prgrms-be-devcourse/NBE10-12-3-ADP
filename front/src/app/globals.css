@@ -1012,6 +1012,9 @@ button:hover {
   left: 50%;
   bottom: 1.5rem;
   z-index: 60;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   max-width: calc(100vw - 2rem);
   transform: translateX(-50%);
   border: 0;
@@ -1025,6 +1028,10 @@ button:hover {
     0 6px 16px rgb(15 118 110 / 0.14),
     0 16px 32px rgb(17 24 39 / 0.16);
   animation: rough-toast-in 180ms ease-out;
+  overflow: hidden;
+  text-align: center;
+  overflow-wrap: anywhere;
+  isolation: isolate;
 }
 
 @keyframes rough-toast-in {

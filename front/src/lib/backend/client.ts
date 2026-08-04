@@ -30,6 +30,16 @@ export const apiFetchRaw = (url: string, options?: RequestInit) => {
   return fetch(`${NEXT_PUBLIC_API_BASE_URL}${url}`, options);
 };
 
+const parseJsonBody = (res: Response) => {
+  return res.text().then((text) => {
+    if (text.length === 0) {
+      return null;
+    }
+
+    return JSON.parse(text);
+  });
+};
+
 export const apiFetch = (url: string, options?: RequestInit) => {
   return apiFetchRaw(url, options).then((res) => {
     if (!res.ok) {
@@ -37,11 +47,11 @@ export const apiFetch = (url: string, options?: RequestInit) => {
         return null;
       }
 
-      return res.json().then((errorData) => {
-        throw { ...errorData, requestUrl: url };
+      return parseJsonBody(res).then((errorData) => {
+        throw { ...(errorData ?? {}), requestUrl: url };
       });
     }
 
-    return res.json();
+    return parseJsonBody(res);
   });
 };

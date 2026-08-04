@@ -29,6 +29,8 @@ import RoughRatingInput from "@/app/_components/RoughRatingInput";
 type BookDetailDto = components["schemas"]["BookDetailDto"];
 type BookDetailWithWishId = BookDetailDto & {
   isWished?: boolean;
+  wished?: boolean;
+  wishId?: number | null;
 };
 type BookDto = components["schemas"]["BookDto"];
 type ReviewDto = components["schemas"]["ReviewDto"];
@@ -215,12 +217,17 @@ function BookDetail() {
   const handleToggleWish = () => {
     if (book == null || id == null) return;
 
-    const isBookWished = book.isWished ?? book.wished ?? false;
+    const wishId = book.wishId;
 
-    if (isBookWished) {
-      apiFetch(`/api/v1/wishes/book/${id}`, { method: "DELETE" })
+    if (wishId != null) {
+      apiFetch(`/api/v1/wishes/${wishId}`, { method: "DELETE" })
         .then((data) => {
-          showToast(data.message);
+          showToast(data?.message ?? "보고 싶어요를 취소했습니다.");
+          setBook((currentBook) =>
+            currentBook == null
+              ? currentBook
+              : { ...currentBook, wishId: null },
+          );
           loadBook();
         })
         .catch(showErrorToast);
@@ -229,7 +236,17 @@ function BookDetail() {
 
     apiFetch(`/api/v1/wishes/book/${id}`, { method: "POST" })
       .then((data) => {
-        showToast(data.message);
+        showToast(data?.message ?? "보고 싶어요에 추가했습니다.");
+        const createdWishId = data?.data?.id;
+
+        if (typeof createdWishId === "number") {
+          setBook((currentBook) =>
+            currentBook == null
+              ? currentBook
+              : { ...currentBook, wishId: createdWishId },
+          );
+        }
+
         loadBook();
       })
       .catch(showErrorToast);
@@ -271,7 +288,7 @@ function BookDetail() {
 
   if (book == null || reviews == null) return <div>로딩중...</div>;
 
-  const isBookWished = book.isWished ?? book.wished ?? false;
+  const isBookWished = book.wishId != null || book.isWished || book.wished;
   const average = book.rating?.["average"];
   const averageNumber = typeof average === "number" ? average : null;
 
