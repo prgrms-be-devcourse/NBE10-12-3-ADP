@@ -5,7 +5,6 @@ import com.back.domain.book.entity.BookOperational
 import com.back.domain.book.repository.BookOperationalRepository
 import com.back.domain.book.repository.BookRepository
 import com.back.domain.book.repository.BookViewCountRedisRepository
-import com.back.global.rq.Rq
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -13,7 +12,6 @@ import org.springframework.transaction.annotation.Transactional
 @Service
 @Transactional(readOnly = true)
 class BookViewCountService(
-    private val rq: Rq,
     private val bookRepository: BookRepository,
     private val bookOperationalRepository: BookOperationalRepository,
     private val bookViewCountRedisRepository: BookViewCountRedisRepository,
@@ -26,9 +24,9 @@ class BookViewCountService(
     }
 
     @Transactional
-    fun incrementViewCount(book: Book) {
-        if (rq.getCookieValue("viewed-%d".format(book.id), "") == "true") {
-            return
+    fun incrementViewCount(book: Book, alreadyViewed: Boolean): Boolean {
+        if (alreadyViewed) {
+            return false
         }
 
         if (!bookViewCountRedisRepository
@@ -37,7 +35,7 @@ class BookViewCountService(
             updateBookViewCountInDb(book, getDBBookViewCount(book) + 1)
         }
 
-        rq.setCookie("viewed-%d".format(book.id), "true", 60)
+        return true
     }
 
     @Transactional

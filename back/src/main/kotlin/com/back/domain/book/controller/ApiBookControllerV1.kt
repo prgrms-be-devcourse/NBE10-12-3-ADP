@@ -1,6 +1,7 @@
 package com.back.domain.book.controller
 
 import com.back.domain.book.controller.request.BookUpdateRequest
+import com.back.domain.book.dto.BookDetailDto
 import com.back.domain.book.dto.BookDto
 import com.back.domain.book.service.BookRecommendService
 import com.back.domain.book.service.BookService
@@ -41,8 +42,17 @@ class ApiBookControllerV1(
 
     @GetMapping("/{id}")
     @Operation(summary = "도서 단건 조회")
-    fun getBookDetail(@PathVariable id: Long)
-        = bookService.getBookDetail(id, rq.actorOrNull)
+    fun getBookDetail(@PathVariable id: Long): BookDetailDto {
+        val viewCookieName = "viewed-%d".format(id)
+        val alreadyViewed = rq.getCookieValue(viewCookieName, "") == "true"
+        val result = bookService.getBookDetail(id, rq.actorOrNull, alreadyViewed)
+
+        if (result.viewCountIncreased) {
+            rq.setCookie(viewCookieName, "true", 60)
+        }
+
+        return result.bookDetail
+    }
 
     @GetMapping("/search")
     @Operation(summary = "도서 검색 다건 조회")

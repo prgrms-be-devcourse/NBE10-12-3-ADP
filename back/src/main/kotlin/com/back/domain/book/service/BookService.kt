@@ -7,6 +7,11 @@ import com.back.domain.member.entity.Member
 import org.springframework.data.domain.Page
 import org.springframework.stereotype.Service
 
+data class BookDetailResult(
+    val bookDetail: BookDetailDto,
+    val viewCountIncreased: Boolean
+)
+
 @Service
 class BookService(
     private val bookQueryService: BookQueryService,
@@ -26,8 +31,8 @@ class BookService(
         return bookQueryService.getBooksOrderByRank(type, page, size)
     }
 
-    fun incrementViewCount(book: Book) {
-        bookViewCountService.incrementViewCount(book)
+    fun incrementViewCount(book: Book, alreadyViewed: Boolean = false): Boolean {
+        return bookViewCountService.incrementViewCount(book, alreadyViewed)
     }
 
     fun updateBooksViewCountInDb() {
@@ -38,12 +43,15 @@ class BookService(
         return bookQueryService.getBook(id)
     }
 
-    fun getBookDetail(id: Long, actor: Member?): BookDetailDto {
+    fun getBookDetail(id: Long, actor: Member?, alreadyViewed: Boolean): BookDetailResult {
         val book = getBook(id)
 
-        bookViewCountService.incrementViewCount(book)
+        val viewCountIncreased = bookViewCountService.incrementViewCount(book, alreadyViewed)
 
-        return bookQueryService.getBookDetailDto(book, actor)
+        return BookDetailResult(
+            bookQueryService.getBookDetailDto(book, actor),
+            viewCountIncreased
+        )
     }
 
     fun updateBook(
