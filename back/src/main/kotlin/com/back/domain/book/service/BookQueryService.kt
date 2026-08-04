@@ -39,7 +39,8 @@ class BookQueryService(
         val book = getBookById(id)
 
         if (book.imgUrl.isNullOrBlank()) {
-            bookThumbnailService.fillMissingImgUrl(book.id, book.isbn)?.let { book.updateImgUrl(it) }
+            bookThumbnailService.fillMissingImgUrl(book.id, book.isbn)
+            return getBookById(id)
         }
 
         return book
@@ -56,7 +57,7 @@ class BookQueryService(
     }
 
     fun getBooks(page: Int, size: Int): Page<BookDto> {
-        return bookRepository
+        val books = bookRepository
             .findAll(
                 PageRequest.of(
                     page,
@@ -64,7 +65,12 @@ class BookQueryService(
                     org.springframework.data.domain.Sort.by(org.springframework.data.domain.Sort.Direction.DESC, "id")
                 )
             )
-            .map { getBookDto(it) }
+
+        val ratingsByIsbn = bookOperationalRepository.findByIsbnIn(
+            books.content.map { it.isbn }
+        ).associate { it.isbn to it.averageRating }
+
+        return books.map { BookDto(it, ratingsByIsbn[it.isbn] ?: 0.0) }
     }
 
     fun getBooksOrderByTopViewedInLastHour(page: Int, size: Int): List<BookDto> {
