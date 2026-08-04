@@ -36,9 +36,6 @@ class BookService(
             ?: throw NoSuchElementException("존재하지 않는 도서입니다.")
     }
 
-    private fun getBookByIsbn(isbn: String)
-        = bookRepository.findByIsbn(isbn)
-
     @Transactional
     fun updateBookViewCountInDb(book: Book, viewCount: Int) {
 
