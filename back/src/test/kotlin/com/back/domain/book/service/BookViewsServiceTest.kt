@@ -30,8 +30,8 @@ class BookViewsServiceTest {
 
         var upperCnt = Int.MAX_VALUE
 
+        println()
         for (book in bookRank) {
-
             val b = bookService.getBookById(book.id)
             val nowCnt = bookService.getBookViewCount(b)
 
