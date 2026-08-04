@@ -3,6 +3,8 @@ package com.back.domain.book.service
 import com.back.domain.book.dto.BookDetailDto
 import com.back.domain.book.dto.BookDto
 import com.back.domain.book.entity.Book
+import com.back.domain.book.entity.BookOperational
+import com.back.domain.book.repository.BookOperationalRepository
 import com.back.domain.book.repository.BookRepository
 import com.back.domain.book.repository.BookViewCountRedisRepository
 import com.back.domain.member.entity.Member
@@ -22,6 +24,8 @@ import kotlin.collections.iterator
 class BookService(
     private val rq: Rq,
     private val bookRepository: BookRepository,
+    private val bookOperationalRepository: BookOperationalRepository,
+    private val bookViewCountRedisRepository: BookViewCountRedisRepository,
     private val reviewRepository: ReviewRepository,
     private val wishRepository: WishRepository,
     private val bookViewCountRedisRepository: BookViewCountRedisRepository,
@@ -34,27 +38,46 @@ class BookService(
         return bookRepository.findByIdOrNull(bookId) ?:
             throw NoSuchElementException("존재하지 않는 도서입니다.")
 
+    fun getBookById(bookId: Long): Book {
+        return bookRepository.findByIdOrNull(bookId) ?: throw NoSuchElementException("존재하지 않는 도서입니다.")
     }
 
     @Transactional
-    fun updateBooksViewCountInDb(book: Book, viewCount: Int) {
+    fun updateBookViewCountInDb(book: Book, viewCount: Int) {
+
+        val book = bookOperationalRepository.findByBookId(book.id)
+            ?: bookOperationalRepository.save(BookOperational(book.id))
+
         book.viewCount = viewCount
+
+    }
+
+    private fun getBookOperational(book: Book)
+        = bookOperationalRepository.findByBookId(book.id)
+
+    private fun getDBBookViewCount(book: Book)
+        = getBookOperational(book)?.viewCount ?: 0
+
+    private fun getBookDto(book: Book) : BookDto {
+        return BookDto(book, getBookOperational(book)?.averageRating ?: 0.0)
     }
 
     fun getBookViewCount(book: Book): Int {
-        val viewCount = bookViewCountRedisRepository
+
+        return bookViewCountRedisRepository
             .findBookViewCountById(book.id)
-
-        if (viewCount != null)
-            return viewCount
-
-        return book.viewCount
+            ?: getDBBookViewCount(book)
     }
 
     fun getBooksOrderByTopViewedInLastHour(page: Int, size: Int): List<BookDto> {
-        val books = bookViewCountRedisRepository.findBookIdOrderByTopViewedInLastHout(page, size) ?: return listOf()
+        val books = bookViewCountRedisRepository.findBookIdOrderByTopViewedInLastHout(page, size)
+            ?: return bookOperationalRepository
+                .findAllByOrderByViewCountDesc(
+                    PageRequest.of(page, size)
+                )
+                .toList().map { getBookDto(getBookById(it.bookId)) }
 
-        return books.map { bookId: Long -> BookDto(getBookById(bookId)) }
+        return books.map { getBookDto(getBookById(it)) }
     }
 
     fun getBooksOrderByRank(type: String, page: Int, size: Int): List<BookDto> {
@@ -65,12 +88,12 @@ class BookService(
         val pageable = PageRequest.of(page, size)
 
         if (type == "rating")
-            return bookRepository.findAllByOrderByAverageRatingDesc(pageable).toList()
-                .map { book -> BookDto(book)}
+            return bookOperationalRepository.findAllByOrderByAverageRatingDesc(pageable).toList()
+                .map { getBookDto(getBookById(it.bookId)) }
 
-        return bookRepository.findAllByOrderByReviewCountDesc(pageable)
+        return bookOperationalRepository.findAllByOrderByReviewCountDesc(pageable)
             .toList()
-            .map { book -> BookDto(book)}
+            .map { getBookDto(getBookById(it.bookId)) }
     }
 
     @Transactional
@@ -79,10 +102,11 @@ class BookService(
             return
         }
 
-        if (bookViewCountRedisRepository
-                .increase(book.id) { book.viewCount}) return
-
-        updateBooksViewCountInDb(book, book.viewCount + 1)
+        if (!bookViewCountRedisRepository
+            .tryIncreaseViewAtRedis(book.id)
+            { getDBBookViewCount(book) }) {
+            updateBookViewCountInDb(book, getDBBookViewCount(book) + 1)
+        }
 
         rq.setCookie("viewed-%d".format(book.id), "true", 60)
 
@@ -95,7 +119,7 @@ class BookService(
 
         for (tuple in viewMap) {
             val book = bookRepository.findByIdOrNull(tuple.key) ?: continue
-            updateBooksViewCountInDb(book, tuple.value)
+            updateBookViewCountInDb(book, tuple.value)
         }
     }
 
@@ -110,15 +134,17 @@ class BookService(
         return book
     }
 
-    fun getBookDetail(id: Long, actor :Member?): BookDetailDto {
+    fun getBookDetail(id: Long, actor: Member?): BookDetailDto {
 
         val book = getBook(id)
 
         return BookDetailDto(
             book,
+            getBookOperational(book)?.reviewCount ?: 0,
             getIsWished(book, actor),
             getRatingMap(book),
-            getBookTags(book))
+            getBookTags(book)
+        )
 
     }
 
@@ -135,7 +161,7 @@ class BookService(
 
         book.update(title, description, authors, publisher, imgUrl)
 
-        return BookDto(book)
+        return getBookDto(book)
     }
 
     @Transactional
@@ -157,7 +183,7 @@ class BookService(
                     org.springframework.data.domain.Sort.by(org.springframework.data.domain.Sort.Direction.DESC, "id")
                 )
             )
-            .map { book -> BookDto(book) }
+            .map { getBookDto(it) }
     }
 
 
@@ -188,17 +214,17 @@ class BookService(
 
         try {
             return bookRepository.searchByKeyword(searchTerm, pageable)
-                .toList().map { book -> BookDto(book) }
+                .toList().map { getBookDto(it) }
 
         } catch (_: java.lang.Exception) {
             // handler();
         }
 
         return bookRepository.findByTitleContaining(searchTerm, pageable)
-            .toList().map { book -> BookDto(book) }
+            .toList().map { getBookDto(it) }
     }
 
-    fun getIsWished(book: Book, actor: Member?) : Boolean {
+    fun getIsWished(book: Book, actor: Member?): Boolean {
 
         if (actor == null) return false
 
@@ -208,11 +234,13 @@ class BookService(
     fun getRatingMap(book: Book): MutableMap<String, Any> {
         val ratingMap: MutableMap<String, Any> = mutableMapOf()
 
-        ratingMap["average"] = book.averageRating
+        ratingMap["average"] =
+            getBookOperational(book)?.averageRating ?: 0
 
         for (i in 1..10) {
             val rating = i * 0.5f
-            ratingMap["%.1f".format(rating)] = reviewRepository.countByBookAndRating(book, rating)
+            ratingMap["%.1f".format(rating)] =
+                reviewRepository.countByBookAndRating(book, rating)
         }
 
         return ratingMap

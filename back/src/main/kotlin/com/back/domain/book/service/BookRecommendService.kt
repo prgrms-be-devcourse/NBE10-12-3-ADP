@@ -1,6 +1,7 @@
 package com.back.domain.book.service
 
 import com.back.domain.book.dto.BookDto
+import com.back.domain.book.repository.BookOperationalRepository
 import com.back.domain.book.repository.BookRepository
 import com.back.domain.member.entity.Member
 import com.back.domain.review.entity.Review
@@ -17,7 +18,8 @@ import org.springframework.transaction.annotation.Transactional
 @Transactional(readOnly = true)
 class BookRecommendService(
     private val reviewRepository: ReviewRepository,
-    private val bookRepository: BookRepository
+    private val bookRepository: BookRepository,
+    private val bookOperationalRepository: BookOperationalRepository
 ) {
 
     private fun reviewToRecommendReview(review: Review): Rating {
@@ -65,9 +67,16 @@ class BookRecommendService(
             )
         }
 
+
+
         return recommendSystem.getRecommendList(actor.id, 5, maxCount)
             .mapNotNull { bookId ->
-                bookRepository.findByIdOrNull(bookId)?.let { BookDto(it) }
+                bookRepository.findByIdOrNull(bookId)?.let {
+                    BookDto(
+                        it,
+                        bookOperationalRepository
+                            .findByBookId(it.id)?.averageRating ?: 0.0)
+                }
             }
     }
 }

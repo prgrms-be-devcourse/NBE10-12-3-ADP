@@ -1,6 +1,7 @@
 package com.back.domain.wish.service
 
 import com.back.domain.book.dto.BookWithTagsDto
+import com.back.domain.book.repository.BookOperationalRepository
 import com.back.domain.book.repository.BookRepository
 import com.back.domain.member.entity.Member
 import com.back.domain.review.repository.ReviewRepository
@@ -17,12 +18,15 @@ class WishService(
     private val wishRepository: WishRepository,
     private val reviewRepository: ReviewRepository,
     private val bookRepository: BookRepository,
+    private val bookOperationalRepository: BookOperationalRepository
 ) {
 
     fun getMyWishes(actor: Member): List<BookWithTagsDto> =
         wishRepository.findByMember(actor).map { wish ->
             BookWithTagsDto(
                 wish.book,
+                bookOperationalRepository
+                    .findByBookId(wish.book.id)?.averageRating ?: 0.0,
                 reviewRepository.findByBook(wish.book)
                     .flatMap { review -> review.tags }
                     .distinct(),
