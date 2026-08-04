@@ -6,11 +6,9 @@ import com.back.domain.book.repository.BookRepository
 import com.back.domain.member.entity.Member
 import com.back.domain.review.entity.Review
 import com.back.domain.review.repository.ReviewRepository
-
 import com.back.standard.recommend.byRating.SimilarityRecommendByRating
 import com.back.standard.recommend.byRating.SimilarityRecommendByRating.Rating
 import org.springframework.data.domain.PageRequest
-import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -22,15 +20,15 @@ class BookRecommendService(
     private val bookOperationalRepository: BookOperationalRepository
 ) {
 
-    private fun reviewToRecommendReview(review: Review): Rating {
+    private fun reviewToRecommendReview(review: Review): Rating<Long, String> {
         return Rating(
             review.reviewer.id,
-            review.book.id,
+            review.book.isbn,
             review.rating
         )
     }
 
-    private fun recommendReviewsByReviewer(reviewer: Member): List<Rating> {
+    private fun recommendReviewsByReviewer(reviewer: Member): List<Rating<Long, String>> {
         return reviewRepository.findByReviewer(reviewer, PageRequest.of(0, 5))
             .toList()
             .map { review: Review -> this.reviewToRecommendReview(review) }
@@ -39,12 +37,13 @@ class BookRecommendService(
     fun getBooksByRecommend(actor: Member?, maxCount: Int): List<BookDto> {
         if (actor == null) return listOf()
 
-        val recommendSystem = SimilarityRecommendByRating()
+        val recommendSystem = SimilarityRecommendByRating<Long, String>()
 
         val recentReviews: List<Review> = reviewRepository
             .findByReviewer(
                 actor,
-                PageRequest.of(0, 5))
+                PageRequest.of(0, 5)
+            )
             .toList()
 
         recommendSystem.setData(
@@ -54,10 +53,8 @@ class BookRecommendService(
         val members: MutableSet<Member> = mutableSetOf()
 
         for (review in recentReviews) {
-            val book = bookRepository.findByIdOrNull(review.book.id) ?: continue
-
             reviewRepository
-                .findByBook(book, PageRequest.of(0, 10))
+                .findByBook(review.book, PageRequest.of(0, 10))
                 .forEach { r -> members.add(r.reviewer) }
         }
 
@@ -67,16 +64,14 @@ class BookRecommendService(
             )
         }
 
+        val recommendedIsbns = recommendSystem.getRecommendList(actor.id, 5, maxCount)
+        val booksByIsbn = bookRepository.findByIsbnIn(recommendedIsbns)
+            .associateBy { it.isbn }
+        val ratingsByIsbn = bookOperationalRepository.findByIsbnIn(recommendedIsbns)
+            .associate { it.isbn to it.averageRating }
 
-
-        return recommendSystem.getRecommendList(actor.id, 5, maxCount)
-            .mapNotNull { bookId ->
-                bookRepository.findByIdOrNull(bookId)?.let {
-                    BookDto(
-                        it,
-                        bookOperationalRepository
-                            .findByIsbn(it.isbn)?.averageRating ?: 0.0)
-                }
-            }
+        return recommendedIsbns.mapNotNull { isbn ->
+            booksByIsbn[isbn]?.let { BookDto(it, ratingsByIsbn[isbn] ?: 0.0) }
+        }
     }
 }

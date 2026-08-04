@@ -26,29 +26,23 @@ class BookService(
     private val bookRepository: BookRepository,
     private val bookOperationalRepository: BookOperationalRepository,
     private val bookViewCountRedisRepository: BookViewCountRedisRepository,
+    private val bookThumbnailService: BookThumbnailService,
     private val reviewRepository: ReviewRepository,
     private val wishRepository: WishRepository,
-    private val bookViewCountRedisRepository: BookViewCountRedisRepository,
-    private val bookThumbnailService: BookThumbnailService,
-
 ) {
 
-    fun getBookById(bookId: Long) : Book {
-
-        return bookRepository.findByIdOrNull(bookId) ?:
-            throw NoSuchElementException("존재하지 않는 도서입니다.")
-
     fun getBookById(bookId: Long): Book {
-        return bookRepository.findByIdOrNull(bookId) ?: throw NoSuchElementException("존재하지 않는 도서입니다.")
+        return bookRepository.findByIdOrNull(bookId)
+            ?: throw NoSuchElementException("존재하지 않는 도서입니다.")
     }
 
     @Transactional
     fun updateBookViewCountInDb(book: Book, viewCount: Int) {
 
-        val book = getBookOperational(book)
+        val bookOperational = getBookOperational(book)
             ?: bookOperationalRepository.save(BookOperational(book.isbn))
 
-        book.viewCount = viewCount
+        bookOperational.viewCount = viewCount
 
     }
 
