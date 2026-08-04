@@ -11,6 +11,8 @@ import com.back.domain.review.dto.ReviewDto
 import com.back.domain.review.dto.ReviewWithBookImgUrlDto
 import com.back.domain.review.dto.ReviewsByMemberDto
 import com.back.domain.review.entity.Review
+import com.back.domain.review.entity.ReviewLike
+import com.back.domain.review.repository.ReviewLikeRepository
 import com.back.domain.review.repository.ReviewRepository
 import com.back.domain.tag.entity.Tag
 import com.back.domain.tag.repository.TagRepository
@@ -28,6 +30,7 @@ import kotlin.math.roundToInt
 @Transactional(readOnly = true)
 class ReviewService(
     private val reviewRepository: ReviewRepository,
+    private val reviewLikeRepository: ReviewLikeRepository,
     private val bookRepository: BookRepository,
     private val bookOperationalRepository: BookOperationalRepository,
     private val memberRepository: MemberRepository,
@@ -148,5 +151,16 @@ class ReviewService(
         reviewRepository.delete(review)
 
         refreshBookRating(book)
+    }
+
+    @Transactional
+    fun createReviewLike(actor: Member, reviewId: Long) {
+        val review = getReview(reviewId)
+
+        if (reviewLikeRepository.existsByReviewAndMember(review, actor))
+            throw ServiceException("409-1", "이미 존재하는 좋아요입니다.")
+
+        reviewLikeRepository.save(ReviewLike(review, actor))
+        review.increaseLikeCount()
     }
 }
