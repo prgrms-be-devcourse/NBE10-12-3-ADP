@@ -1,5 +1,7 @@
 package com.back.standard.recommend.util
 
+import kotlin.math.sqrt
+
 class CosineSimilarityCalcer<I, L> : SimilarityCalcer<I, L> {
 
     private var vectorASqrMagnitude = 0.0
@@ -29,7 +31,11 @@ class CosineSimilarityCalcer<I, L> : SimilarityCalcer<I, L> {
             ret += element.value * otherValue
         }
 
-        return ret / Math.sqrt(vectorASqrMagnitude * vectorBSqrMagnitude)
+        val denominator = sqrt(vectorASqrMagnitude * vectorBSqrMagnitude)
+        
+        if (denominator == 0.0) return 0.0
+
+        return ret / denominator
     }
 
     override fun getSimilarList(target: Vector<L>, matrix: Map<I, Vector<L>>): List<SimilarityCalcer.Similar<I>> {

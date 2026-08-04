@@ -140,7 +140,6 @@ class BookService(
 
     fun getBook(id: Long): Book {
         val book = getBookById(id)
-        incrementViewCount(book)
 
         if (book.imgUrl.isNullOrBlank()) {
             bookThumbnailService.fillMissingImgUrl(book.id, book.isbn)?.let { book.updateImgUrl(it) }
@@ -149,9 +148,12 @@ class BookService(
         return book
     }
 
+    @Transactional
     fun getBookDetail(id: Long, actor: Member?): BookDetailDto {
 
         val book = getBook(id)
+
+        incrementViewCount(book)
 
         return BookDetailDto(
             book,
