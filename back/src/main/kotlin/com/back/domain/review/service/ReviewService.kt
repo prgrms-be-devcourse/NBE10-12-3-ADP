@@ -6,6 +6,7 @@ import com.back.domain.member.entity.Member
 import com.back.domain.member.repository.MemberRepository
 import com.back.domain.review.dto.AdminReviewDto
 import com.back.domain.review.dto.ReviewDto
+import com.back.domain.review.dto.ReviewWithBookImgUrlDto
 import com.back.domain.review.dto.ReviewsByMemberDto
 import com.back.domain.review.entity.Review
 import com.back.domain.review.repository.ReviewRepository
@@ -64,7 +65,14 @@ class ReviewService(
         return ratings
     }
 
-    fun getReviewsByBookId(bookId: Long): List<ReviewDto> =
+    fun getReviewsOrderByLatest(page: Int, size: Int)
+        = reviewRepository
+            .findAllByOrderByIdDesc(
+                PageRequest.of(page, size))
+            .toList()
+            .map { ReviewWithBookImgUrlDto(it) }
+
+    fun getReviewsByBookId(bookId: Long) =
         reviewRepository.findByBook(getBookById(bookId)).map { ReviewDto(it) }
 
     fun getReviewsByMemberId(memberId: Long): ReviewsByMemberDto {
@@ -72,7 +80,7 @@ class ReviewService(
 
         return ReviewsByMemberDto(
             getRatingMap(member),
-            reviewRepository.findByReviewer(member).map { ReviewDto(it) }
+            reviewRepository.findByReviewer(member).map { ReviewWithBookImgUrlDto(it) }
         )
     }
 
