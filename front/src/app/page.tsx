@@ -25,6 +25,23 @@ type LatestReviewDto = ReviewDto & {
   bookImgUrl?: string | null;
 };
 
+function extractListData<T>(data: unknown): T[] {
+  if (Array.isArray(data)) {
+    return data;
+  }
+
+  if (
+    data != null &&
+    typeof data === "object" &&
+    "content" in data &&
+    Array.isArray(data.content)
+  ) {
+    return data.content as T[];
+  }
+
+  return [];
+}
+
 function CarouselArrow({ direction }: { direction: "left" | "right" }) {
   return (
     <svg
@@ -345,16 +362,24 @@ export default function Page() {
       apiFetch(`/api/v1/books/rank?type=reviewCount&page=0&size=10`),
     ]).then(([popularData, latestReviewData, topRatedData, mostReviewedData]) => {
       setPopularBooks(
-        popularData.status === "fulfilled" ? popularData.value : [],
+        popularData.status === "fulfilled"
+          ? extractListData<BookDto>(popularData.value)
+          : [],
       );
       setLatestReviews(
-        latestReviewData.status === "fulfilled" ? latestReviewData.value : [],
+        latestReviewData.status === "fulfilled"
+          ? extractListData<LatestReviewDto>(latestReviewData.value)
+          : [],
       );
       setTopRatedBooks(
-        topRatedData.status === "fulfilled" ? topRatedData.value : [],
+        topRatedData.status === "fulfilled"
+          ? extractListData<BookDto>(topRatedData.value)
+          : [],
       );
       setMostReviewedBooks(
-        mostReviewedData.status === "fulfilled" ? mostReviewedData.value : [],
+        mostReviewedData.status === "fulfilled"
+          ? extractListData<BookDto>(mostReviewedData.value)
+          : [],
       );
     });
   }, []);
