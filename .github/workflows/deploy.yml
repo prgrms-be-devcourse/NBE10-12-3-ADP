@@ -74,6 +74,7 @@ jobs:
           docker rmi $IMAGE || true
           docker run -d \
             --name application \
+            --network common \
             --env-file .env \
             -p 8080:8080 \
             $IMAGE
