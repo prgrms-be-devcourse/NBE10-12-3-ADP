@@ -9,6 +9,8 @@ import { useAuth } from "@/lib/auth/AuthProvider";
 import {
   buildGitHubLoginUrl,
   consumeAuthReturnPath,
+  getCurrentAuthReturnPath,
+  getGitHubLoginUrlForReturnPath,
   saveCurrentAuthReturnPath,
 } from "@/lib/auth/authReturnPath";
 import { useTheme } from "@/lib/theme/ThemeProvider";
@@ -156,6 +158,9 @@ export default function Header() {
   const [isSearchPending, setIsSearchPending] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const searchInputRef = useRef<HTMLInputElement | null>(null);
+  const githubLoginHref = !isLogin
+    ? getGitHubLoginUrlForReturnPath(getCurrentAuthReturnPath())
+    : "#";
 
   useEffect(() => {
     const handleSearchLoading = (event: Event) => {
@@ -334,7 +339,7 @@ export default function Header() {
           {!isLoginMemberPending && !isLogin && (
             <div className="auth-action-enter">
               <a
-                href={`${process.env.NEXT_PUBLIC_API_BASE_URL}/oauth2/authorization/github?redirectUrl=${process.env.NEXT_PUBLIC_FRONTEND_BASE_URL}`}
+                href={githubLoginHref}
                 className="theme-nav-link theme-nav-control gap-1.5"
                 onClick={handleGitHubLogin}
                 aria-label="GitHub로 로그인"

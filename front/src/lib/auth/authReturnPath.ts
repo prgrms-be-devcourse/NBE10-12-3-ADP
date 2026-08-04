@@ -51,13 +51,20 @@ export const consumeAuthReturnPath = () => {
   return normalizePath(storedPath ?? FALLBACK_PATH);
 };
 
-export const buildGitHubLoginUrl = () => {
+export const getGitHubLoginUrlForReturnPath = (returnPath: string) => {
   if (typeof window === "undefined") return "#";
 
-  const returnPath = saveCurrentAuthReturnPath();
-  const redirectUrl = new URL(returnPath, window.location.origin).toString();
+  const redirectUrl = new URL(normalizePath(returnPath), window.location.origin)
+    .toString();
 
   return `${process.env.NEXT_PUBLIC_API_BASE_URL}/oauth2/authorization/github?redirectUrl=${encodeURIComponent(
     redirectUrl,
   )}`;
+};
+
+export const buildGitHubLoginUrl = () => {
+  if (typeof window === "undefined") return "#";
+
+  const returnPath = saveCurrentAuthReturnPath();
+  return getGitHubLoginUrlForReturnPath(returnPath);
 };
