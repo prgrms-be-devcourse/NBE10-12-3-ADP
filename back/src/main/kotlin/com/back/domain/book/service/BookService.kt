@@ -24,7 +24,8 @@ class BookService(
     private val bookRepository: BookRepository,
     private val reviewRepository: ReviewRepository,
     private val wishRepository: WishRepository,
-    private val bookViewCountRedisRepository: BookViewCountRedisRepository
+    private val bookViewCountRedisRepository: BookViewCountRedisRepository,
+    private val bookThumbnailService: BookThumbnailService,
 
 ) {
 
@@ -101,6 +102,11 @@ class BookService(
     fun getBook(id: Long): Book {
         val book = getBookById(id)
         incrementViewCount(book)
+
+        if (book.imgUrl.isNullOrBlank()) {
+            bookThumbnailService.fillMissingImgUrl(book.id)?.let { book.updateImgUrl(it) }
+        }
+
         return book
     }
 
