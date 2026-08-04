@@ -3,7 +3,6 @@ package com.back.domain.book.service
 import com.back.domain.book.dto.BookDetailDto
 import com.back.domain.book.dto.BookDto
 import com.back.domain.book.entity.Book
-import com.back.domain.book.entity.BookOperational
 import com.back.domain.book.repository.BookOperationalRepository
 import com.back.domain.book.repository.BookRepository
 import com.back.domain.book.repository.BookViewCountRedisRepository
@@ -86,11 +85,11 @@ class BookQueryService(
         val books = bookViewCountRedisRepository.findBookIdOrderByTopViewedInLastHout(page, size)
 
         if (books.isNullOrEmpty()) {
-            return bookOperationalRepository
-                .findAllByOrderByViewCountDesc(
+            return bookRepository
+                .findAllOrderByViewCountDesc(
                     PageRequest.of(page, size)
                 ).toList()
-                .let { getBookDtosFromOperations(it) }
+                .let { getBookDtos(it) }
         }
 
         return getBookDtosByBookIds(books)
@@ -103,13 +102,13 @@ class BookQueryService(
         val pageable = PageRequest.of(page, size)
 
         if (type == "rating")
-            return bookOperationalRepository
-                .findAllByOrderByAverageRatingDesc(pageable).toList()
-                .let { getBookDtosFromOperations(it) }
+            return bookRepository
+                .findAllOrderByAverageRatingDesc(pageable).toList()
+                .let { getBookDtos(it) }
 
-        return bookOperationalRepository
-            .findAllByOrderByReviewCountDesc(pageable).toList()
-            .let { getBookDtosFromOperations(it) }
+        return bookRepository
+            .findAllOrderByReviewCountDesc(pageable).toList()
+            .let { getBookDtos(it) }
     }
 
     fun getTagsByBookId(bookId: Long): List<String> {
@@ -150,15 +149,6 @@ class BookQueryService(
             .associate { it.isbn to it.averageRating }
 
         return books.map { BookDto(it, ratingsByIsbn[it.isbn] ?: 0.0) }
-    }
-
-    private fun getBookDtosFromOperations(operations: List<BookOperational>): List<BookDto> {
-        val booksByIsbn = bookRepository.findByIsbnIn(operations.map { it.isbn })
-            .associateBy { it.isbn }
-
-        return operations.mapNotNull { operation ->
-            booksByIsbn[operation.isbn]?.let { BookDto(it, operation.averageRating) }
-        }
     }
 
     private fun getBookDtosByBookIds(bookIds: List<Long>): List<BookDto> {
