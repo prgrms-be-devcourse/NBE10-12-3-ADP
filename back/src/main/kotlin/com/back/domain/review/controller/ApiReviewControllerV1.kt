@@ -31,6 +31,14 @@ class ApiReviewControllerV1(
     private val rq: Rq
 ) {
 
+    @GetMapping("/latest")
+    @Operation(summary = "도서별 리뷰 다건 조회")
+    fun getReviewsOrderByLatest(
+        @RequestParam(defaultValue = "0") page: Int,
+        @RequestParam(defaultValue = "10") size: Int
+    ): List<ReviewDto> =
+        reviewService.getReviewsOrderByLatest(page, size)
+
     @GetMapping("/book/{bookId}")
     @Operation(summary = "도서별 리뷰 다건 조회")
     fun getReviewsByBookId(
