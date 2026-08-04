@@ -1,6 +1,10 @@
 package com.back.domain.review.controller
 
+import com.back.domain.book.entity.Book
+import com.back.domain.book.repository.BookOperationalRepository
+import com.back.domain.book.repository.BookRepository
 import com.back.domain.review.service.ReviewService
+import org.assertj.core.api.Assertions.assertThat
 import org.hamcrest.Matchers
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
@@ -18,6 +22,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers.handler
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 import org.springframework.transaction.annotation.Transactional
+import java.time.LocalDateTime
 
 @ActiveProfiles("test")
 @SpringBootTest
@@ -29,6 +34,12 @@ class ApiReviewControllerV1PostTest {
 
     @Autowired
     private lateinit var reviewService: ReviewService
+
+    @Autowired
+    private lateinit var bookRepository: BookRepository
+
+    @Autowired
+    private lateinit var bookOperationalRepository: BookOperationalRepository
 
     @Throws(Exception::class)
     private fun postReview(bookId: Long, rating: Float, content: String, tags: List<String>): ResultActions {
@@ -90,6 +101,35 @@ class ApiReviewControllerV1PostTest {
             resultActions
                 .andExpect(jsonPath("$.data.tags[$i]").value(tags[i]))
         }
+    }
+
+    @Test
+    @DisplayName("리뷰 작성 시 운영 정보가 없는 도서의 운영 정보가 생성된다")
+    @WithUserDetails("user2")
+    @Throws(Exception::class)
+    fun t8() {
+        val book = bookRepository.save(
+            Book(
+                "리뷰로 운영 정보가 생기는 책",
+                "리뷰 생성 시 운영 정보가 함께 만들어져야 한다",
+                "isbn-review-creates-operational",
+                "작가",
+                LocalDateTime.now(),
+                "출판사",
+                ""
+            )
+        )
+
+        assertThat(bookOperationalRepository.findByIsbn(book.isbn)).isNull()
+
+        postReview(book.id, 4.5f, "운영 정보 생성 확인", listOf("운영"))
+            .andExpect(status().isCreated())
+
+        val bookOperational = bookOperationalRepository.findByIsbn(book.isbn)
+
+        assertThat(bookOperational).isNotNull
+        assertThat(bookOperational!!.reviewCount).isEqualTo(1)
+        assertThat(bookOperational.averageRating).isEqualTo(4.5)
     }
 
     @Test
