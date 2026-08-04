@@ -2,15 +2,21 @@
 
 개발자들의 도서 리뷰 공유 플랫폼
 
+- 문서 최신화 기준 커밋: `9fdc044` (`2026-08-04`, `[fix/ADP-211] 도서 수집 정보, 도서 운영 정보 분리 (#48)`)
+
 - 프론트엔드 배포: [READTHEM.md](https://readthem-md.pages.dev)
-- 백엔드 API: [Swagger API 문서](https://powell-remix-off-grade.trycloudflare.com/swagger-ui/index.html)
+- 백엔드 API 문서: [Swagger UI](https://powell-remix-off-grade.trycloudflare.com/swagger-ui/index.html)
+
+## 프로젝트 개요
+
+READTHEM.md는 도서를 검색하고, 리뷰를 작성하고, 찜 목록을 관리하고, 개인 책장 위젯을 공유할 수 있는 서비스입니다.
 
 ## 역할 분담
 
-| 팀원   | 역할 | 담당업무                   |
-| ------ | ---- | -------------------------- |
-| 이호영 | 팀장 | 배포                       |
-| 김민준 | 팀원 | 도서 정보 수집             |
+| 팀원 | 역할 | 담당업무 |
+| --- | --- | --- |
+| 이호영 | 팀장 | 배포 |
+| 김민준 | 팀원 | 도서 정보 수집 |
 | 이지헌 | 팀원 | 소셜 로그인, 추천 알고리즘 |
 
 ## 주요 기능
@@ -22,77 +28,26 @@
 - GitHub 로그인 기반 회원 기능
 - 관리자용 도서, 회원, 리뷰 관리
 - 개인 책장 위젯 생성 및 공유
-  ![Readthem.md](https://powell-remix-off-grade.trycloudflare.com/api/v1/widgets/puppywimy)
+
+## 문서
+
+- API 문서: [docs/api/book.md](docs/api/book.md), [docs/api/review.md](docs/api/review.md), [docs/api/member.md](docs/api/member.md), [docs/api/wish.md](docs/api/wish.md), [docs/api/widget.md](docs/api/widget.md), [docs/api/tag.md](docs/api/tag.md), [docs/api/global-exception.md](docs/api/global-exception.md)
+- 관리자 API 문서: [docs/api/book.admin.md](docs/api/book.admin.md), [docs/api/member.admin.md](docs/api/member.admin.md), [docs/api/review.admin.md](docs/api/review.admin.md)
+- 프로젝트 구조: [docs/project-structure.md](docs/project-structure.md)
+- ERD: [docs/erd.mermaid](docs/erd.mermaid)
+- 설계 규칙: [docs/review-rules/software-architecture.md](docs/review-rules/software-architecture.md), [docs/review-rules/refactoring-rules.md](docs/review-rules/refactoring-rules.md)
 
 ## 기술 스택
 
 ### Backend
 
-- **Core**: Java 25, Spring Boot 4.0.6
-- **Database & ORM**: MySQL(배포 환경), H2 Database (In-Memory)(개발 환경), Redis, Spring Data JPA
-- **API Documentation**: Springdoc OpenAPI (Swagger)
-- **Other**: Lombok, Spring Validation, Spring AOP (상태코드 매핑용 Aspect)
+- Java 25, Spring Boot 4.0.6
+- MySQL, H2 Database, Redis, Spring Data JPA
+- Springdoc OpenAPI, Spring Validation, Spring AOP
 
 ### Frontend
 
-- **Framework**: Next.js 16.2.9, React 19.2.4
-
-## 프로젝트 구조
-
-<details>
-    <summary>front</summary>
-  <pre>
-  src
-  ├── app
-  │   ├── admin
-  │   ├── books
-  │   │   ├── detail
-  │   │   └── search
-  │   ├── members
-  │   │   ├── detail
-  │   │   ├── join
-  │   │   └── login
-  │   └── mypage
-  └── lib
-      ├── auth
-      ├── backend
-      │   └── apiV1
-      └── theme
-  </pre>
-</details>
-<details>
-    <summary>back</summary>
-    <pre>
-src/main/java/com/back
-├── domain
-│   ├── book
-│   ├── home
-│   ├── member
-│   ├── review
-│   ├── tag
-│   ├── widget
-│   └── wish
-├── global
-│   ├── app
-│   ├── aspect
-│   ├── exception
-│   ├── globalExceptionHandler
-│   ├── initData
-│   ├── jpa
-│   ├── redis
-│   ├── rq
-│   ├── rsData
-│   ├── security
-│   └── springDoc
-└── standard
-    ├── recommend
-    │   ├── byContent
-    │   ├── byRating
-    │   └── util
-    └── util
-    
-</pre>
-</details>
+- Next.js 16.2.9, React 19.2.4
 
 ## 실행 환경
 
@@ -108,8 +63,6 @@ src/main/java/com/back
 - `front/.env.example`
 - `back/.env.example`
 - `widget/.env.example`
-
-필요한 값을 복사해서 각 `.env` 파일로 만들어 사용하세요.
 
 ### `front/.env`
 
@@ -133,17 +86,7 @@ CUSTOM__SECURITY__ALLOWED_ORIGINS=http://localhost:3000
 CUSTOM__SECURITY__COOKIE_DOMAIN=localhost
 ```
 
-프로덕션 환경에서는 추가로 데이터베이스 접속 정보가 필요합니다.
-
-```env
-PROD__SPRING__DATASOURCE__URL=
-PROD__SPRING__DATASOURCE__USERNAME=
-PROD__SPRING__DATASOURCE__PASSWORD=
-```
-
 ## 실행 방법
-
-개발 서버는 보통 `back`, `front`, `widget` 순서로 올리면 편합니다.
 
 ### 1. 백엔드 실행
 
@@ -151,9 +94,6 @@ PROD__SPRING__DATASOURCE__PASSWORD=
 cd back
 ./gradlew bootRun
 ```
-
-개발 환경에서는 H2를 사용할 수 있고, `application-dev.yaml` 기준으로 로컬 DB 파일이 생성됩니다.
-Redis, GitHub OAuth, JWT 관련 값은 `back/.env`에 함께 설정해야 합니다.
 
 ### 2. 프론트엔드 실행
 
@@ -163,11 +103,7 @@ pnpm install
 pnpm dev
 ```
 
-브라우저에서 `http://localhost:3000`으로 접속합니다.
-
 ### 3. 위젯 패키지
-
-`widget` 디렉터리는 위젯 렌더링 서버입니다.
 
 ```bash
 cd widget
@@ -175,20 +111,20 @@ npm install
 npm start
 ```
 
-기본 실행 주소는 `http://localhost:3001`입니다.
-
 ## API 개요
 
-백엔드는 기본적으로 `/api/v1/**` 경로의 REST API를 제공합니다.
+백엔드는 REST API를 제공합니다. 상세 계약은 `docs/api/`를 참고하세요.
 
-- `/api/v1/books`
-- `/api/v1/reviews`
-- `/api/v1/members`
-- `/api/v1/wishes`
-- `/api/v1/tags`
-- `/api/v1/widgets`
-
-OpenAPI 문서는 백엔드 실행 후 `http://localhost:8080/swagger-ui/index.html`에서 확인할 수 있습니다.
+- [도서 API](docs/api/book.md)
+- [도서 관리자 API](docs/api/book.admin.md)
+- [리뷰 API](docs/api/review.md)
+- [리뷰 관리자 API](docs/api/review.admin.md)
+- [회원 API](docs/api/member.md)
+- [회원 관리자 API](docs/api/member.admin.md)
+- [찜 API](docs/api/wish.md)
+- [태그 API](docs/api/tag.md)
+- [위젯 API](docs/api/widget.md)
+- [예외 처리](docs/api/global-exception.md)
 
 ## 개발 스크립트
 
@@ -211,12 +147,8 @@ OpenAPI 문서는 백엔드 실행 후 `http://localhost:8080/swagger-ui/index.h
 ## 브랜치 전략
 
 - `main`: GitHub Actions를 통해 배포되는 운영 브랜치
-  - 직접 push 불가
 - `dev`: 개발 내용을 모으는 통합 브랜치
-  - 직접 push 불가
-  - 한 명의 승인 후 `main`으로 병합 가능
 - `feat`: 세부 기능별 작업 브랜치
-  - 한 명의 승인 후 `dev`로 병합 가능
 
 ## 참고
 
