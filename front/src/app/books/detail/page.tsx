@@ -9,6 +9,7 @@ import { apiFetch } from "@/lib/backend/client";
 
 import { useAuth } from "@/lib/auth/AuthProvider";
 import type { components } from "@/lib/backend/apiV1/schema";
+import { goToErrorPage } from "@/lib/error/goToErrorPage";
 import { ratingColor } from "@/lib/ratingColor";
 import { ratingFillColor } from "@/lib/ratingColor";
 
@@ -37,8 +38,6 @@ function BookDetail() {
   const [reviews, setReviews] = useState<ReviewDto[] | null>(null);
   const [recommendBooks, setRecommendBooks] = useState<BookDto[] | null>(null);
   const [editingReviewId, setEditingReviewId] = useState<number | null>(null);
-  const [loadError, setLoadError] = useState<string | null>(null);
-  const [recommendError, setRecommendError] = useState<string | null>(null);
   const [showWriteForm, setShowWriteForm] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false);
 
@@ -47,12 +46,9 @@ function BookDetail() {
 
     apiFetch(`/api/v1/books/${id}`)
       .then((data) => {
-        setLoadError(null);
         setBook(data);
       })
-      .catch((error) => {
-        setLoadError(`${error.resultCode} : ${error.message}`);
-      });
+      .catch(goToErrorPage);
   };
 
   const loadReviews = () => {
@@ -60,56 +56,38 @@ function BookDetail() {
 
     apiFetch(`/api/v1/reviews/book/${id}`)
       .then((data) => {
-        setLoadError(null);
         setReviews(data);
       })
-      .catch((error) => {
-        setLoadError(`${error.resultCode} : ${error.message}`);
-      });
+      .catch(goToErrorPage);
   };
 
-  const loadRecommendBooks = () => {
-    if (!isLogin) {
-      setRecommendBooks([]);
-      setRecommendError(null);
+  useEffect(() => {
+    if (id == null) {
+      goToErrorPage({ message: "책 ID가 없습니다." });
       return;
     }
 
-    apiFetch("/api/v1/books/recommend")
-      .then((data) => {
-        setRecommendError(null);
-        setRecommendBooks(data);
-      })
-      .catch((error) => {
-        setRecommendError(`${error.resultCode} : ${error.message}`);
-        setRecommendBooks([]);
-      });
-  };
-
-  useEffect(() => {
-    if (id == null) return;
-
     apiFetch(`/api/v1/books/${id}`)
       .then((data) => {
-        setLoadError(null);
         setBook(data);
       })
-      .catch((error) => {
-        setLoadError(`${error.resultCode} : ${error.message}`);
-      });
+      .catch(goToErrorPage);
 
     apiFetch(`/api/v1/reviews/book/${id}`)
       .then((data) => {
-        setLoadError(null);
         setReviews(data);
       })
-      .catch((error) => {
-        setLoadError(`${error.resultCode} : ${error.message}`);
-      });
+      .catch(goToErrorPage);
   }, [id]);
 
   useEffect(() => {
-    loadRecommendBooks();
+    if (!isLogin) return;
+
+    apiFetch("/api/v1/books/recommend")
+      .then((data) => {
+        setRecommendBooks(data);
+      })
+      .catch(goToErrorPage);
   }, [isLogin]);
 
   const extractReviewFields = (form: HTMLFormElement) => {
@@ -168,9 +146,7 @@ function BookDetail() {
         loadReviews();
         loadBook();
       })
-      .catch((error) => {
-        alert(`${error.resultCode} : ${error.message}`);
-      });
+      .catch(goToErrorPage);
   };
 
   const handleEditSubmit = (
@@ -193,9 +169,7 @@ function BookDetail() {
         loadReviews();
         loadBook();
       })
-      .catch((error) => {
-        alert(`${error.resultCode} : ${error.message}`);
-      });
+      .catch(goToErrorPage);
   };
 
   const handleToggleWish = () => {
@@ -208,9 +182,7 @@ function BookDetail() {
         alert(data.message);
         loadBook();
       })
-      .catch((error) => {
-        alert(`${error.resultCode} : ${error.message}`);
-      });
+      .catch(goToErrorPage);
   };
 
   const openLoginModal = () => {
@@ -240,19 +212,11 @@ function BookDetail() {
         loadReviews();
         loadBook();
       })
-      .catch((error) => {
-        alert(`${error.resultCode} : ${error.message}`);
-      });
+      .catch(goToErrorPage);
   };
 
   if (id == null) {
-    return <div>오류가 발생했습니다: 책 ID가 없습니다.</div>;
-  }
-
-  if (loadError != null) {
-    return (
-      <div>오류가 발생했습니다: {loadError} (백엔드 확인이 필요합니다)</div>
-    );
+    return <div>로딩중...</div>;
   }
 
   if (book == null || reviews == null) return <div>로딩중...</div>;
@@ -375,9 +339,6 @@ function BookDetail() {
           ) : recommendBooks.length === 0 ? (
             <div className="mt-2 text-sm theme-muted">
               리뷰를 추가하여 추천을 받아보세요.
-              {recommendError && (
-                <span className="ml-1">({recommendError})</span>
-              )}
             </div>
           ) : (
             <ul className="book-scroll-list mt-3 flex gap-3 overflow-x-auto py-2 pb-4">

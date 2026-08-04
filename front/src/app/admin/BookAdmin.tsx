@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 
 import { apiFetch } from "@/lib/backend/client";
+import { goToErrorPage } from "@/lib/error/goToErrorPage";
 
 import type { components } from "@/lib/backend/apiV1/schema";
 
@@ -19,7 +20,9 @@ export default function BookAdmin() {
   const [editingBook, setEditingBook] = useState<BookDetailDto | null>(null);
 
   const loadBooks = (page: number) => {
-    apiFetch(`/api/v1/books/admin?page=${page}&size=10`).then(setPageData);
+    apiFetch(`/api/v1/books/admin?page=${page}&size=10`)
+      .then(setPageData)
+      .catch(goToErrorPage);
   };
 
   useEffect(() => {
@@ -27,10 +30,12 @@ export default function BookAdmin() {
   }, [pageNumber]);
 
   const startEdit = (id: number) => {
-    apiFetch(`/api/v1/books/${id}`).then((data) => {
-      setEditingId(id);
-      setEditingBook(data);
-    });
+    apiFetch(`/api/v1/books/${id}`)
+      .then((data) => {
+        setEditingId(id);
+        setEditingBook(data);
+      })
+      .catch(goToErrorPage);
   };
 
   const cancelEdit = () => {
@@ -69,9 +74,7 @@ export default function BookAdmin() {
         cancelEdit();
         loadBooks(pageNumber);
       })
-      .catch((error) => {
-        alert(`${error.resultCode} : ${error.message}`);
-      });
+      .catch(goToErrorPage);
   };
 
   const handleDelete = (id: number) => {
@@ -82,9 +85,7 @@ export default function BookAdmin() {
         alert(data.message);
         loadBooks(pageNumber);
       })
-      .catch((error) => {
-        alert(`${error.resultCode} : ${error.message}`);
-      });
+      .catch(goToErrorPage);
   };
 
   if (pageData == null) return <div>로딩중...</div>;

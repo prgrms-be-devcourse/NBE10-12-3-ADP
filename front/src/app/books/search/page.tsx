@@ -7,6 +7,7 @@ import { Suspense, useCallback, useEffect, useRef, useState } from "react";
 import { apiFetch } from "@/lib/backend/client";
 
 import type { components } from "@/lib/backend/apiV1/schema";
+import { goToErrorPage } from "@/lib/error/goToErrorPage";
 
 import BookGrid from "@/app/_components/BookGrid";
 
@@ -36,7 +37,6 @@ function SearchResultsContent({ searchTerm }: { searchTerm: string }) {
     searchTerm.length > 0,
   );
   const [isLoadingMore, setIsLoadingMore] = useState(false);
-  const [loadError, setLoadError] = useState<string | null>(null);
 
   const requestSearchPage = useCallback(
     (page: number, signal?: AbortSignal, onStart?: () => void) => {
@@ -73,7 +73,7 @@ function SearchResultsContent({ searchTerm }: { searchTerm: string }) {
         })
         .catch((error) => {
           if (signal?.aborted) return;
-          setLoadError(`${error.resultCode} : ${error.message}`);
+          goToErrorPage(error);
         })
         .finally(() => {
           if (signal?.aborted) return;
@@ -89,7 +89,6 @@ function SearchResultsContent({ searchTerm }: { searchTerm: string }) {
 
   const loadMorePage = useCallback(() => {
     requestSearchPage(pageNumber + 1, undefined, () => {
-      setLoadError(null);
       setIsLoadingMore(true);
     });
   }, [pageNumber, requestSearchPage]);
@@ -133,12 +132,6 @@ function SearchResultsContent({ searchTerm }: { searchTerm: string }) {
 
   if (searchTerm.length === 0) {
     return <div>검색어를 입력해주세요.</div>;
-  }
-
-  if (loadError != null) {
-    return (
-      <div>오류가 발생했습니다: {loadError} (백엔드 확인이 필요합니다)</div>
-    );
   }
 
   return (

@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 
 import { apiFetch } from "@/lib/backend/client";
+import { goToErrorPage } from "@/lib/error/goToErrorPage";
 
 import type { components } from "@/lib/backend/apiV1/schema";
 
@@ -15,7 +16,9 @@ export default function MemberAdmin() {
   const [pageNumber, setPageNumber] = useState(0);
 
   const loadMembers = (page: number) => {
-    apiFetch(`/api/v1/members/admin?page=${page}&size=10`).then(setPageData);
+    apiFetch(`/api/v1/members/admin?page=${page}&size=10`)
+      .then(setPageData)
+      .catch(goToErrorPage);
   };
 
   useEffect(() => {
@@ -30,9 +33,7 @@ export default function MemberAdmin() {
         alert(data.message);
         loadMembers(pageNumber);
       })
-      .catch((error) => {
-        alert(`${error.resultCode} : ${error.message}`);
-      });
+      .catch(goToErrorPage);
   };
 
   if (pageData == null) return <div>로딩중...</div>;

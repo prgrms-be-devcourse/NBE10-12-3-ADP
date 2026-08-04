@@ -203,7 +203,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** 도서별 리뷰 다건 조회 */
+        /** 리뷰 최신순 다건 조회 */
         get: operations["getReviewsOrderByLatest"];
         put?: never;
         post?: never;
@@ -1032,7 +1032,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json;charset=UTF-8": components["schemas"]["ReviewDto"][];
+                    "application/json;charset=UTF-8": components["schemas"]["ReviewWithBookImgUrlDto"][];
                 };
             };
         };

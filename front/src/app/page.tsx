@@ -11,6 +11,7 @@ import {
 } from "react";
 
 import { apiFetch } from "@/lib/backend/client";
+import { goToErrorPage } from "@/lib/error/goToErrorPage";
 
 import type { components } from "@/lib/backend/apiV1/schema";
 
@@ -338,8 +339,6 @@ export default function Page() {
   const [latestReviews, setLatestReviews] = useState<LatestReviewDto[] | null>(
     null,
   );
-  const [loadError, setLoadError] = useState<string | null>(null);
-
   useEffect(() => {
     Promise.all([
       apiFetch(`/api/v1/books/rank?type=views&page=0&size=10`),
@@ -348,22 +347,13 @@ export default function Page() {
       apiFetch(`/api/v1/books/rank?type=reviewCount&page=0&size=10`),
     ])
       .then(([popularData, latestReviewData, topRatedData, mostReviewedData]) => {
-        setLoadError(null);
         setPopularBooks(popularData);
         setLatestReviews(latestReviewData);
         setTopRatedBooks(topRatedData);
         setMostReviewedBooks(mostReviewedData);
       })
-      .catch((error) => {
-        setLoadError(`${error.resultCode} : ${error.message}`);
-      });
+      .catch(goToErrorPage);
   }, []);
-
-  if (loadError != null) {
-    return (
-      <div>오류가 발생했습니다: {loadError} (백엔드 확인이 필요합니다)</div>
-    );
-  }
 
   const rankedSections = [
     {

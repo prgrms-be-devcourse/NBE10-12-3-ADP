@@ -8,6 +8,7 @@ import { Suspense, useEffect, useState } from "react";
 import { API_BASE_URL, apiFetch } from "@/lib/backend/client";
 
 import type { components } from "@/lib/backend/apiV1/schema";
+import { goToErrorPage } from "@/lib/error/goToErrorPage";
 import { ratingColor } from "@/lib/ratingColor";
 
 import LibraryProfilePanel from "@/app/_components/LibraryProfilePanel";
@@ -30,38 +31,28 @@ function MemberDetail() {
 
   const [member, setMember] = useState<MemberDto | null>(null);
   const [reviewData, setReviewData] = useState<ReviewsByMemberDto | null>(null);
-  const [loadError, setLoadError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (id == null) return;
+    if (id == null) {
+      goToErrorPage({ message: "회원 ID가 없습니다." });
+      return;
+    }
 
     apiFetch(`/api/v1/members/${id}`)
       .then((data) => {
-        setLoadError(null);
         setMember(data);
       })
-      .catch((error) => {
-        setLoadError(`${error.resultCode} : ${error.message}`);
-      });
+      .catch(goToErrorPage);
 
     apiFetch(`/api/v1/reviews/member/${id}`)
       .then((data: ReviewsByMemberDto) => {
-        setLoadError(null);
         setReviewData(data);
       })
-      .catch((error) => {
-        setLoadError(`${error.resultCode} : ${error.message}`);
-      });
+      .catch(goToErrorPage);
   }, [id]);
 
   if (id == null) {
-    return <div>오류가 발생했습니다: 회원 ID가 없습니다.</div>;
-  }
-
-  if (loadError != null) {
-    return (
-      <div>오류가 발생했습니다: {loadError} (백엔드 확인이 필요합니다)</div>
-    );
+    return <div>로딩중...</div>;
   }
 
   if (member == null || reviewData == null) return <div>로딩중...</div>;

@@ -9,6 +9,7 @@ import { API_BASE_URL, apiFetch } from "@/lib/backend/client";
 
 import { useAuth } from "@/lib/auth/AuthProvider";
 import type { components } from "@/lib/backend/apiV1/schema";
+import { goToErrorPage } from "@/lib/error/goToErrorPage";
 import { ratingColor } from "@/lib/ratingColor";
 
 import LibraryProfilePanel from "@/app/_components/LibraryProfilePanel";
@@ -34,30 +35,23 @@ export default function Page() {
   const [reviewData, setReviewData] = useState<ReviewsByMemberDto | null>(null);
   const [wishes, setWishes] = useState<BookDto[] | null>(null);
   const [tab, setTab] = useState<"reviews" | "wishes">("reviews");
-  const [loadError, setLoadError] = useState<string | null>(null);
   const [isWidgetGuideOpen, setIsWidgetGuideOpen] = useState(false);
   const [copiedWidgetLink, setCopiedWidgetLink] = useState(false);
 
   const loadReviews = () => {
     apiFetch(`/api/v1/reviews/member/mine`)
       .then((data: ReviewsByMemberDto) => {
-        setLoadError(null);
         setReviewData(data);
       })
-      .catch((error) => {
-        setLoadError(`${error.resultCode} : ${error.message}`);
-      });
+      .catch(goToErrorPage);
   };
 
   const loadWishes = () => {
     apiFetch(`/api/v1/wishes/mine`)
       .then((data) => {
-        setLoadError(null);
         setWishes(data);
       })
-      .catch((error) => {
-        setLoadError(`${error.resultCode} : ${error.message}`);
-      });
+      .catch(goToErrorPage);
   };
 
   useEffect(() => {
@@ -80,9 +74,7 @@ export default function Page() {
         alert(data.message);
         loadReviews();
       })
-      .catch((error) => {
-        alert(`${error.resultCode} : ${error.message}`);
-      });
+      .catch(goToErrorPage);
   };
 
   const handleRemoveWish = (bookId: number) => {
@@ -91,9 +83,7 @@ export default function Page() {
         alert(data.message);
         loadWishes();
       })
-      .catch((error) => {
-        alert(`${error.resultCode} : ${error.message}`);
-      });
+      .catch(goToErrorPage);
   };
 
   const handleWithdraw = () => {
@@ -107,9 +97,7 @@ export default function Page() {
       .then(() => {
         router.replace(`/`);
       })
-      .catch((error) => {
-        alert(`${error.resultCode} : ${error.message}`);
-      });
+      .catch(goToErrorPage);
   };
 
   const handleLogout = () => {
@@ -131,12 +119,6 @@ export default function Page() {
   const handleOpenWidgetGuide = () => {
     setIsWidgetGuideOpen((current) => !current);
   };
-
-  if (loadError != null) {
-    return (
-      <div>오류가 발생했습니다: {loadError} (백엔드 확인이 필요합니다)</div>
-    );
-  }
 
   if (
     isLoginMemberPending ||

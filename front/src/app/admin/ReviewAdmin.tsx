@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 
 import { apiFetch } from "@/lib/backend/client";
+import { goToErrorPage } from "@/lib/error/goToErrorPage";
 
 import type { components } from "@/lib/backend/apiV1/schema";
 import { ratingColor } from "@/lib/ratingColor";
@@ -17,7 +18,9 @@ export default function ReviewAdmin() {
   const [pageNumber, setPageNumber] = useState(0);
 
   const loadReviews = (page: number) => {
-    apiFetch(`/api/v1/reviews/admin?page=${page}&size=10`).then(setPageData);
+    apiFetch(`/api/v1/reviews/admin?page=${page}&size=10`)
+      .then(setPageData)
+      .catch(goToErrorPage);
   };
 
   useEffect(() => {
@@ -32,9 +35,7 @@ export default function ReviewAdmin() {
         alert(data.message);
         loadReviews(pageNumber);
       })
-      .catch((error) => {
-        alert(`${error.resultCode} : ${error.message}`);
-      });
+      .catch(goToErrorPage);
   };
 
   if (pageData == null) return <div>로딩중...</div>;

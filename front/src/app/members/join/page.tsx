@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { apiFetch } from "@/lib/backend/client";
 
 import { useAuth } from "@/lib/auth/AuthProvider";
+import { goToErrorPage } from "@/lib/error/goToErrorPage";
 
 import RoughButton from "@/app/_components/RoughButton";
 import { RoughInput } from "@/app/_components/RoughInput";
@@ -67,9 +68,7 @@ export default function Page() {
       .then(() => {
         router.replace(`/`);
       })
-      .catch((error) => {
-        alert(`${error.resultCode} : ${error.message}`);
-      });
+      .catch(goToErrorPage);
   };
 
   return (
