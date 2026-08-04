@@ -104,7 +104,7 @@ class BookService(
         incrementViewCount(book)
 
         if (book.imgUrl.isNullOrBlank()) {
-            bookThumbnailService.fillMissingImgUrl(book.id)?.let { book.updateImgUrl(it) }
+            bookThumbnailService.fillMissingImgUrl(book.id, book.isbn)?.let { book.updateImgUrl(it) }
         }
 
         return book
