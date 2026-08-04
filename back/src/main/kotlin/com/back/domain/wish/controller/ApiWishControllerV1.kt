@@ -1,6 +1,7 @@
 package com.back.domain.wish.controller
 
-import com.back.domain.book.dto.BookWithTagsDto
+import com.back.domain.book.dto.BookWithWishIdAndTagsDto
+import com.back.domain.wish.dto.WishDto
 import com.back.domain.wish.service.WishService
 import com.back.global.rq.Rq
 import com.back.global.rsData.RsData
@@ -25,17 +26,19 @@ class ApiWishControllerV1(
 
     @GetMapping("/mine")
     @Operation(summary = "내 찜 다건 조회")
-    fun getMyWishes(): List<BookWithTagsDto> =
+    fun getMyWishes(): List<BookWithWishIdAndTagsDto> =
         wishService.getMyWishes(rq.actor)
 
     @PostMapping("/book/{bookId}")
     @Operation(summary = "찜 생성")
     fun createWish(
         @PathVariable bookId: Long
-    ): RsData<Unit> {
-        wishService.createWish(rq.actor, bookId)
+    ): RsData<WishDto> {
 
-        return RsData("201-1", "찜 생성을 성공했습니다.")
+        return RsData(
+            "201-1",
+            "찜 생성을 성공했습니다.",
+            wishService.createWish(rq.actor, bookId))
     }
 
     @DeleteMapping("/{id}")

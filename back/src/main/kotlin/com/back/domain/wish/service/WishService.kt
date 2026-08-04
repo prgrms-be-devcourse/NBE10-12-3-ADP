@@ -1,10 +1,11 @@
 package com.back.domain.wish.service
 
-import com.back.domain.book.dto.BookWithTagsDto
+import com.back.domain.book.dto.BookWithWishIdAndTagsDto
 import com.back.domain.book.repository.BookOperationalRepository
 import com.back.domain.book.repository.BookRepository
 import com.back.domain.member.entity.Member
 import com.back.domain.review.repository.ReviewRepository
+import com.back.domain.wish.dto.WishDto
 import com.back.domain.wish.entity.Wish
 import com.back.domain.wish.repository.WishRepository
 import com.back.global.exception.ServiceException
@@ -21,16 +22,17 @@ class WishService(
     private val bookOperationalRepository: BookOperationalRepository
 ) {
 
-    fun getMyWishes(actor: Member): List<BookWithTagsDto> {
+    fun getMyWishes(actor: Member): List<BookWithWishIdAndTagsDto> {
         val wishes = wishRepository.findByMember(actor)
         val ratingsByIsbn = bookOperationalRepository.findByIsbnIn(
             wishes.map { it.book.isbn }
         ).associate { it.isbn to it.averageRating }
 
         return wishes.map { wish ->
-            BookWithTagsDto(
+            BookWithWishIdAndTagsDto(
                 wish.book,
                 ratingsByIsbn[wish.book.isbn] ?: 0.0,
+                wish.id,
                 reviewRepository.findByBook(wish.book)
                     .flatMap { review -> review.tags }
                     .distinct(),
@@ -39,7 +41,7 @@ class WishService(
     }
 
     @Transactional
-    fun createWish(actor: Member, bookId: Long) {
+    fun createWish(actor: Member, bookId: Long) : WishDto {
         val book = bookRepository.findById(bookId).orElseThrow {
             ServiceException("404-1", "존재하지 않는 도서입니다.")
         }
@@ -48,7 +50,7 @@ class WishService(
             throw ServiceException("409-1", "이미 존재하는 찜입니다.")
         }
 
-        wishRepository.save(Wish(actor, book))
+        return WishDto(wishRepository.save(Wish(actor, book)))
     }
 
     @Transactional

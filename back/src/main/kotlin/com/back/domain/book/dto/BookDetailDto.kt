@@ -17,14 +17,14 @@ class BookDetailDto(
     val reviewCount: Int,
     val rating: Map<String, Any>,
     val tags: List<String>,
-    val isWished: Boolean
+    val wishId: Long?
 ) : BookDtoBase(id, title, imgUrl) {
     constructor(
         book: Book,
         reviewCount: Int,
-        isWished: Boolean,
         ratingMap: Map<String, Any>,
-        tags: List<String>
+        tags: List<String>,
+        wishId: Long?
     ) : this(
         book.id,
         book.title,
@@ -38,7 +38,7 @@ class BookDetailDto(
         reviewCount,
         ratingMap,
         tags,
-        isWished
+        wishId
     )
 
     companion object {

@@ -57,7 +57,7 @@ class ApiV1BookControllerTest {
             .andExpect(jsonPath("$.rating").exists())
             .andExpect(jsonPath("$.rating.average").exists())
             .andExpect(jsonPath("$.tags").isArray())
-            .andExpect(jsonPath("$.isWished").value(false)) // 비인증 시 isWished 없음
+            .andExpect(jsonPath("$.wishId").doesNotExist()) // 비인증 시 wishId 없음
     }
 
     @Test
@@ -77,7 +77,7 @@ class ApiV1BookControllerTest {
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.id").value(book.id))
             .andExpect(jsonPath("$.title").value(book.title))
-            .andExpect(jsonPath("$.isWished").isBoolean()) // 인증 시 isWished 있음
+            .andExpect(jsonPath("$.wishId").exists()) // 인증 시 wishId 있음
     }
 
     @Test

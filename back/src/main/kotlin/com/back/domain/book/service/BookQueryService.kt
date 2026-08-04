@@ -58,9 +58,9 @@ class BookQueryService(
         return BookDetailDto(
             book,
             getBookOperational(book)?.reviewCount ?: 0,
-            getIsWished(book, actor),
             getRatingMap(book),
-            getBookTags(book)
+            getBookTags(book),
+            getWishIdOrNull(book, actor)
         )
     }
 
@@ -171,10 +171,10 @@ class BookQueryService(
             .toList()
     }
 
-    private fun getIsWished(book: Book, actor: Member?): Boolean {
-        if (actor == null) return false
+    private fun getWishIdOrNull(book: Book, actor: Member?): Long? {
+        if (actor == null) return null
 
-        return wishRepository.findByMemberAndBook(actor, book) != null
+        return wishRepository.findByMemberAndBook(actor, book)?.id
     }
 
     private fun getRatingMap(book: Book): MutableMap<String, Any> {

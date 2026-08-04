@@ -13,10 +13,10 @@ export interface paths {
         };
         get?: never;
         /** 리뷰 수정 */
-        put: operations["edit"];
+        put: operations["updateReview"];
         post?: never;
         /** 리뷰 삭제 */
-        delete: operations["delete"];
+        delete: operations["deleteReview"];
         options?: never;
         head?: never;
         patch?: never;
@@ -30,18 +30,18 @@ export interface paths {
             cookie?: never;
         };
         /** 도서 단건 조회 */
-        get: operations["getBook"];
-        /** 도서 정보 수정 (관리자) */
-        put: operations["modify"];
+        get: operations["getBookDetail"];
+        /** 도서 수정 (관리자) */
+        put: operations["updateBook"];
         post?: never;
         /** 도서 삭제 (관리자) */
-        delete: operations["delete_1"];
+        delete: operations["deleteBook"];
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/api/v1/wishes/book/{id}": {
+    "/api/v1/wishes/book/{bookId}": {
         parameters: {
             query?: never;
             header?: never;
@@ -50,10 +50,9 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** 찜 목록 추가 */
-        post: operations["addWish"];
-        /** 찜 목록 삭제 */
-        delete: operations["deleteWish"];
+        /** 찜 생성 */
+        post: operations["createWish"];
+        delete?: never;
         options?: never;
         head?: never;
         patch?: never;
@@ -68,8 +67,8 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** 태그 추가 */
-        post: operations["post"];
+        /** 태그 생성 */
+        post: operations["createTag"];
         delete?: never;
         options?: never;
         head?: never;
@@ -83,11 +82,11 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** 리뷰 다건 조회 */
-        get: operations["getReviewsByBook"];
+        /** 도서별 리뷰 다건 조회 */
+        get: operations["getReviewsByBookId"];
         put?: never;
-        /** 리뷰 작성 */
-        post: operations["post_1"];
+        /** 리뷰 생성 */
+        post: operations["createReview"];
         delete?: never;
         options?: never;
         head?: never;
@@ -103,10 +102,10 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** 회원 가입 */
+        /** 회원가입 */
         post: operations["join"];
         /** 회원 탈퇴 */
-        delete: operations["delete_2"];
+        delete: operations["delete"];
         options?: never;
         head?: never;
         patch?: never;
@@ -136,8 +135,25 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** 내 찜 목록 조회 */
-        get: operations["getWishes"];
+        /** 내 찜 다건 조회 */
+        get: operations["getMyWishes"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/widgets/{githubId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** 위젯 단건 조회 */
+        get: operations["getWidget"];
         put?: never;
         post?: never;
         delete?: never;
@@ -153,8 +169,8 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** 특정 회원이 작성한 리뷰 다건 조회 */
-        get: operations["getReviewsByMember"];
+        /** 회원별 리뷰 다건 조회 */
+        get: operations["getReviewsByMemberId"];
         put?: never;
         post?: never;
         delete?: never;
@@ -170,8 +186,25 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** 내가 작성한 리뷰 다건 조회 */
-        get: operations["mine"];
+        /** 내 리뷰 다건 조회 */
+        get: operations["getMyReviews"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/reviews/latest": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** 리뷰 최신순 다건 조회 */
+        get: operations["getReviewsOrderByLatest"];
         put?: never;
         post?: never;
         delete?: never;
@@ -204,8 +237,8 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** 회원 정보 조회 */
-        get: operations["getUser"];
+        /** 회원 단건 조회 */
+        get: operations["getMember"];
         put?: never;
         post?: never;
         delete?: never;
@@ -222,7 +255,7 @@ export interface paths {
             cookie?: never;
         };
         /** 내 정보 조회 */
-        get: operations["me"];
+        get: operations["getMy"];
         put?: never;
         post?: never;
         delete?: never;
@@ -255,8 +288,8 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** 도서 검색 */
-        get: operations["search"];
+        /** 도서 검색 다건 조회 */
+        get: operations["getBooksBySearch"];
         put?: never;
         post?: never;
         delete?: never;
@@ -272,7 +305,8 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get: operations["recommend"];
+        /** 도서 추천 다건 조회 */
+        get: operations["getBooksByRecommend"];
         put?: never;
         post?: never;
         delete?: never;
@@ -288,7 +322,8 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get: operations["rank"];
+        /** 도서 순위 다건 조회 */
+        get: operations["getBooksOrderByRank"];
         put?: never;
         post?: never;
         delete?: never;
@@ -309,6 +344,23 @@ export interface paths {
         put?: never;
         post?: never;
         delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/wishes/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** 찜 삭제 */
+        delete: operations["deleteWish"];
         options?: never;
         head?: never;
         patch?: never;
@@ -352,110 +404,144 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
-        PostReviewsReqBody: {
+        ReviewUpdateRequest: {
             /** Format: float */
-            rating: number;
-            content: string;
-            tags: string[];
+            rating: number | null;
+            content?: string;
+            tags?: string[];
         };
         MemberDto: {
             /** Format: int64 */
             id: number;
-            githubId: string;
-            githubLink: string;
+            githubId?: string | null;
+            githubLink?: string | null;
         };
         ReviewDto: {
             /** Format: int64 */
-            id: number;
+            id?: number;
             /** Format: int64 */
-            bookId: number;
+            bookId?: number;
+            bookTitle?: string;
             /** Format: float */
-            rating: number;
-            content: string;
+            rating?: number;
+            content?: string;
             /** Format: date-time */
-            modifiedDate: string;
+            modifiedDate?: string;
             /** Format: date-time */
-            createdDate: string;
-            reviewer: components["schemas"]["MemberDto"];
-            tags: string[];
+            createdDate?: string;
+            reviewer?: components["schemas"]["MemberDto"];
+            tags?: string[];
         };
         RsDataReviewDto: {
-            resultCode: string;
-            message: string;
+            resultCode?: string;
+            message?: string;
             data?: components["schemas"]["ReviewDto"];
         };
-        BookModifyReqBody: {
-            title: string;
-            description?: string;
-            authors?: string;
-            publisher?: string;
-            imgUrl?: string;
+        BookUpdateRequest: {
+            title?: string;
+            description?: string | null;
+            authors?: string | null;
+            publisher?: string | null;
+            imgUrl?: string | null;
         };
         BookDto: {
             /** Format: int64 */
-            id: number;
-            title: string;
-            imgUrl: string;
+            id?: number;
+            title?: string;
+            imgUrl?: string | null;
             /** Format: double */
-            averageRating: number;
+            averageRating?: number;
         };
         RsDataBookDto: {
-            resultCode: string;
-            message: string;
+            resultCode?: string;
+            message?: string;
             data?: components["schemas"]["BookDto"];
         };
-        RsDataVoid: {
-            resultCode: string;
-            message: string;
-            data?: unknown;
+        RsDataWishDto: {
+            resultCode?: string;
+            message?: string;
+            data?: components["schemas"]["WishDto"];
         };
-        TagPostReqBody: {
+        WishDto: {
+            /** Format: int64 */
+            id?: number;
+        };
+        TagCreateRequest: {
             name: string;
         };
-        MemberJoinReqBody: {
+        RsDataUnit: {
+            resultCode?: string;
+            message?: string;
+        };
+        ReviewCreateRequest: {
+            /** Format: float */
+            rating: number | null;
+            content?: string;
+            tags?: string[];
+        };
+        MemberJoinRequest: {
             username: string;
             password: string;
             githubId: string;
         };
-        MemberLoginResBody: {
+        RsDataTokenDto: {
+            resultCode?: string;
+            message?: string;
+            data?: components["schemas"]["TokenDto"];
+        };
+        TokenDto: {
             accessToken?: string;
-            refreshToken?: string;
+            refreshToken?: string | null;
         };
-        RsDataMemberLoginResBody: {
-            resultCode: string;
-            message: string;
-            data?: components["schemas"]["MemberLoginResBody"];
-        };
-        MemberLoginReqBody: {
+        MemberLoginRequest: {
             username: string;
             password: string;
         };
-        BookWithTagDto: {
+        BookWithWishIdAndTagsDto: {
             /** Format: int64 */
-            id: number;
-            title: string;
-            imgUrl: string;
+            id?: number;
+            title?: string;
+            imgUrl?: string | null;
             /** Format: double */
-            averageRating: number;
-            tags: string[];
+            averageRating?: number;
+            /** Format: int64 */
+            wishId?: number;
+            tags?: string[];
+        };
+        ReviewWithBookImgUrlDto: {
+            /** Format: int64 */
+            id?: number;
+            /** Format: int64 */
+            bookId?: number;
+            bookTitle?: string;
+            /** Format: float */
+            rating?: number;
+            content?: string;
+            /** Format: date-time */
+            modifiedDate?: string;
+            /** Format: date-time */
+            createdDate?: string;
+            reviewer?: components["schemas"]["MemberDto"];
+            tags?: string[];
+            bookImgUrl?: string | null;
         };
         ReviewsByMemberDto: {
-            rating: {
+            rating?: {
                 [key: string]: unknown;
             };
-            results: components["schemas"]["ReviewDto"][];
+            results?: components["schemas"]["ReviewWithBookImgUrlDto"][];
         };
         AdminReviewDto: {
             /** Format: int64 */
-            id: number;
-            bookTitle: string;
+            id?: number;
+            bookTitle?: string;
             /** Format: float */
-            rating: number;
-            content: string;
+            rating?: number;
+            content?: string;
             /** Format: date-time */
-            createdDate: string;
-            reviewer: components["schemas"]["MemberDto"];
-            tags: string[];
+            createdDate?: string;
+            reviewer?: components["schemas"]["MemberDto"];
+            tags?: string[];
         };
         PageAdminReviewDto: {
             /** Format: int64 */
@@ -476,10 +562,10 @@ export interface components {
             empty?: boolean;
         };
         PageableObject: {
-            sort?: components["schemas"]["SortObject"];
-            paged?: boolean;
             /** Format: int32 */
             pageNumber?: number;
+            sort?: components["schemas"]["SortObject"];
+            paged?: boolean;
             /** Format: int32 */
             pageSize?: number;
             unpaged?: boolean;
@@ -487,28 +573,29 @@ export interface components {
             offset?: number;
         };
         SortObject: {
-            unsorted?: boolean;
             sorted?: boolean;
+            unsorted?: boolean;
             empty?: boolean;
         };
         MemberWithUsernameAndWidgetLinkDto: {
             /** Format: int64 */
             id: number;
-            username: string;
-            githubId: string;
-            githubLink: string;
-            widgetLink: string;
+            githubId?: string | null;
+            githubLink?: string | null;
+            username?: string | null;
+            widgetLink?: string | null;
         };
         AdminMemberDto: {
             /** Format: int64 */
             id: number;
-            username: string;
-            nickname?: string;
-            githubId?: string;
-            isAdmin: boolean;
-            isDeleted: boolean;
+            githubId?: string | null;
+            githubLink?: string | null;
+            username?: string | null;
+            nickname?: string | null;
             /** Format: date-time */
             createdDate: string;
+            deleted?: boolean;
+            admin?: boolean;
         };
         PageAdminMemberDto: {
             /** Format: int64 */
@@ -530,22 +617,23 @@ export interface components {
         };
         BookDetailDto: {
             /** Format: int64 */
-            id: number;
-            title: string;
-            description: string;
-            isbn: string;
-            publishedDate: string;
-            authors: string[];
-            publisher: string;
-            translators: string[];
-            imgUrl: string;
+            id?: number;
+            title?: string;
+            imgUrl?: string | null;
+            description?: string | null;
+            isbn?: string;
+            publishedDate?: string;
+            authors?: string[];
+            publisher?: string | null;
+            translators?: string[];
             /** Format: int32 */
-            reviewCount: number;
-            rating: {
+            reviewCount?: number;
+            rating?: {
                 [key: string]: unknown;
             };
-            tags: string[];
-            isWished: boolean;
+            tags?: string[];
+            /** Format: int64 */
+            wishId?: number | null;
         };
         PageBookDto: {
             /** Format: int64 */
@@ -574,7 +662,7 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
-    edit: {
+    updateReview: {
         parameters: {
             query?: never;
             header?: never;
@@ -585,7 +673,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["PostReviewsReqBody"];
+                "application/json": components["schemas"]["ReviewUpdateRequest"];
             };
         };
         responses: {
@@ -600,7 +688,7 @@ export interface operations {
             };
         };
     };
-    delete: {
+    deleteReview: {
         parameters: {
             query?: never;
             header?: never;
@@ -617,12 +705,12 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json;charset=UTF-8": components["schemas"]["RsDataVoid"];
+                    "application/json;charset=UTF-8": components["schemas"]["RsDataUnit"];
                 };
             };
         };
     };
-    getBook: {
+    getBookDetail: {
         parameters: {
             query?: never;
             header?: never;
@@ -644,7 +732,7 @@ export interface operations {
             };
         };
     };
-    modify: {
+    updateBook: {
         parameters: {
             query?: never;
             header?: never;
@@ -655,7 +743,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["BookModifyReqBody"];
+                "application/json": components["schemas"]["BookUpdateRequest"];
             };
         };
         responses: {
@@ -670,7 +758,7 @@ export interface operations {
             };
         };
     };
-    delete_1: {
+    deleteBook: {
         parameters: {
             query?: never;
             header?: never;
@@ -687,17 +775,17 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json;charset=UTF-8": components["schemas"]["RsDataVoid"];
+                    "application/json;charset=UTF-8": components["schemas"]["RsDataUnit"];
                 };
             };
         };
     };
-    addWish: {
+    createWish: {
         parameters: {
             query?: never;
             header?: never;
             path: {
-                id: number;
+                bookId: number;
             };
             cookie?: never;
         };
@@ -709,34 +797,12 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json;charset=UTF-8": components["schemas"]["RsDataVoid"];
+                    "application/json;charset=UTF-8": components["schemas"]["RsDataWishDto"];
                 };
             };
         };
     };
-    deleteWish: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: number;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json;charset=UTF-8": components["schemas"]["RsDataVoid"];
-                };
-            };
-        };
-    };
-    post: {
+    createTag: {
         parameters: {
             query?: never;
             header?: never;
@@ -745,7 +811,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["TagPostReqBody"];
+                "application/json": components["schemas"]["TagCreateRequest"];
             };
         };
         responses: {
@@ -755,12 +821,12 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json;charset=UTF-8": components["schemas"]["RsDataVoid"];
+                    "application/json;charset=UTF-8": components["schemas"]["RsDataUnit"];
                 };
             };
         };
     };
-    getReviewsByBook: {
+    getReviewsByBookId: {
         parameters: {
             query?: never;
             header?: never;
@@ -782,7 +848,7 @@ export interface operations {
             };
         };
     };
-    post_1: {
+    createReview: {
         parameters: {
             query?: never;
             header?: never;
@@ -793,7 +859,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["PostReviewsReqBody"];
+                "application/json": components["schemas"]["ReviewCreateRequest"];
             };
         };
         responses: {
@@ -817,7 +883,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["MemberJoinReqBody"];
+                "application/json": components["schemas"]["MemberJoinRequest"];
             };
         };
         responses: {
@@ -827,12 +893,12 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json;charset=UTF-8": components["schemas"]["RsDataMemberLoginResBody"];
+                    "application/json;charset=UTF-8": components["schemas"]["RsDataTokenDto"];
                 };
             };
         };
     };
-    delete_2: {
+    delete: {
         parameters: {
             query?: never;
             header?: never;
@@ -847,7 +913,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json;charset=UTF-8": components["schemas"]["RsDataVoid"];
+                    "application/json;charset=UTF-8": components["schemas"]["RsDataUnit"];
                 };
             };
         };
@@ -861,7 +927,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["MemberLoginReqBody"];
+                "application/json": components["schemas"]["MemberLoginRequest"];
             };
         };
         responses: {
@@ -871,12 +937,12 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json;charset=UTF-8": components["schemas"]["RsDataMemberLoginResBody"];
+                    "application/json;charset=UTF-8": components["schemas"]["RsDataTokenDto"];
                 };
             };
         };
     };
-    getWishes: {
+    getMyWishes: {
         parameters: {
             query?: never;
             header?: never;
@@ -891,12 +957,34 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json;charset=UTF-8": components["schemas"]["BookWithTagDto"][];
+                    "application/json;charset=UTF-8": components["schemas"]["BookWithWishIdAndTagsDto"][];
                 };
             };
         };
     };
-    getReviewsByMember: {
+    getWidget: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                githubId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json;charset=UTF-8": string;
+                };
+            };
+        };
+    };
+    getReviewsByMemberId: {
         parameters: {
             query?: never;
             header?: never;
@@ -918,7 +1006,7 @@ export interface operations {
             };
         };
     };
-    mine: {
+    getMyReviews: {
         parameters: {
             query?: never;
             header?: never;
@@ -934,6 +1022,29 @@ export interface operations {
                 };
                 content: {
                     "application/json;charset=UTF-8": components["schemas"]["ReviewsByMemberDto"];
+                };
+            };
+        };
+    };
+    getReviewsOrderByLatest: {
+        parameters: {
+            query?: {
+                page?: number;
+                size?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json;charset=UTF-8": components["schemas"]["ReviewWithBookImgUrlDto"][];
                 };
             };
         };
@@ -961,7 +1072,7 @@ export interface operations {
             };
         };
     };
-    getUser: {
+    getMember: {
         parameters: {
             query?: never;
             header?: never;
@@ -983,7 +1094,7 @@ export interface operations {
             };
         };
     };
-    me: {
+    getMy: {
         parameters: {
             query?: never;
             header?: never;
@@ -1026,7 +1137,7 @@ export interface operations {
             };
         };
     };
-    search: {
+    getBooksBySearch: {
         parameters: {
             query: {
                 searchTerm: string;
@@ -1050,9 +1161,11 @@ export interface operations {
             };
         };
     };
-    recommend: {
+    getBooksByRecommend: {
         parameters: {
-            query?: never;
+            query?: {
+                maxCount?: number;
+            };
             header?: never;
             path?: never;
             cookie?: never;
@@ -1070,7 +1183,7 @@ export interface operations {
             };
         };
     };
-    rank: {
+    getBooksOrderByRank: {
         parameters: {
             query?: {
                 type?: string;
@@ -1117,6 +1230,28 @@ export interface operations {
             };
         };
     };
+    deleteWish: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json;charset=UTF-8": components["schemas"]["RsDataUnit"];
+                };
+            };
+        };
+    };
     logout: {
         parameters: {
             query?: never;
@@ -1132,7 +1267,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json;charset=UTF-8": components["schemas"]["RsDataVoid"];
+                    "application/json;charset=UTF-8": components["schemas"]["RsDataUnit"];
                 };
             };
         };
@@ -1154,7 +1289,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json;charset=UTF-8": components["schemas"]["RsDataVoid"];
+                    "application/json;charset=UTF-8": components["schemas"]["RsDataUnit"];
                 };
             };
         };
