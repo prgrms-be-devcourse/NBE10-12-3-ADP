@@ -2,9 +2,7 @@ package com.back.domain.review.controller
 
 import com.back.domain.review.controller.request.ReviewCreateRequest
 import com.back.domain.review.controller.request.ReviewUpdateRequest
-import com.back.domain.review.dto.AdminReviewDto
 import com.back.domain.review.dto.ReviewDto
-import com.back.domain.review.dto.ReviewsByMemberDto
 import com.back.domain.review.service.ReviewService
 import com.back.global.rq.Rq
 import com.back.global.rsData.RsData
@@ -12,16 +10,7 @@ import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.validation.Valid
-import org.springframework.data.domain.Page
-import org.springframework.web.bind.annotation.DeleteMapping
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PathVariable
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.PutMapping
-import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RequestParam
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping("/api/v1/reviews")
@@ -36,28 +25,25 @@ class ApiReviewControllerV1(
     fun getReviewsOrderByLatest(
         @RequestParam(defaultValue = "0") page: Int,
         @RequestParam(defaultValue = "10") size: Int
-    ): List<ReviewDto> =
-        reviewService.getReviewsOrderByLatest(page, size)
+    ) = reviewService.getReviewsOrderByLatest(page, size)
 
     @GetMapping("/book/{bookId}")
     @Operation(summary = "도서별 리뷰 다건 조회")
     fun getReviewsByBookId(
         @PathVariable bookId: Long
-    ): List<ReviewDto> =
-        reviewService.getReviewsByBookId(bookId)
+    ) = reviewService.getReviewsByBookId(bookId)
 
     @GetMapping("/member/{memberId}")
     @Operation(summary = "회원별 리뷰 다건 조회")
     fun getReviewsByMemberId(
         @PathVariable memberId: Long
-    ): ReviewsByMemberDto =
-        reviewService.getReviewsByMemberId(memberId)
+    ) = reviewService.getReviewsByMemberId(memberId)
 
     @GetMapping("/member/mine")
     @Operation(summary = "내 리뷰 다건 조회")
     @SecurityRequirement(name = "bearerAuth")
-    fun getMyReviews(): ReviewsByMemberDto =
-        reviewService.getReviewsByMemberId(rq.actor.id)
+    fun getMyReviews()
+        = reviewService.getReviewsByMemberId(rq.actor.id)
 
     @GetMapping("/admin")
     @Operation(summary = "리뷰 다건 조회 (관리자)")
@@ -65,8 +51,7 @@ class ApiReviewControllerV1(
     fun getReviews(
         @RequestParam(defaultValue = "0") page: Int,
         @RequestParam(defaultValue = "10") size: Int
-    ): Page<AdminReviewDto> =
-        reviewService.getReviews(page, size)
+    ) = reviewService.getReviews(page, size)
 
     @PostMapping("/book/{bookId}")
     @Operation(summary = "리뷰 생성")
