@@ -569,7 +569,6 @@ export interface components {
             pageSize?: number;
             sort?: components["schemas"]["SortObject"];
             unpaged?: boolean;
-            sort?: components["schemas"]["SortObject"];
             /** Format: int64 */
             offset?: number;
         };

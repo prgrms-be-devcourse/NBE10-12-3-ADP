@@ -149,7 +149,7 @@ function BookDetail() {
     */
 
     if (contentInput.value.length > 500) {
-      alert("리뷰 내용은 500자 이하로 입력해주세요.");
+      showToast("리뷰 내용은 500자 이하로 입력해주세요.");
       contentInput.focus();
       return null;
     }
@@ -182,7 +182,7 @@ function BookDetail() {
       body: JSON.stringify(body),
     })
       .then((data) => {
-        alert(data.message);
+        showToast(data?.message ?? "리뷰를 작성했습니다.");
         form.reset();
         setShowWriteForm(false);
         loadReviews();
@@ -206,7 +206,7 @@ function BookDetail() {
       body: JSON.stringify(body),
     })
       .then((data) => {
-        alert(data.message);
+        showToast(data?.message ?? "리뷰를 수정했습니다.");
         setEditingReviewId(null);
         loadReviews();
         loadBook();
@@ -275,7 +275,7 @@ function BookDetail() {
       method: "DELETE",
     })
       .then((data) => {
-        alert(data.message);
+        showToast(data?.message ?? "리뷰를 삭제했습니다.");
         loadReviews();
         loadBook();
       })
