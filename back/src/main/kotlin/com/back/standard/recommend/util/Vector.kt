@@ -25,6 +25,7 @@ class Vector<L> {
 
     fun subtractionValue(value: Double): Vector<L> {
         values.replaceAll { _, oldValue -> oldValue - value }
+        sum -= value * values.size
         return this
     }
 
