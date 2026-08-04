@@ -30,8 +30,4 @@ interface BookRepository : JpaRepository<Book, Long> {
         nativeQuery = true
     )
     fun searchByKeyword(@Param("keyword") keyword: String, pageable: Pageable): Page<Book>
-
-    fun findAllByOrderByAverageRatingDesc(pageable: Pageable?): Page<Book>
-
-    fun findAllByOrderByReviewCountDesc(pageable: Pageable?): Page<Book>
 }
