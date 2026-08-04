@@ -77,11 +77,14 @@ class BookQueryService(
 
     fun getBooksOrderByTopViewedInLastHour(page: Int, size: Int): List<BookDto> {
         val books = bookViewCountRedisRepository.findBookIdOrderByTopViewedInLastHout(page, size)
-            ?: return bookOperationalRepository
+
+        if (books.isNullOrEmpty()) {
+            return bookOperationalRepository
                 .findAllByOrderByViewCountDesc(
                     PageRequest.of(page, size)
                 ).toList()
                 .let { getBookDtosFromOperations(it) }
+        }
 
         return getBookDtosByBookIds(books)
     }
