@@ -14,10 +14,9 @@ export default function AuthReturnPathRestorer() {
 
   useEffect(() => {
     if (isLoginMemberPending || !isLogin) return;
-    if (pathname !== "/") return;
 
     const returnPath = consumeAuthReturnPath();
-    if (returnPath === "/") return;
+    if (pathname !== "/" || returnPath === "/") return;
 
     router.replace(returnPath);
   }, [isLogin, isLoginMemberPending, pathname, router]);
