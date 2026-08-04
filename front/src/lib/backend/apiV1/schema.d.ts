@@ -551,19 +551,19 @@ export interface components {
             empty?: boolean;
         };
         PageableObject: {
+            unpaged?: boolean;
             paged?: boolean;
             /** Format: int32 */
             pageNumber?: number;
             /** Format: int32 */
             pageSize?: number;
             sort?: components["schemas"]["SortObject"];
-            unpaged?: boolean;
             /** Format: int64 */
             offset?: number;
         };
         SortObject: {
-            sorted?: boolean;
             unsorted?: boolean;
+            sorted?: boolean;
             empty?: boolean;
         };
         MemberWithUsernameAndWidgetLinkDto: {

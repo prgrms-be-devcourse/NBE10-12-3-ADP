@@ -11,6 +11,7 @@ import { useAuth } from "@/lib/auth/AuthProvider";
 import type { components } from "@/lib/backend/apiV1/schema";
 import { goToErrorPage } from "@/lib/error/goToErrorPage";
 import { ratingColor } from "@/lib/ratingColor";
+import { useToast } from "@/lib/toast/ToastProvider";
 
 import LibraryProfilePanel from "@/app/_components/LibraryProfilePanel";
 import LibraryWidgetPreview from "@/app/_components/LibraryWidgetPreview";
@@ -28,9 +29,27 @@ type ReviewWithBookImgUrl = NonNullable<
   bookImgUrl?: string | null;
 };
 
+function WishIcon() {
+  return (
+    <svg
+      aria-hidden="true"
+      className="inline-block h-4 w-4 shrink-0 align-[-0.125em]"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M19 21l-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />
+    </svg>
+  );
+}
+
 export default function Page() {
   const router = useRouter();
   const { loginMember, isLogin, isLoginMemberPending, refresh } = useAuth();
+  const { showToast, showErrorToast } = useToast();
 
   const [reviewData, setReviewData] = useState<ReviewsByMemberDto | null>(null);
   const [wishes, setWishes] = useState<BookDto[] | null>(null);
@@ -74,16 +93,16 @@ export default function Page() {
         alert(data.message);
         loadReviews();
       })
-      .catch(goToErrorPage);
+      .catch(showErrorToast);
   };
 
   const handleRemoveWish = (bookId: number) => {
     apiFetch(`/api/v1/wishes/book/${bookId}`, { method: "DELETE" })
       .then((data) => {
-        alert(data.message);
+        showToast(data.message);
         loadWishes();
       })
-      .catch(goToErrorPage);
+      .catch(showErrorToast);
   };
 
   const handleWithdraw = () => {
@@ -97,7 +116,7 @@ export default function Page() {
       .then(() => {
         router.replace(`/`);
       })
-      .catch(goToErrorPage);
+      .catch(showErrorToast);
   };
 
   const handleLogout = () => {
@@ -236,7 +255,7 @@ export default function Page() {
                   <RoughDivider fullWidth />
                   <Link
                     href={`/books/detail?id=${review.bookId}`}
-                    className="rough-book-card relative flex h-20 w-14 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-white"
+                    className="rough-book-card review-book-thumbnail relative flex h-20 w-14 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-white"
                     aria-label={`${review.bookTitle ?? `책 #${review.bookId}`} 상세 보기`}
                   >
                     <RoughFrame
@@ -329,6 +348,7 @@ export default function Page() {
                       type="button"
                       onClick={() => handleRemoveWish(book.id)}
                     >
+                      <WishIcon />
                       보고 싶어요 취소
                     </RoughButton>
                   </div>

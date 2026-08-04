@@ -12,6 +12,7 @@ import type { components } from "@/lib/backend/apiV1/schema";
 import { goToErrorPage } from "@/lib/error/goToErrorPage";
 import { ratingColor } from "@/lib/ratingColor";
 import { ratingFillColor } from "@/lib/ratingColor";
+import { useToast } from "@/lib/toast/ToastProvider";
 
 import Avatar from "@/app/_components/Avatar";
 import LoginRequiredModal from "@/app/_components/LoginRequiredModal";
@@ -26,15 +27,54 @@ import { RoughInput, RoughTextarea } from "@/app/_components/RoughInput";
 import RoughRatingInput from "@/app/_components/RoughRatingInput";
 
 type BookDetailDto = components["schemas"]["BookDetailDto"];
+type BookDetailWithWishId = BookDetailDto & {
+  isWished?: boolean;
+};
 type BookDto = components["schemas"]["BookDto"];
 type ReviewDto = components["schemas"]["ReviewDto"];
+
+function WishIcon() {
+  return (
+    <svg
+      aria-hidden="true"
+      className="inline-block h-4 w-4 shrink-0 align-[-0.125em]"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M19 21l-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />
+    </svg>
+  );
+}
+
+function ReviewIcon() {
+  return (
+    <svg
+      aria-hidden="true"
+      className="inline-block h-4 w-4 shrink-0 align-[-0.125em]"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M12 20h9" />
+      <path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z" />
+    </svg>
+  );
+}
 
 function BookDetail() {
   const searchParams = useSearchParams();
   const id = searchParams.get("id");
   const { loginMember, isLogin } = useAuth();
+  const { showToast, showErrorToast } = useToast();
 
-  const [book, setBook] = useState<BookDetailDto | null>(null);
+  const [book, setBook] = useState<BookDetailWithWishId | null>(null);
   const [reviews, setReviews] = useState<ReviewDto[] | null>(null);
   const [recommendBooks, setRecommendBooks] = useState<BookDto[] | null>(null);
   const [editingReviewId, setEditingReviewId] = useState<number | null>(null);
@@ -146,7 +186,7 @@ function BookDetail() {
         loadReviews();
         loadBook();
       })
-      .catch(goToErrorPage);
+      .catch(showErrorToast);
   };
 
   const handleEditSubmit = (
@@ -169,20 +209,30 @@ function BookDetail() {
         loadReviews();
         loadBook();
       })
-      .catch(goToErrorPage);
+      .catch(showErrorToast);
   };
 
   const handleToggleWish = () => {
     if (book == null || id == null) return;
 
-    apiFetch(`/api/v1/wishes/book/${id}`, {
-      method: book.isWished ? "DELETE" : "POST",
-    })
+    const isBookWished = book.isWished ?? book.wished ?? false;
+
+    if (isBookWished) {
+      apiFetch(`/api/v1/wishes/book/${id}`, { method: "DELETE" })
+        .then((data) => {
+          showToast(data.message);
+          loadBook();
+        })
+        .catch(showErrorToast);
+      return;
+    }
+
+    apiFetch(`/api/v1/wishes/book/${id}`, { method: "POST" })
       .then((data) => {
-        alert(data.message);
+        showToast(data.message);
         loadBook();
       })
-      .catch(goToErrorPage);
+      .catch(showErrorToast);
   };
 
   const openLoginModal = () => {
@@ -212,7 +262,7 @@ function BookDetail() {
         loadReviews();
         loadBook();
       })
-      .catch(goToErrorPage);
+      .catch(showErrorToast);
   };
 
   if (id == null) {
@@ -221,6 +271,7 @@ function BookDetail() {
 
   if (book == null || reviews == null) return <div>로딩중...</div>;
 
+  const isBookWished = book.isWished ?? book.wished ?? false;
   const average = book.rating?.["average"];
   const averageNumber = typeof average === "number" ? average : null;
 
@@ -260,11 +311,12 @@ function BookDetail() {
             <RoughButton
               fullWidth
               roughSize="sm"
-              tone={book.isWished ? "wishActive" : "wish"}
+              tone={isBookWished ? "wishActive" : "wish"}
               type="button"
               onClick={handleToggleWish}
             >
-              {book.isWished ? "🔖 보고 싶어요 취소" : "🔖 보고 싶어요"}
+              <WishIcon />
+              {isBookWished ? "보고 싶어요 취소" : "보고 싶어요"}
             </RoughButton>
           ) : (
             <RoughButton
@@ -274,7 +326,8 @@ function BookDetail() {
               type="button"
               onClick={openLoginModal}
             >
-              🔖 보고 싶어요
+              <WishIcon />
+              보고 싶어요
             </RoughButton>
           )}
         </div>
@@ -404,6 +457,7 @@ function BookDetail() {
             type="button"
             onClick={handleOpenReviewAction}
           >
+            <ReviewIcon />
             리뷰 작성하기
           </RoughButton>
         </div>

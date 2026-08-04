@@ -5,7 +5,7 @@ import { useState } from "react";
 import { apiFetch } from "@/lib/backend/client";
 
 import { useAuth } from "@/lib/auth/AuthProvider";
-import { goToErrorPage } from "@/lib/error/goToErrorPage";
+import { useToast } from "@/lib/toast/ToastProvider";
 
 import RoughButton from "@/app/_components/RoughButton";
 import { RoughInput } from "@/app/_components/RoughInput";
@@ -17,6 +17,7 @@ type Tab = "members" | "books" | "reviews";
 
 export default function Page() {
   const { isLogin, isLoginMemberPending, isAdmin, refresh } = useAuth();
+  const { showErrorToast } = useToast();
 
   const [tab, setTab] = useState<Tab>("members");
 
@@ -40,7 +41,7 @@ export default function Page() {
       }),
     })
       .then(() => refresh())
-      .catch(goToErrorPage);
+      .catch(showErrorToast);
   };
 
   if (isLoginMemberPending) {

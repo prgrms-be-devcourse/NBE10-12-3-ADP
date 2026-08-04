@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useEffect, useState } from "react";
 
-import { apiFetch } from "@/lib/backend/client";
+import { apiFetch, apiFetchRaw } from "@/lib/backend/client";
 
 import type { components } from "@/lib/backend/apiV1/schema";
 
@@ -25,13 +25,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [isAdmin, setIsAdmin] = useState(false);
 
   const refresh = () => {
-    return apiFetch(`/api/v1/members/me`)
-      .then((data) => {
-        setLoginMember(data);
+    return apiFetchRaw(`/api/v1/members/me`)
+      .then((res) => {
+        if (!res.ok) {
+          setLoginMember(null);
+          setIsAdmin(false);
+          return;
+        }
 
-        return apiFetch(`/api/v1/members/admin?page=0&size=1`)
-          .then(() => setIsAdmin(true))
-          .catch(() => setIsAdmin(false));
+        return res.json().then((data) => {
+          setLoginMember(data);
+
+          return apiFetch(`/api/v1/members/admin?page=0&size=1`)
+            .then(() => setIsAdmin(true))
+            .catch(() => setIsAdmin(false));
+        });
       })
       .catch(() => {
         setLoginMember(null);

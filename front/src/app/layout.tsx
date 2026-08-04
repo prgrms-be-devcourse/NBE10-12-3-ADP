@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 
 import { AuthProvider } from "@/lib/auth/AuthProvider";
 import { ThemeProvider } from "@/lib/theme/ThemeProvider";
+import { ToastProvider } from "@/lib/toast/ToastProvider";
 
 import Header from "@/app/_components/Header";
 import RoughBar from "@/app/_components/RoughBar";
@@ -44,32 +45,34 @@ export default function RootLayout({
       </head>
       <body className="flex min-h-screen flex-col antialiased">
         <ThemeProvider>
-          <AuthProvider>
-            <Header />
-            <main className="relative z-0 mx-auto flex w-full max-w-4xl flex-grow flex-col p-4">
-              <div className="relative flex flex-1 flex-col">{children}</div>
-            </main>
-            <footer className="theme-site-footer text-center text-sm theme-muted">
-              <div className="theme-rough-divider-bar">
-                <RoughBar
-                  className="h-full w-full"
-                  fill="transparent"
-                  lineInset={0}
-                  variant="line"
-                />
-              </div>
-              <div className="px-2 py-6">
-                <a
-                  href="https://github.com/prgrms-be-devcourse/NBE10-12-3-ADP"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="theme-link"
-                >
-                  GitHub Repository
-                </a>
-              </div>
-            </footer>
-          </AuthProvider>
+          <ToastProvider>
+            <AuthProvider>
+              <Header />
+              <main className="relative z-0 mx-auto flex w-full max-w-4xl flex-grow flex-col p-4">
+                <div className="relative flex flex-1 flex-col">{children}</div>
+              </main>
+              <footer className="theme-site-footer text-center text-sm theme-muted">
+                <div className="theme-rough-divider-bar">
+                  <RoughBar
+                    className="h-full w-full"
+                    fill="transparent"
+                    lineInset={0}
+                    variant="line"
+                  />
+                </div>
+                <div className="px-2 py-6">
+                  <a
+                    href="https://github.com/prgrms-be-devcourse/NBE10-12-3-ADP"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="theme-link"
+                  >
+                    GitHub Repository
+                  </a>
+                </div>
+              </footer>
+            </AuthProvider>
+          </ToastProvider>
         </ThemeProvider>
       </body>
     </html>

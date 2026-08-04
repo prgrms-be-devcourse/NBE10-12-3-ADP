@@ -516,10 +516,23 @@ button:hover {
   transform: translateY(-3px);
 }
 
+.rough-book-card.review-book-thumbnail:hover {
+  box-shadow:
+    0 1px 4px rgb(15 118 110 / 0.06),
+    0 10px 20px rgb(15 118 110 / 0.1);
+  transform: none;
+}
+
 :root[data-theme="dark"] .rough-book-card:hover {
   box-shadow:
     0 4px 12px rgb(0 0 0 / 0.24),
     0 16px 30px rgb(0 0 0 / 0.34);
+}
+
+:root[data-theme="dark"] .rough-book-card.review-book-thumbnail:hover {
+  box-shadow:
+    0 1px 5px rgb(0 0 0 / 0.18),
+    0 10px 22px rgb(0 0 0 / 0.28);
 }
 
 .book-scroll-fade {
@@ -992,6 +1005,38 @@ button:hover {
 .rough-modal-card > *:not(.rough-overlay) {
   position: relative;
   z-index: 1;
+}
+
+.rough-toast {
+  position: fixed;
+  left: 50%;
+  bottom: 1.5rem;
+  z-index: 60;
+  max-width: calc(100vw - 2rem);
+  transform: translateX(-50%);
+  border: 0;
+  border-radius: 14px;
+  background: var(--surface-soft);
+  padding: 0.625rem 1rem;
+  color: var(--ink);
+  font-size: 0.875rem;
+  font-weight: 600;
+  box-shadow:
+    0 6px 16px rgb(15 118 110 / 0.14),
+    0 16px 32px rgb(17 24 39 / 0.16);
+  animation: rough-toast-in 180ms ease-out;
+}
+
+@keyframes rough-toast-in {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 0.5rem);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
 }
 
 .rough-rating-chart {

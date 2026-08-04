@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 
 import { apiFetch } from "@/lib/backend/client";
 import { goToErrorPage } from "@/lib/error/goToErrorPage";
+import { useToast } from "@/lib/toast/ToastProvider";
 
 import type { components } from "@/lib/backend/apiV1/schema";
 import { ratingColor } from "@/lib/ratingColor";
@@ -14,6 +15,7 @@ import RoughButton from "@/app/_components/RoughButton";
 type PageAdminReviewDto = components["schemas"]["PageAdminReviewDto"];
 
 export default function ReviewAdmin() {
+  const { showErrorToast } = useToast();
   const [pageData, setPageData] = useState<PageAdminReviewDto | null>(null);
   const [pageNumber, setPageNumber] = useState(0);
 
@@ -35,7 +37,7 @@ export default function ReviewAdmin() {
         alert(data.message);
         loadReviews(pageNumber);
       })
-      .catch(goToErrorPage);
+      .catch(showErrorToast);
   };
 
   if (pageData == null) return <div>로딩중...</div>;

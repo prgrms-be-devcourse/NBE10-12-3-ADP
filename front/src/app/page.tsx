@@ -281,7 +281,7 @@ function LatestReviewSection({
                     <RoughFrame className="rough-overlay" variant="card" />
                     <Link
                       href={`/books/detail?id=${review.bookId}`}
-                      className="rough-book-card relative flex h-28 w-20 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-white"
+                      className="rough-book-card review-book-thumbnail relative flex h-28 w-20 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-white"
                       aria-label={`${review.bookTitle ?? `책 #${review.bookId}`} 상세 보기`}
                     >
                       <RoughFrame

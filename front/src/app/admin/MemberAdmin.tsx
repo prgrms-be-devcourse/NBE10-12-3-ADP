@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 
 import { apiFetch } from "@/lib/backend/client";
 import { goToErrorPage } from "@/lib/error/goToErrorPage";
+import { useToast } from "@/lib/toast/ToastProvider";
 
 import type { components } from "@/lib/backend/apiV1/schema";
 
@@ -12,6 +13,7 @@ import RoughButton from "@/app/_components/RoughButton";
 type PageAdminMemberDto = components["schemas"]["PageAdminMemberDto"];
 
 export default function MemberAdmin() {
+  const { showErrorToast } = useToast();
   const [pageData, setPageData] = useState<PageAdminMemberDto | null>(null);
   const [pageNumber, setPageNumber] = useState(0);
 
@@ -33,7 +35,7 @@ export default function MemberAdmin() {
         alert(data.message);
         loadMembers(pageNumber);
       })
-      .catch(goToErrorPage);
+      .catch(showErrorToast);
   };
 
   if (pageData == null) return <div>로딩중...</div>;

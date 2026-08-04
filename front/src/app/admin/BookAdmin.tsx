@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 
 import { apiFetch } from "@/lib/backend/client";
 import { goToErrorPage } from "@/lib/error/goToErrorPage";
+import { useToast } from "@/lib/toast/ToastProvider";
 
 import type { components } from "@/lib/backend/apiV1/schema";
 
@@ -14,6 +15,7 @@ type PageBookDto = components["schemas"]["PageBookDto"];
 type BookDetailDto = components["schemas"]["BookDetailDto"];
 
 export default function BookAdmin() {
+  const { showErrorToast } = useToast();
   const [pageData, setPageData] = useState<PageBookDto | null>(null);
   const [pageNumber, setPageNumber] = useState(0);
   const [editingId, setEditingId] = useState<number | null>(null);
@@ -35,7 +37,7 @@ export default function BookAdmin() {
         setEditingId(id);
         setEditingBook(data);
       })
-      .catch(goToErrorPage);
+      .catch(showErrorToast);
   };
 
   const cancelEdit = () => {
@@ -74,7 +76,7 @@ export default function BookAdmin() {
         cancelEdit();
         loadBooks(pageNumber);
       })
-      .catch(goToErrorPage);
+      .catch(showErrorToast);
   };
 
   const handleDelete = (id: number) => {
@@ -85,7 +87,7 @@ export default function BookAdmin() {
         alert(data.message);
         loadBooks(pageNumber);
       })
-      .catch(goToErrorPage);
+      .catch(showErrorToast);
   };
 
   if (pageData == null) return <div>로딩중...</div>;
