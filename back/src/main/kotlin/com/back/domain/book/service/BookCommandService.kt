@@ -40,6 +40,7 @@ class BookCommandService(
 
         reviewRepository.deleteAll(reviewRepository.findByBook(book))
         wishRepository.deleteAllByBook(book)
+        bookOperationalRepository.deleteByIsbn(book.isbn)
 
         bookRepository.delete(book)
     }
