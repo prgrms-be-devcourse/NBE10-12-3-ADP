@@ -32,7 +32,7 @@ class ApiReviewControllerV1(
 ) {
 
     @GetMapping("/latest")
-    @Operation(summary = "도서별 리뷰 다건 조회")
+    @Operation(summary = "리뷰 최신순 다건 조회")
     fun getReviewsOrderByLatest(
         @RequestParam(defaultValue = "0") page: Int,
         @RequestParam(defaultValue = "10") size: Int
