@@ -150,7 +150,7 @@ function GitHubIcon() {
 export default function Header() {
   const router = useRouter();
   const { isLogin, isLoginMemberPending, isAdmin, logout } = useAuth();
-  const { showErrorToast } = useToast();
+  const { showToast, showErrorToast } = useToast();
   const { toggleTheme } = useTheme();
   const [searchTerm, setSearchTerm] = useState("");
   const [isSearchPending, setIsSearchPending] = useState(false);
@@ -205,6 +205,7 @@ export default function Header() {
 
     logout()
       .then(() => {
+        showToast("로그아웃되었습니다.");
         router.replace(consumeAuthReturnPath());
       })
       .catch(showErrorToast);

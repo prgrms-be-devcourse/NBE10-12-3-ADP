@@ -128,6 +128,7 @@ export default function Page() {
 
     apiFetch(`/api/v1/members/logout`, { method: "DELETE" })
       .then(() => {
+        showToast("로그아웃되었습니다.");
         return refresh().then(() => router.replace(consumeAuthReturnPath()));
       })
       .catch(showErrorToast);
