@@ -17,7 +17,7 @@ type PageBookDto = components["schemas"]["PageBookDto"];
 const SEARCH_PAGE_SIZE = 20;
 
 function isPageBookDto(data: BookDto[] | PageBookDto): data is PageBookDto {
-  return !Array.isArray(data) && "content" in data;
+  return data != null && !Array.isArray(data) && "content" in data;
 }
 
 function searchLoadingChanged(isLoading: boolean) {
