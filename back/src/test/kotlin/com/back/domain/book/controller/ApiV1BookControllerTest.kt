@@ -1,5 +1,6 @@
 package com.back.domain.book.controller
 
+import com.back.domain.book.repository.BookOperationalRepository
 import com.back.domain.book.repository.BookRepository
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
@@ -26,6 +27,8 @@ class ApiV1BookControllerTest {
 
     @Autowired
     private lateinit var bookRepository: BookRepository
+    @Autowired
+    private lateinit var bookOperationalRepository: BookOperationalRepository
 
     @Test
     @DisplayName("도서 단건 조회 - 비인증 사용자")
@@ -104,7 +107,8 @@ class ApiV1BookControllerTest {
                 .andExpect(jsonPath("$[$i].title").value(expected.title))
                 .andExpect(jsonPath("$[$i].imgUrl").value(expected.imgUrl))
                 .andExpect(
-                    jsonPath("$[$i].averageRating").value(expected.averageRating)
+                    jsonPath("$[$i].averageRating").value(
+                        bookOperationalRepository.findByBookId(expected.id)?.averageRating ?: 0)
                 )
         }
     }

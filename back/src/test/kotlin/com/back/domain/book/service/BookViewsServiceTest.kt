@@ -31,11 +31,15 @@ class BookViewsServiceTest {
 
         var upperCnt = Int.MAX_VALUE
 
+        println()
         for (book in bookRank) {
+            println("aaa${book.id}")
             val b = bookService.getBookById(book.id)
             val nowCnt = bookService.getBookViewCount(b)
 
-            val expectedViewCount = viewsCount[(book.id - 1).toInt()]
+            val expectedViewCount =
+                if (book.id <= viewsCount.size) viewsCount[(book.id - 1).toInt()]
+                else 0
 
             assertThat(nowCnt).isEqualTo(expectedViewCount)
             assertThat(upperCnt).isGreaterThanOrEqualTo(nowCnt)
