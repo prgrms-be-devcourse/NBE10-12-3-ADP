@@ -22,7 +22,7 @@ class KakaoBookClient(
                 }
                 .retrieve()
                 .bodyToMono(KakaoBookSearchResponse::class.java)
-                .block(Duration.ofSeconds(3))
+                .block(Duration.ofSeconds(2))
                 ?.documents
                 ?.firstOrNull()
                 ?.thumbnail
