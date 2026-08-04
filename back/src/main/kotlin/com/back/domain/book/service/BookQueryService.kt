@@ -117,22 +117,27 @@ class BookQueryService(
         val pageable = PageRequest.of(page, size)
 
         try {
-            return bookRepository.searchByKeyword(searchTerm, pageable)
-                .toList().map { getBookDto(it) }
+            return getBookDtos(
+                bookRepository.searchByKeyword(searchTerm, pageable).toList()
+            )
 
         } catch (_: java.lang.Exception) {
             // handler();
         }
 
-        return bookRepository.findByTitleContaining(searchTerm, pageable)
-            .toList().map { getBookDto(it) }
+        return getBookDtos(
+            bookRepository.findByTitleContaining(searchTerm, pageable).toList()
+        )
     }
 
     private fun getBookOperational(book: Book) =
         bookOperationalRepository.findByIsbn(book.isbn)
 
-    private fun getBookDto(book: Book): BookDto {
-        return BookDto(book, getBookOperational(book)?.averageRating ?: 0.0)
+    private fun getBookDtos(books: List<Book>): List<BookDto> {
+        val ratingsByIsbn = bookOperationalRepository.findByIsbnIn(books.map { it.isbn })
+            .associate { it.isbn to it.averageRating }
+
+        return books.map { BookDto(it, ratingsByIsbn[it.isbn] ?: 0.0) }
     }
 
     private fun getBookDtosFromOperations(operations: List<BookOperational>): List<BookDto> {

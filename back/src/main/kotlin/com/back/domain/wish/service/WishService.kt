@@ -21,17 +21,22 @@ class WishService(
     private val bookOperationalRepository: BookOperationalRepository
 ) {
 
-    fun getMyWishes(actor: Member): List<BookWithTagsDto> =
-        wishRepository.findByMember(actor).map { wish ->
+    fun getMyWishes(actor: Member): List<BookWithTagsDto> {
+        val wishes = wishRepository.findByMember(actor)
+        val ratingsByIsbn = bookOperationalRepository.findByIsbnIn(
+            wishes.map { it.book.isbn }
+        ).associate { it.isbn to it.averageRating }
+
+        return wishes.map { wish ->
             BookWithTagsDto(
                 wish.book,
-                bookOperationalRepository
-                    .findByIsbn(wish.book.isbn)?.averageRating ?: 0.0,
+                ratingsByIsbn[wish.book.isbn] ?: 0.0,
                 reviewRepository.findByBook(wish.book)
                     .flatMap { review -> review.tags }
                     .distinct(),
             )
         }
+    }
 
     @Transactional
     fun createWish(actor: Member, bookId: Long) {
