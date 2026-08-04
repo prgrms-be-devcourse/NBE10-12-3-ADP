@@ -7,7 +7,8 @@ import kotlin.math.roundToInt
 
 @Entity
 class BookOperational(
-    val bookId: Long,
+    @field:Column(unique = true)
+    val isbn: String,
     var viewCount: Int = 0,
     var averageRating: Double = 0.0,
     var reviewCount: Int = 0

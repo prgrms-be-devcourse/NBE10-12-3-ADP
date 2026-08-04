@@ -1,6 +1,8 @@
 package com.back.domain.review.service
 
 import com.back.domain.book.entity.Book
+import com.back.domain.book.entity.BookOperational
+import com.back.domain.book.repository.BookOperationalRepository
 import com.back.domain.book.repository.BookRepository
 import com.back.domain.member.entity.Member
 import com.back.domain.member.repository.MemberRepository
@@ -27,6 +29,7 @@ import kotlin.math.roundToInt
 class ReviewService(
     private val reviewRepository: ReviewRepository,
     private val bookRepository: BookRepository,
+    private val bookOperationalRepository: BookOperationalRepository,
     private val memberRepository: MemberRepository,
     private val tagRepository: TagRepository
 ) {
@@ -49,7 +52,12 @@ class ReviewService(
     private fun refreshBookRating(book: Book) {
         val averageRating = reviewRepository.getAverageRatingByBook(book)
         val reviewCount = reviewRepository.countByBook(book)
-        book.updateRating(averageRating, reviewCount)
+
+        val bookOperational =
+            bookOperationalRepository.findByIsbn(book.isbn)
+                ?: bookOperationalRepository.save(BookOperational(book.isbn))
+
+        bookOperational.updateRating(averageRating, reviewCount)
     }
 
     private fun getRatingMap(member: Member): Map<String, Any> {

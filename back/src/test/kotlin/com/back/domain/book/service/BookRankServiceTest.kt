@@ -1,8 +1,7 @@
 package com.back.domain.book.service
 
-import com.back.domain.book.dto.BookDto
-import com.back.domain.book.entity.Book
 import com.back.domain.book.repository.BookOperationalRepository
+import com.back.domain.book.repository.BookRepository
 import com.back.domain.review.service.ReviewService
 import com.back.global.exception.ServiceException
 import org.assertj.core.api.AssertionsForClassTypes
@@ -11,13 +10,14 @@ import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.transaction.annotation.Transactional
 
 @ActiveProfiles("test")
 @SpringBootTest
 @Transactional
-class BookRankServiceTest {
+class BookRankServiceTest(@Autowired private val bookRepository: BookRepository) {
     @Autowired
     private lateinit var reviewService: ReviewService
 
@@ -46,8 +46,11 @@ class BookRankServiceTest {
     }
 
     fun getAverageRating(id: Long)
-        = bookOperationalRepository
-        .findByBookId(id)?.averageRating ?: throw ServiceException("404-1", "오류")
+        = bookRepository.findByIdOrNull(id)?.let {
+            bookOperationalRepository
+                .findByIsbn(it.isbn)?.averageRating
+                ?: throw ServiceException("404-1", "오류")
+    }
 
     @Test
     @DisplayName("도서 순위(평점) 다건 조회")

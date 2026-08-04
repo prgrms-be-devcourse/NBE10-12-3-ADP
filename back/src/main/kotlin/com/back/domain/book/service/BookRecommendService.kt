@@ -75,7 +75,7 @@ class BookRecommendService(
                     BookDto(
                         it,
                         bookOperationalRepository
-                            .findByBookId(it.id)?.averageRating ?: 0.0)
+                            .findByIsbn(it.isbn)?.averageRating ?: 0.0)
                 }
             }
     }

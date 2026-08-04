@@ -26,7 +26,7 @@ class WishService(
             BookWithTagsDto(
                 wish.book,
                 bookOperationalRepository
-                    .findByBookId(wish.book.id)?.averageRating ?: 0.0,
+                    .findByIsbn(wish.book.isbn)?.averageRating ?: 0.0,
                 reviewRepository.findByBook(wish.book)
                     .flatMap { review -> review.tags }
                     .distinct(),

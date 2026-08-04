@@ -1,6 +1,5 @@
 package com.back.domain.book.service
 
-import com.back.domain.book.entity.Book
 import org.assertj.core.api.AssertionsForClassTypes.assertThat
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test

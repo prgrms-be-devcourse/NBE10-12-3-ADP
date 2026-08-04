@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc
 import org.springframework.data.domain.PageRequest
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.security.test.context.support.WithUserDetails
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.servlet.MockMvc
@@ -102,14 +103,16 @@ class ApiV1BookControllerTest {
 
         for (i in expectedBooks.indices) {
             val expected = expectedBooks[i]
+            val expectedAvgRating =
+                bookRepository.findByIdOrNull(expected.id)?.let {
+                    bookOperationalRepository
+                        .findByIsbn(it.isbn)?.averageRating ?: 0
+                }
             resultActions
                 .andExpect(jsonPath("$[$i].id").value(expected.id))
                 .andExpect(jsonPath("$[$i].title").value(expected.title))
                 .andExpect(jsonPath("$[$i].imgUrl").value(expected.imgUrl))
-                .andExpect(
-                    jsonPath("$[$i].averageRating").value(
-                        bookOperationalRepository.findByBookId(expected.id)?.averageRating ?: 0)
-                )
+                .andExpect(jsonPath("$[$i].averageRating").value(expectedAvgRating))
         }
     }
 }

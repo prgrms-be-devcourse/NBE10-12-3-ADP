@@ -10,7 +10,7 @@ import org.springframework.stereotype.Repository
 @Repository
 interface BookOperationalRepository : JpaRepository<BookOperational, Long> {
 
-    fun findByBookId(bookId: Long) : BookOperational?
+    fun findByIsbn(isbn: String) : BookOperational?
 
     fun findAllByOrderByAverageRatingDesc(pageable: Pageable): Page<BookOperational>
 
