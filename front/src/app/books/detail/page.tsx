@@ -282,6 +282,8 @@ function BookDetail() {
   const isBookWished = book.wishId != null || book.isWished || book.wished;
   const average = book.rating?.["average"];
   const averageNumber = typeof average === "number" ? average : null;
+  const authors = book.authors ?? [];
+  const tags = book.tags ?? [];
 
   return (
     <div className="flex flex-col gap-6 p-4 max-w-3xl mx-auto w-full">
@@ -344,14 +346,14 @@ function BookDetail() {
           <div className="flex min-w-0 flex-col gap-2">
             <h1 className="text-2xl font-bold">{book.title}</h1>
             <div className="text-sm theme-muted">
-              {book.authors.join(", ") || "-"} · {book.publisher} ·{" "}
+              {authors.join(", ") || "-"} · {book.publisher} ·{" "}
               {book.publishedDate}
             </div>
 
             <p className="mt-1 text-sm theme-description">{book.description}</p>
 
             <div className="flex flex-wrap gap-2 text-sm theme-tag">
-              {book.tags.map((tag) => (
+              {tags.map((tag) => (
                 <span key={tag}>#{tag}</span>
               ))}
             </div>
@@ -441,11 +443,15 @@ function BookDetail() {
                       <div className="mt-1 flex items-center gap-1 text-xs theme-muted">
                         <span className="relative inline-block h-3.5 w-3.5 shrink-0">
                           <RoughStarIcon
-                            fill={ratingFillColor(recommendBook.averageRating)}
+                            fill={ratingFillColor(recommendBook.averageRating ?? 0)}
                             className="rough-overlay"
                           />
                         </span>
-                        <span>{recommendBook.averageRating.toFixed(1)}</span>
+                        <span>
+                          {typeof recommendBook.averageRating === "number"
+                            ? recommendBook.averageRating.toFixed(1)
+                            : "-"}
+                        </span>
                       </div>
                     </div>
                   </Link>
@@ -476,11 +482,14 @@ function BookDetail() {
 
         <ul className="mt-2 flex w-full flex-col">
           {reviews.map((review) => (
-            <li key={review.id} className="relative py-3">
-              {editingReviewId === review.id ? (
+            <li key={review.id ?? review.createdDate} className="relative py-3">
+              {editingReviewId === review.id && review.id != null ? (
                 <form
                   className="flex flex-col gap-2"
-                  onSubmit={(e) => handleEditSubmit(e, review.id)}
+                  onSubmit={(e) => {
+                    if (review.id == null) return;
+                    handleEditSubmit(e, review.id);
+                  }}
                 >
                   <RoughRatingInput
                     name="rating"
@@ -490,14 +499,14 @@ function BookDetail() {
                   <RoughTextarea
                     name="content"
                     defaultValue={review.content}
-                    maxLength={30}
+                    maxLength={500}
                     rows={2}
                   />
                   <RoughInput
                     inputClassName="px-2"
                     type="text"
                     name="tags"
-                    defaultValue={review.tags.join(", ")}
+                    defaultValue={(review.tags ?? []).join(", ")}
                   />
                   <div className="flex gap-2">
                     <RoughButton roughSize="sm" tone="submit" type="submit">
@@ -515,25 +524,35 @@ function BookDetail() {
                 </form>
               ) : (
                 <div className="flex items-start gap-3">
-                  <Link href={`/members/detail?id=${review.reviewer.id}`}>
-                    <Avatar label={review.reviewer.githubId} />
-                  </Link>
+                  {review.reviewer?.id != null ? (
+                    <Link href={`/members/detail?id=${review.reviewer.id}`}>
+                      <Avatar label={review.reviewer.githubId ?? null} />
+                    </Link>
+                  ) : (
+                    <Avatar label={review.reviewer?.githubId ?? null} />
+                  )}
 
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-1">
-                      <Link
-                        className="font-semibold hover:underline"
-                        href={`/members/detail?id=${review.reviewer.id}`}
-                      >
-                        {review.reviewer.githubId ?? "탈퇴한 사용자"}
-                      </Link>
-                      {review.reviewer.githubLink && (
+                      {review.reviewer?.id != null ? (
+                        <Link
+                          className="font-semibold hover:underline"
+                          href={`/members/detail?id=${review.reviewer.id}`}
+                        >
+                          {review.reviewer.githubId ?? "탈퇴한 사용자"}
+                        </Link>
+                      ) : (
+                        <span className="font-semibold">
+                          {review.reviewer?.githubId ?? "탈퇴한 사용자"}
+                        </span>
+                      )}
+                      {review.reviewer?.githubLink && (
                         <a
                           className="rough-github-inline"
                           href={review.reviewer.githubLink}
                           target="_blank"
                           rel="noreferrer"
-                          aria-label={`${review.reviewer.githubId ?? "사용자"} GitHub`}
+                          aria-label={`${review.reviewer?.githubId ?? "사용자"} GitHub`}
                         >
                           {/* eslint-disable-next-line @next/next/no-img-element */}
                           <img
@@ -546,7 +565,7 @@ function BookDetail() {
                     </div>
 
                     <div className="flex flex-wrap gap-1 text-xs theme-tag">
-                      {review.tags.map((tag) => (
+                      {(review.tags ?? []).map((tag) => (
                         <span key={tag}>#{tag}</span>
                       ))}
                     </div>
@@ -556,13 +575,16 @@ function BookDetail() {
                       {review.createdDate}
                     </div>
 
-                    {loginMember?.id === review.reviewer.id && (
+                    {loginMember?.id != null && loginMember.id === review.reviewer?.id && (
                       <div className="flex gap-2 mt-1">
                         <RoughButton
                           className="px-2"
                           roughSize="sm"
                           type="button"
-                          onClick={() => setEditingReviewId(review.id)}
+                          onClick={() => {
+                            if (review.id == null) return;
+                            setEditingReviewId(review.id);
+                          }}
                         >
                           수정
                         </RoughButton>
@@ -571,7 +593,10 @@ function BookDetail() {
                           roughSize="sm"
                           tone="cancel"
                           type="button"
-                          onClick={() => handleDelete(review.id)}
+                          onClick={() => {
+                            if (review.id == null) return;
+                            handleDelete(review.id);
+                          }}
                         >
                           삭제
                         </RoughButton>
@@ -580,9 +605,13 @@ function BookDetail() {
                   </div>
 
                   <span
-                    className={`font-bold shrink-0 ${ratingColor(review.rating)}`}
+                    className={`font-bold shrink-0 ${
+                      typeof review.rating === "number"
+                        ? ratingColor(review.rating)
+                        : ""
+                    }`}
                   >
-                    <RatingValue rating={review.rating} />
+                    <RatingValue rating={review.rating ?? 0} />
                   </span>
                 </div>
               )}

@@ -14,7 +14,7 @@ import RoughButton from "@/app/_components/RoughButton";
 type PageAdminMemberDto = components["schemas"]["PageAdminMemberDto"];
 
 export default function MemberAdmin() {
-  const { showErrorToast } = useToast();
+  const { showToast, showErrorToast } = useToast();
   const [pageData, setPageData] = useState<PageAdminMemberDto | null>(null);
   const [pageNumber, setPageNumber] = useState(0);
 
@@ -33,7 +33,7 @@ export default function MemberAdmin() {
 
     apiFetch(`/api/v1/members/admin/${id}`, { method: "DELETE" })
       .then((data) => {
-        alert(data.message);
+        showToast(data?.message ?? "회원을 강제 탈퇴시켰습니다.");
         loadMembers(pageNumber);
       })
       .catch(showErrorToast);
@@ -73,18 +73,21 @@ export default function MemberAdmin() {
                   <td className="p-2">{member.username}</td>
                   <td className="p-2">{member.nickname}</td>
                   <td className="p-2">{member.githubId}</td>
-                  <td className="p-2">{member.isAdmin ? "관리자" : "일반"}</td>
+                  <td className="p-2">{member.admin ? "관리자" : "일반"}</td>
                   <td className="p-2 theme-muted">
-                    {member.isDeleted ? "탈퇴" : "정상"}
+                    {member.deleted ? "탈퇴" : "정상"}
                   </td>
                   <td className="p-2 theme-subtle">{member.createdDate}</td>
                   <td className="p-2">
-                    {!member.isAdmin && !member.isDeleted && (
+                    {!member.admin && !member.deleted && (
                       <RoughButton
                         roughSize="sm"
                         tone="cancel"
                         type="button"
-                        onClick={() => handleForceDelete(member.id)}
+                        onClick={() => {
+                          if (member.id == null) return;
+                          handleForceDelete(member.id);
+                        }}
                       >
                         강제 탈퇴
                       </RoughButton>

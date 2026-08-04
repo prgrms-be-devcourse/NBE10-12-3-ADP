@@ -16,7 +16,7 @@ import RoughButton from "@/app/_components/RoughButton";
 type PageAdminReviewDto = components["schemas"]["PageAdminReviewDto"];
 
 export default function ReviewAdmin() {
-  const { showErrorToast } = useToast();
+  const { showToast, showErrorToast } = useToast();
   const [pageData, setPageData] = useState<PageAdminReviewDto | null>(null);
   const [pageNumber, setPageNumber] = useState(0);
 
@@ -35,7 +35,7 @@ export default function ReviewAdmin() {
 
     apiFetch(`/api/v1/reviews/${reviewId}`, { method: "DELETE" })
       .then((data) => {
-        alert(data.message);
+        showToast(data?.message ?? "리뷰를 삭제했습니다.");
         loadReviews(pageNumber);
       })
       .catch(showErrorToast);
@@ -57,32 +57,39 @@ export default function ReviewAdmin() {
             <AdminRoughDivider />
           </li>
           {reviews.map((review, index) => (
-            <Fragment key={review.id}>
+            <Fragment key={review.id ?? index}>
               <li className="flex items-start gap-3 py-2">
                 <div className="min-w-0 flex-1">
                   <div className="text-sm font-semibold">
                     {review.bookTitle}
                   </div>
                   <div className="text-xs theme-muted">
-                    {review.reviewer.githubId ?? "탈퇴한 사용자"}
+                    {review.reviewer?.githubId ?? "탈퇴한 사용자"}
                   </div>
                   <div className="text-sm">{review.content}</div>
                   <div className="flex flex-wrap gap-1 text-xs theme-tag">
-                    {review.tags.map((tag) => (
+                    {(review.tags ?? []).map((tag) => (
                       <span key={tag}>#{tag}</span>
                     ))}
                   </div>
                 </div>
                 <span
-                  className={`shrink-0 font-bold ${ratingColor(review.rating)}`}
+                  className={`shrink-0 font-bold ${
+                    typeof review.rating === "number"
+                      ? ratingColor(review.rating)
+                      : ""
+                  }`}
                 >
-                  <RatingValue rating={review.rating} />
+                  <RatingValue rating={review.rating ?? 0} />
                 </span>
                 <RoughButton
                   roughSize="sm"
                   tone="cancel"
                   type="button"
-                  onClick={() => handleDelete(review.id)}
+                  onClick={() => {
+                    if (review.id == null) return;
+                    handleDelete(review.id);
+                  }}
                 >
                   삭제
                 </RoughButton>

@@ -114,7 +114,7 @@ export default function Page() {
 
     apiFetch(`/api/v1/members`, { method: "DELETE" })
       .then((data) => {
-        alert(data.message);
+        showToast(data?.message ?? "회원 탈퇴가 완료되었습니다.");
         return refresh();
       })
       .then(() => {
@@ -126,9 +126,11 @@ export default function Page() {
   const handleLogout = () => {
     saveCurrentAuthReturnPath();
 
-    apiFetch(`/api/v1/members/logout`, { method: "DELETE" }).then(() => {
-      refresh().then(() => router.replace(consumeAuthReturnPath()));
-    });
+    apiFetch(`/api/v1/members/logout`, { method: "DELETE" })
+      .then(() => {
+        return refresh().then(() => router.replace(consumeAuthReturnPath()));
+      })
+      .catch(showErrorToast);
   };
 
   const handleCopyWidgetLink = async (code: string) => {
@@ -156,6 +158,7 @@ export default function Page() {
 
   const average = reviewData.rating?.["average"];
   const averageNumber = typeof average === "number" ? average : null;
+  const reviewResults = reviewData.results ?? [];
   const widgetLink = loginMember?.githubId
     ? `${API_BASE_URL}/api/v1/widgets/${loginMember.githubId}`
     : "";
@@ -230,7 +233,7 @@ export default function Page() {
               }`}
               onClick={() => setTab("reviews")}
             >
-              작성한 리뷰 {reviewData.results.length}
+              작성한 리뷰 {reviewResults.length}
             </button>
           </div>
           <div className="theme-tab">
@@ -248,14 +251,14 @@ export default function Page() {
 
         {tab === "reviews" && (
           <>
-            {reviewData.results.length === 0 && (
+            {reviewResults.length === 0 && (
               <div className="text-sm theme-muted">작성한 리뷰가 없습니다.</div>
             )}
 
             <ul className="flex w-full flex-col">
-              {reviewData.results.map((review) => (
+              {reviewResults.map((review) => (
                 <li
-                  key={review.id}
+                  key={review.id ?? review.bookId}
                   className="relative flex items-start gap-3 py-3"
                 >
                   <RoughDivider fullWidth />
@@ -288,7 +291,7 @@ export default function Page() {
                     </Link>
 
                     <div className="flex flex-wrap gap-1 text-xs theme-tag">
-                      {review.tags.map((tag) => (
+                      {(review.tags ?? []).map((tag) => (
                         <span key={tag}>#{tag}</span>
                       ))}
                     </div>
@@ -303,16 +306,23 @@ export default function Page() {
                       roughSize="sm"
                       tone="cancel"
                       type="button"
-                      onClick={() => handleDeleteReview(review.id)}
+                      onClick={() => {
+                        if (review.id == null) return;
+                        handleDeleteReview(review.id);
+                      }}
                     >
                       삭제
                     </RoughButton>
                   </div>
 
                   <span
-                    className={`font-bold shrink-0 ${ratingColor(review.rating)}`}
+                    className={`font-bold shrink-0 ${
+                      typeof review.rating === "number"
+                        ? ratingColor(review.rating)
+                        : ""
+                    }`}
                   >
-                    <RatingValue rating={review.rating} />
+                    <RatingValue rating={review.rating ?? 0} />
                   </span>
                 </li>
               ))}

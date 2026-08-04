@@ -16,7 +16,7 @@ type PageBookDto = components["schemas"]["PageBookDto"];
 type BookDetailDto = components["schemas"]["BookDetailDto"];
 
 export default function BookAdmin() {
-  const { showErrorToast } = useToast();
+  const { showToast, showErrorToast } = useToast();
   const [pageData, setPageData] = useState<PageBookDto | null>(null);
   const [pageNumber, setPageNumber] = useState(0);
   const [editingId, setEditingId] = useState<number | null>(null);
@@ -73,7 +73,7 @@ export default function BookAdmin() {
       }),
     })
       .then((data) => {
-        alert(data.message);
+        showToast(data?.message ?? "도서 정보를 수정했습니다.");
         cancelEdit();
         loadBooks(pageNumber);
       })
@@ -85,7 +85,7 @@ export default function BookAdmin() {
 
     apiFetch(`/api/v1/books/${id}`, { method: "DELETE" })
       .then((data) => {
-        alert(data.message);
+        showToast(data?.message ?? "도서를 삭제했습니다.");
         loadBooks(pageNumber);
       })
       .catch(showErrorToast);
@@ -121,10 +121,13 @@ export default function BookAdmin() {
                   <td className="p-2">{book.title}</td>
                   <td className="p-2">{book.averageRating}</td>
                   <td className="flex gap-2 p-2">
-                    <RoughButton
+                      <RoughButton
                       roughSize="sm"
                       type="button"
-                      onClick={() => startEdit(book.id)}
+                      onClick={() => {
+                        if (book.id == null) return;
+                        startEdit(book.id);
+                      }}
                     >
                       수정
                     </RoughButton>
@@ -132,7 +135,10 @@ export default function BookAdmin() {
                       roughSize="sm"
                       tone="cancel"
                       type="button"
-                      onClick={() => handleDelete(book.id)}
+                      onClick={() => {
+                        if (book.id == null) return;
+                        handleDelete(book.id);
+                      }}
                     >
                       삭제
                     </RoughButton>
@@ -189,26 +195,26 @@ export default function BookAdmin() {
           <RoughTextarea
             name="description"
             placeholder="설명"
-            defaultValue={editingBook.description}
+            defaultValue={editingBook.description ?? ""}
             rows={3}
           />
           <RoughInput
             type="text"
             name="authors"
             placeholder="저자 (쉼표로 구분)"
-            defaultValue={editingBook.authors.join(", ")}
+            defaultValue={(editingBook.authors ?? []).join(", ")}
           />
           <RoughInput
             type="text"
             name="publisher"
             placeholder="출판사"
-            defaultValue={editingBook.publisher}
+            defaultValue={editingBook.publisher ?? ""}
           />
           <RoughInput
             type="text"
             name="imgUrl"
             placeholder="표지 이미지 URL"
-            defaultValue={editingBook.imgUrl}
+            defaultValue={editingBook.imgUrl ?? ""}
           />
           <div className="flex gap-2">
             <RoughButton tone="submit" type="submit">

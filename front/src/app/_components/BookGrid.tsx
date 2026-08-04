@@ -51,6 +51,8 @@ function BookGridItem({
   layout,
 }: BookGridItemProps) {
   const [isImageLoaded, setIsImageLoaded] = useState(false);
+  const averageRating =
+    typeof book.averageRating === "number" ? book.averageRating : 0;
 
   return (
     <Link
@@ -88,9 +90,9 @@ function BookGridItem({
       </div>
       <span className="book-title">{book.title}</span>
       <span
-        className={`book-rating font-bold ${ratingColor(book.averageRating)}`}
+        className={`book-rating font-bold ${ratingColor(averageRating)}`}
       >
-        <RatingValue rating={book.averageRating} />
+        <RatingValue rating={averageRating} />
       </span>
     </Link>
   );

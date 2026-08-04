@@ -12,6 +12,7 @@ import {
   saveCurrentAuthReturnPath,
 } from "@/lib/auth/authReturnPath";
 import { useTheme } from "@/lib/theme/ThemeProvider";
+import { useToast } from "@/lib/toast/ToastProvider";
 
 import RoughBar from "@/app/_components/RoughBar";
 import RoughButton from "@/app/_components/RoughButton";
@@ -149,6 +150,7 @@ function GitHubIcon() {
 export default function Header() {
   const router = useRouter();
   const { isLogin, isLoginMemberPending, isAdmin, logout } = useAuth();
+  const { showErrorToast } = useToast();
   const { toggleTheme } = useTheme();
   const [searchTerm, setSearchTerm] = useState("");
   const [isSearchPending, setIsSearchPending] = useState(false);
@@ -201,9 +203,11 @@ export default function Header() {
   const handleLogout = () => {
     saveCurrentAuthReturnPath();
 
-    logout().then(() => {
-      router.replace(consumeAuthReturnPath());
-    });
+    logout()
+      .then(() => {
+        router.replace(consumeAuthReturnPath());
+      })
+      .catch(showErrorToast);
   };
 
   const handleGitHubLogin = (

@@ -59,12 +59,13 @@ function MemberDetail() {
 
   const average = reviewData.rating?.["average"];
   const averageNumber = typeof average === "number" ? average : null;
+  const reviewResults = reviewData.results ?? [];
 
   return (
     <div className="flex gap-8">
       <LibraryProfilePanel
         avatarLabel={member.githubId}
-        username={member.username}
+        username={member.githubId}
         githubId={member.githubId}
         githubLink={member.githubLink}
         averageLabel="평균 별점"
@@ -84,21 +85,21 @@ function MemberDetail() {
           <div className="flex gap-2">
             <div className="theme-tab">
               <div className="theme-tab-active px-3 py-2 text-sm">
-                작성한 리뷰 {reviewData.results.length}
+                작성한 리뷰 {reviewResults.length}
               </div>
             </div>
           </div>
 
-          {reviewData.results.length === 0 && (
+          {reviewResults.length === 0 && (
             <div className="mt-2 text-sm theme-muted">
               작성한 리뷰가 없습니다.
             </div>
           )}
 
           <ul className="flex w-full flex-col">
-            {reviewData.results.map((review) => (
+            {reviewResults.map((review) => (
               <li
-                key={review.id}
+                key={review.id ?? review.bookId}
                 className="relative flex items-start gap-3 py-3"
               >
                 <RoughDivider fullWidth />
@@ -131,7 +132,7 @@ function MemberDetail() {
                   </Link>
 
                   <div className="flex flex-wrap gap-1 text-xs theme-tag">
-                    {review.tags.map((tag) => (
+                    {(review.tags ?? []).map((tag) => (
                       <span key={tag}>#{tag}</span>
                     ))}
                   </div>
@@ -143,9 +144,13 @@ function MemberDetail() {
                 </div>
 
                 <span
-                  className={`font-bold shrink-0 ${ratingColor(review.rating)}`}
+                  className={`font-bold shrink-0 ${
+                    typeof review.rating === "number"
+                      ? ratingColor(review.rating)
+                      : ""
+                  }`}
                 >
-                  <RatingValue rating={review.rating} />
+                  <RatingValue rating={review.rating ?? 0} />
                 </span>
               </li>
             ))}
