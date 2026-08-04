@@ -1,45 +1,180 @@
 @import "tailwindcss";
 
+@font-face {
+  font-family: "GangwonEducationModuche";
+  src: url("https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2201-2@1.0/GangwonEdu_OTFLightA.woff")
+    format("woff");
+  font-weight: 300;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "GangwonEducationModuche";
+  src: url("https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2201-2@1.0/GangwonEdu_OTFLightA.woff")
+    format("woff");
+  font-weight: 400;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "GangwonEducationModuche";
+  src: url("https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2201-2@1.0/GangwonEdu_OTFBoldA.woff")
+    format("woff");
+  font-weight: 500;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "GangwonEducationModuche";
+  src: url("https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2201-2@1.0/GangwonEdu_OTFBoldA.woff")
+    format("woff");
+  font-weight: 600;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "GangwonEducationModuche";
+  src: url("https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2201-2@1.0/GangwonEdu_OTFBoldA.woff")
+    format("woff");
+  font-weight: 700;
+  font-display: swap;
+}
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-  --line: #171717;
-  --surface: #ffffff;
+  --background: #fffaf0;
+  --foreground: #1f2933;
+  --line: #17202a;
+  --surface: #fffdf7;
   --surface-card: #ffffff;
-  --surface-soft: #fffdf7;
-  --surface-muted: #f9fafb;
+  --surface-soft: #fff5d9;
+  --surface-muted: #eef8f4;
   --surface-transparent: transparent;
-  --surface-muted-hover: #f3f4f6;
-  --surface-hover: #f3f4f6;
-  --book-skeleton: #fafafa;
-  --book-skeleton-active: #f5f6f7;
+  --surface-muted-hover: #dff3eb;
+  --surface-hover: #e8f6ff;
+  --header-background: rgb(255 253 247 / 0.82);
+  --footer-background: #eef8f4;
+  --accent: #0f766e;
+  --accent-soft: #ccfbf1;
+  --accent-warm: #facc15;
+  --title-tape-yellow: rgb(250 204 21 / 0.42);
+  --title-tape-mint: rgb(45 212 191 / 0.28);
+  --title-tape-peach: rgb(251 146 60 / 0.28);
+  --title-highlight: var(--title-tape-yellow);
+  --book-skeleton: #f7f2e8;
+  --book-skeleton-active: #efe4ce;
 }
 
 :root[data-theme="dark"] {
-  --background: #202020;
+  --background: #171b22;
   --foreground: #f4f1ea;
   --line: #f4f1ea;
-  --surface: #202020;
-  --surface-card: #262626;
-  --surface-soft: #1b1b1b;
-  --surface-muted: #242424;
+  --surface: #1f2630;
+  --surface-card: #242d38;
+  --surface-soft: #121720;
+  --surface-muted: #263241;
   --surface-transparent: transparent;
-  --surface-muted-hover: #2f2f2f;
-  --surface-hover: #2f2f2f;
-  --book-skeleton: #171717;
-  --book-skeleton-active: #121212;
+  --surface-muted-hover: #314154;
+  --surface-hover: #2e4054;
+  --header-background: rgb(31 38 48 / 0.9);
+  --footer-background: #121720;
+  --accent: #5eead4;
+  --accent-soft: #134e4a;
+  --accent-warm: #fde68a;
+  --title-tape-yellow: rgb(59 130 246 / 0.34);
+  --title-tape-mint: rgb(45 110 101 / 0.48);
+  --title-tape-peach: rgb(139 88 61 / 0.46);
+  --title-highlight: var(--title-tape-yellow);
+  --book-skeleton: #202832;
+  --book-skeleton-active: #2a3542;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: "Gaegu", sans-serif;
+  --font-sans:
+    "GangwonEducationModuche", "Apple SD Gothic Neo", "Malgun Gothic", Arial,
+    Helvetica, sans-serif;
+  --text-xs: 0.8125rem;
+  --text-sm: 0.9375rem;
+  --text-base: 1.0625rem;
+  --text-lg: 1.1875rem;
+  --text-xl: 1.3125rem;
+  --text-2xl: 1.5625rem;
+  --text-3xl: 1.9375rem;
+}
+
+html,
+body,
+button,
+input,
+textarea,
+select {
+  font-family:
+    "GangwonEducationModuche", "Apple SD Gothic Neo", "Malgun Gothic", Arial,
+    Helvetica, sans-serif;
 }
 
 body {
-  background: var(--background);
+  background:
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--accent-soft) 30%, transparent),
+      transparent 18rem
+    ),
+    var(--background);
   color: var(--foreground);
-  font-family: "Gaegu", Arial, Helvetica, sans-serif;
+  font-size: 1.0625rem;
+  overflow-x: clip;
+}
+
+:root[data-theme="dark"] body {
+  background: var(--background);
+}
+
+h1,
+h2 {
+  display: inline-block;
+  position: relative;
+  z-index: 0;
+  width: fit-content;
+  max-width: 100%;
+}
+
+h1 {
+  --title-tape: var(--title-tape-yellow);
+}
+
+h2 {
+  --title-tape: var(--title-tape-mint);
+}
+
+.main-section-heading {
+  display: inline-flex;
+  width: fit-content;
+  max-width: 100%;
+  align-items: center;
+  gap: 0.375rem;
+  white-space: nowrap;
+}
+
+.main-section-heading svg {
+  display: inline-block;
+  flex: 0 0 auto;
+}
+
+h1::before,
+h2::before {
+  position: absolute;
+  inset: 0.06em -0.18em 0.04em;
+  z-index: -1;
+  display: block;
+  border-radius: 0.08em;
+  background: var(--title-tape);
+  clip-path: polygon(1.5% 7%, 98.5% 0, 100% 88%, 0 100%);
+  content: "";
+  opacity: 0.82;
+  transform: rotate(-0.45deg);
+  transform-origin: center;
 }
 
 a,
@@ -49,9 +184,47 @@ textarea {
   transition: transform 160ms ease;
 }
 
-button:hover,
 a:hover {
-  transform: translate(-1px, -1px);
+  transform: translateY(-1px);
+}
+
+button:hover {
+  transform: none;
+}
+
+.theme-site-header {
+  position: relative;
+  z-index: 60;
+  isolation: isolate;
+  background: var(--header-background);
+  backdrop-filter: blur(10px);
+}
+
+.theme-site-footer {
+  position: relative;
+  z-index: 60;
+  isolation: isolate;
+  background: var(--footer-background);
+}
+
+.theme-rough-divider-bar {
+  position: relative;
+  left: 50%;
+  z-index: 100;
+  height: 12px;
+  width: 100vw;
+  flex: 0 0 12px;
+  overflow: visible;
+  pointer-events: none;
+  transform: translateX(-50%);
+}
+
+.theme-rough-divider-bar svg {
+  position: relative;
+  z-index: 100;
+  display: block;
+  height: 100%;
+  width: 100%;
 }
 
 .sketch-shell {
@@ -148,11 +321,11 @@ a:hover {
 }
 
 .rough-input-history {
-  background: #e0f2fe;
+  background: #e0f7ff;
 }
 
 .rough-input-wish {
-  background: #fff1f2;
+  background: #fff0f4;
 }
 
 .rough-input-sm {
@@ -252,10 +425,6 @@ a:hover {
   filter: brightness(0) invert(1);
 }
 
-:root[data-theme="dark"] .rough-github-button-icon {
-  filter: brightness(0) invert(1);
-}
-
 :root[data-theme="dark"] .rough-github-inline-image {
   filter: brightness(0) invert(1);
 }
@@ -313,9 +482,11 @@ a:hover {
   border-radius: 12px;
   background: var(--surface-card);
   box-shadow:
-    0 1px 4px rgb(17 24 39 / 0.04),
-    0 10px 20px rgb(17 24 39 / 0.08);
-  transition: transform 160ms ease;
+    0 1px 4px rgb(15 118 110 / 0.06),
+    0 10px 20px rgb(15 118 110 / 0.1);
+  transition:
+    box-shadow 180ms ease,
+    transform 180ms ease;
 }
 
 :root[data-theme="dark"] .rough-book-card {
@@ -324,16 +495,37 @@ a:hover {
     0 10px 22px rgb(0 0 0 / 0.28);
 }
 
+.book-link,
+.book-link:hover {
+  transform: none;
+}
+
+.book-link .book-title,
+.book-link .book-rating,
+.book-link:hover .book-title,
+.book-link:hover .book-rating {
+  color: inherit;
+  transform: none;
+  transition: none;
+}
+
 .rough-book-card:hover {
-  transform: translateY(-2px);
+  box-shadow:
+    0 4px 10px rgb(15 118 110 / 0.12),
+    0 16px 28px rgb(15 118 110 / 0.18);
+  transform: translateY(-3px);
+}
+
+:root[data-theme="dark"] .rough-book-card:hover {
+  box-shadow:
+    0 4px 12px rgb(0 0 0 / 0.24),
+    0 16px 30px rgb(0 0 0 / 0.34);
 }
 
 .book-scroll-fade {
-  --book-scroll-gutter: max(1rem, calc((100vw - 56rem) / 2 + 1rem));
+  --book-scroll-gutter: 0px;
   position: relative;
-  left: 50%;
-  width: 100vw;
-  transform: translateX(-50%);
+  width: 100%;
   overflow: hidden;
 }
 
@@ -344,7 +536,7 @@ a:hover {
   top: 0;
   bottom: 0;
   z-index: 30;
-  width: var(--book-scroll-gutter);
+  width: 0.35rem;
   content: "";
 }
 
@@ -370,7 +562,38 @@ a:hover {
 
 .book-scroll-list::after {
   content: "";
-  flex: 0 0 48px;
+  flex: 0 0 12px;
+}
+
+.latest-review-item {
+  width: 100%;
+  flex-basis: 100%;
+}
+
+@media (width >= 640px) {
+  .latest-review-item {
+    width: calc((100% - 1rem) / 2);
+    flex-basis: calc((100% - 1rem) / 2);
+  }
+}
+
+@media (width >= 1024px) {
+  .book-horizontal-item {
+    width: calc((100% - 5rem) / 5);
+    flex-basis: calc((100% - 5rem) / 5);
+  }
+}
+
+.theme-section-divider-bar {
+  height: 10px;
+  width: 100%;
+  padding-block: 2px;
+  overflow: visible;
+}
+
+.theme-section-divider-bar svg {
+  display: block;
+  width: 100%;
 }
 
 .book-skeleton {
@@ -391,7 +614,6 @@ a:hover {
 
 .book-title {
   display: -webkit-box;
-  height: 3rem;
   overflow: hidden;
   padding: 0 0.25rem;
   line-height: 1.5rem;
@@ -403,7 +625,6 @@ a:hover {
   display: block;
   height: 1.5rem;
   line-height: 1.5rem;
-  margin-top: auto;
   padding: 0 0.25rem;
 }
 
@@ -451,9 +672,7 @@ a:hover {
 .rough-card-line {
   inset: 0;
   opacity: 0.68;
-  transition:
-    opacity 160ms ease,
-    transform 160ms ease;
+  transition: opacity 180ms ease;
 }
 
 .rough-book-cover-line {
@@ -463,6 +682,18 @@ a:hover {
 .theme-nav-button {
   border-radius: 0.5rem;
   padding: 0.5rem;
+}
+
+.theme-nav-control {
+  display: inline-flex;
+  box-sizing: border-box;
+  height: 34px;
+  min-width: 34px;
+  align-items: center;
+  justify-content: center;
+  gap: 0.375rem;
+  font-size: 1rem;
+  line-height: 1.5rem;
 }
 
 .theme-nav-button:hover {
@@ -494,16 +725,46 @@ a:hover {
   padding: 0.5rem;
 }
 
+.theme-nav-link.theme-nav-control {
+  padding: 0 0.5rem;
+}
+
 .theme-nav-link:hover {
   background: var(--surface-hover);
 }
 
+.mobile-search-toggle {
+  display: none;
+}
+
+.search-submit-button {
+  display: inline-flex;
+}
+
+@media (width <= 520px) {
+  .mobile-search-toggle {
+    display: inline-flex;
+  }
+
+  .search-submit-button {
+    display: none;
+  }
+
+  .search-submit-button.search-submit-button-open {
+    display: inline-flex;
+  }
+
+  .theme-nav-label {
+    display: none;
+  }
+}
+
 .theme-tag {
-  color: #2563eb;
+  color: #0f766e;
 }
 
 :root[data-theme="dark"] .theme-tag {
-  color: #93c5fd;
+  color: #5eead4;
 }
 
 .theme-muted {
@@ -512,6 +773,14 @@ a:hover {
 
 :root[data-theme="dark"] .theme-muted {
   color: #9ca3af;
+}
+
+.theme-description {
+  color: #374151;
+}
+
+:root[data-theme="dark"] .theme-description {
+  color: #e5e7eb;
 }
 
 .theme-subtle {
@@ -537,26 +806,25 @@ a:hover {
   justify-content: center;
 }
 
-.theme-tab-divider {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: -5px;
-  height: 10px;
-  width: 100%;
-}
-
-.theme-tab-divider.theme-tab-divider-strong {
-  color: var(--foreground);
-}
-
-.theme-tab-divider > .rough-overlay {
-  inset: 0;
-}
-
 .theme-tab-active {
+  display: inline-flex;
+  position: relative;
+  z-index: 0;
+  isolation: isolate;
   color: var(--foreground);
   font-weight: 700;
+}
+
+.theme-tab-active::before {
+  position: absolute;
+  inset: 0.22em -0.15em 0.14em;
+  z-index: -1;
+  border-radius: 0.1em;
+  background: var(--title-tape-peach);
+  clip-path: polygon(1.5% 8%, 99% 0, 100% 88%, 0 100%);
+  content: "";
+  opacity: 0.9;
+  transform: rotate(0.35deg);
 }
 
 .theme-tab-inactive {
@@ -568,9 +836,8 @@ a:hover {
   color: #737373;
 }
 
-.group:hover .rough-card-line {
+.rough-book-card:hover .rough-card-line {
   opacity: 1;
-  transform: translateY(-2px);
 }
 
 .rough-cover {
@@ -618,6 +885,15 @@ a:hover {
   line-height: 1.25rem;
 }
 
+.rough-action-button:hover {
+  transform: none;
+}
+
+.rough-action-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.58;
+}
+
 .rough-action-sm {
   font-size: 0.875rem;
 }
@@ -635,35 +911,35 @@ a:hover {
 }
 
 .rough-action-wish {
-  background: #fff1f2;
+  background: #fff0f4;
   color: #be123c;
 }
 
 .rough-action-wish:hover {
-  background: #ffe4e6;
+  background: #ffe1e9;
 }
 
 .rough-action-wish-active {
-  background: #ffe4e6;
+  background: #ffe1e9;
   color: #be123c;
 }
 
 .rough-action-history {
-  background: #e0f2fe;
-  color: #0369a1;
+  background: #dcfce7;
+  color: #166534;
 }
 
 .rough-action-history:hover {
-  background: #bae6fd;
+  background: #bbf7d0;
 }
 
 .rough-action-submit {
-  background: #ecfccb;
-  color: #3f6212;
+  background: #fef3c7;
+  color: #92400e;
 }
 
 .rough-action-submit:hover {
-  background: #d9f99d;
+  background: #fde68a;
 }
 
 .rough-action-cancel {

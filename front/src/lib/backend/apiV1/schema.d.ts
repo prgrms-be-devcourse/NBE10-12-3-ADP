@@ -203,7 +203,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** 리뷰 최신순 다건 조회 */
+        /** 도서별 리뷰 다건 조회 */
         get: operations["getReviewsOrderByLatest"];
         put?: never;
         post?: never;
@@ -457,21 +457,12 @@ export interface components {
             message?: string;
             data?: components["schemas"]["BookDto"];
         };
-        RsDataWishDto: {
-            resultCode?: string;
-            message?: string;
-            data?: components["schemas"]["WishDto"];
-        };
-        WishDto: {
-            /** Format: int64 */
-            id?: number;
-        };
-        TagCreateRequest: {
-            name: string;
-        };
         RsDataUnit: {
             resultCode?: string;
             message?: string;
+        };
+        TagCreateRequest: {
+            name: string;
         };
         ReviewCreateRequest: {
             /** Format: float */
@@ -497,15 +488,13 @@ export interface components {
             username: string;
             password: string;
         };
-        BookWithWishIdAndTagsDto: {
+        BookWithTagsDto: {
             /** Format: int64 */
             id?: number;
             title?: string;
             imgUrl?: string | null;
             /** Format: double */
             averageRating?: number;
-            /** Format: int64 */
-            wishId?: number;
             tags?: string[];
         };
         ReviewWithBookImgUrlDto: {
@@ -548,10 +537,10 @@ export interface components {
             totalElements?: number;
             /** Format: int32 */
             totalPages?: number;
+            pageable?: components["schemas"]["PageableObject"];
+            sort?: components["schemas"]["SortObject"];
             /** Format: int32 */
             numberOfElements?: number;
-            sort?: components["schemas"]["SortObject"];
-            pageable?: components["schemas"]["PageableObject"];
             /** Format: int32 */
             size?: number;
             content?: components["schemas"]["AdminReviewDto"][];
@@ -562,12 +551,12 @@ export interface components {
             empty?: boolean;
         };
         PageableObject: {
-            /** Format: int32 */
-            pageNumber?: number;
-            sort?: components["schemas"]["SortObject"];
             paged?: boolean;
             /** Format: int32 */
+            pageNumber?: number;
+            /** Format: int32 */
             pageSize?: number;
+            sort?: components["schemas"]["SortObject"];
             unpaged?: boolean;
             /** Format: int64 */
             offset?: number;
@@ -594,18 +583,18 @@ export interface components {
             nickname?: string | null;
             /** Format: date-time */
             createdDate: string;
-            deleted?: boolean;
             admin?: boolean;
+            deleted?: boolean;
         };
         PageAdminMemberDto: {
             /** Format: int64 */
             totalElements?: number;
             /** Format: int32 */
             totalPages?: number;
+            pageable?: components["schemas"]["PageableObject"];
+            sort?: components["schemas"]["SortObject"];
             /** Format: int32 */
             numberOfElements?: number;
-            sort?: components["schemas"]["SortObject"];
-            pageable?: components["schemas"]["PageableObject"];
             /** Format: int32 */
             size?: number;
             content?: components["schemas"]["AdminMemberDto"][];
@@ -632,18 +621,17 @@ export interface components {
                 [key: string]: unknown;
             };
             tags?: string[];
-            /** Format: int64 */
-            wishId?: number | null;
+            wished?: boolean;
         };
         PageBookDto: {
             /** Format: int64 */
             totalElements?: number;
             /** Format: int32 */
             totalPages?: number;
+            pageable?: components["schemas"]["PageableObject"];
+            sort?: components["schemas"]["SortObject"];
             /** Format: int32 */
             numberOfElements?: number;
-            sort?: components["schemas"]["SortObject"];
-            pageable?: components["schemas"]["PageableObject"];
             /** Format: int32 */
             size?: number;
             content?: components["schemas"]["BookDto"][];
@@ -797,7 +785,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json;charset=UTF-8": components["schemas"]["RsDataWishDto"];
+                    "application/json;charset=UTF-8": components["schemas"]["RsDataUnit"];
                 };
             };
         };
@@ -957,7 +945,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json;charset=UTF-8": components["schemas"]["BookWithWishIdAndTagsDto"][];
+                    "application/json;charset=UTF-8": components["schemas"]["BookWithTagsDto"][];
                 };
             };
         };
@@ -1044,7 +1032,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json;charset=UTF-8": components["schemas"]["ReviewWithBookImgUrlDto"][];
+                    "application/json;charset=UTF-8": components["schemas"]["ReviewDto"][];
                 };
             };
         };

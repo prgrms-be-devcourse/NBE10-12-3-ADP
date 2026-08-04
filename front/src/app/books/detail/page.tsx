@@ -10,19 +10,19 @@ import { apiFetch } from "@/lib/backend/client";
 import { useAuth } from "@/lib/auth/AuthProvider";
 import type { components } from "@/lib/backend/apiV1/schema";
 import { ratingColor } from "@/lib/ratingColor";
+import { ratingFillColor } from "@/lib/ratingColor";
 
 import Avatar from "@/app/_components/Avatar";
 import LoginRequiredModal from "@/app/_components/LoginRequiredModal";
 import RatingHistogram from "@/app/_components/RatingHistogram";
 import RatingValue from "@/app/_components/RatingValue";
+import { RoughStarIcon } from "@/app/_components/RatingValue";
 import ReviewFormModal from "@/app/_components/ReviewFormModal";
 import RoughButton from "@/app/_components/RoughButton";
 import RoughDivider from "@/app/_components/RoughDivider";
 import RoughFrame from "@/app/_components/RoughFrame";
 import { RoughInput, RoughTextarea } from "@/app/_components/RoughInput";
 import RoughRatingInput from "@/app/_components/RoughRatingInput";
-import { RoughStarIcon } from "@/app/_components/RatingValue";
-import { ratingFillColor } from "@/lib/ratingColor";
 
 type BookDetailDto = components["schemas"]["BookDetailDto"];
 type BookDto = components["schemas"]["BookDto"];
@@ -323,9 +323,7 @@ function BookDetail() {
               {book.publishedDate}
             </div>
 
-            <p className="mt-1 text-sm text-gray-700 dark:text-gray-200">
-              {book.description}
-            </p>
+            <p className="mt-1 text-sm theme-description">{book.description}</p>
 
             <div className="flex flex-wrap gap-2 text-sm theme-tag">
               {book.tags.map((tag) => (
@@ -376,19 +374,17 @@ function BookDetail() {
             </div>
           ) : recommendBooks.length === 0 ? (
             <div className="mt-2 text-sm theme-muted">
-              아직 추천할 도서가 없어요.
+              리뷰를 추가하여 추천을 받아보세요.
               {recommendError && (
                 <span className="ml-1">({recommendError})</span>
               )}
             </div>
           ) : (
-            <ul
-              className="book-scroll-list mt-3 flex gap-3 overflow-x-auto py-2 pb-4"
-            >
+            <ul className="book-scroll-list mt-3 flex gap-3 overflow-x-auto py-2 pb-4">
               {recommendBooks.map((recommendBook) => (
                 <li key={recommendBook.id} className="min-w-0 shrink-0">
                   <Link
-                    className="group flex h-full w-24 flex-col gap-1.5"
+                    className="book-link group flex h-full w-24 flex-col gap-1.5"
                     href={`/books/detail?id=${recommendBook.id}`}
                   >
                     <div className="rough-book-card rounded-xl bg-white">
@@ -447,7 +443,7 @@ function BookDetail() {
             type="button"
             onClick={handleOpenReviewAction}
           >
-            독서 이력에 추가하기
+            리뷰 작성하기
           </RoughButton>
         </div>
 

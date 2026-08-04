@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 
-import { useEffect, useMemo, useState } from "react";
+import { type RefObject, useEffect, useMemo, useState } from "react";
 
 import type { components } from "@/lib/backend/apiV1/schema";
 import { ratingColor } from "@/lib/ratingColor";
@@ -17,6 +17,7 @@ type BookGridProps = {
   books?: BookDto[];
   isLoading?: boolean;
   layout?: "grid" | "horizontal";
+  scrollRef?: RefObject<HTMLUListElement | null>;
 };
 
 type BookGridItemProps = {
@@ -54,7 +55,7 @@ function BookGridItem({
   return (
     <Link
       href={`/books/detail?id=${book.id}`}
-      className="flex h-full flex-col gap-2"
+      className="book-link flex h-full flex-col gap-2"
     >
       <div className="rough-book-card rounded-xl bg-white">
         <RoughFrame
@@ -99,6 +100,7 @@ export default function BookGrid({
   books = [],
   isLoading = false,
   layout = "grid",
+  scrollRef,
 }: BookGridProps) {
   const [visibleContentKey, setVisibleContentKey] = useState("");
 
@@ -131,7 +133,7 @@ export default function BookGrid({
 
   const itemClassName =
     layout === "horizontal"
-      ? "group flex w-44 shrink-0 flex-col sm:w-[185px]"
+      ? "book-horizontal-item group flex w-40 shrink-0 flex-col sm:w-44"
       : "group flex flex-col";
 
   const coverClassName =
@@ -144,7 +146,7 @@ export default function BookGrid({
   }
 
   const list = (
-    <ul className={listClassName}>
+    <ul className={listClassName} ref={scrollRef}>
       {isLoading
         ? skeletonItems.map((_, index) => (
             <li key={index} className={itemClassName} aria-hidden="true">
@@ -155,6 +157,7 @@ export default function BookGrid({
             <li
               key={`${book.id}:${book.imgUrl ?? ""}`}
               className={`${itemClassName} relative`}
+              data-book-item="true"
             >
               <div
                 className={`pointer-events-none absolute inset-0 transition-opacity duration-300 ease-out ${

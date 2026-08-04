@@ -11,17 +11,21 @@ import { useAuth } from "@/lib/auth/AuthProvider";
 import type { components } from "@/lib/backend/apiV1/schema";
 import { ratingColor } from "@/lib/ratingColor";
 
-import Avatar from "@/app/_components/Avatar";
-import RatingHistogram from "@/app/_components/RatingHistogram";
+import LibraryProfilePanel from "@/app/_components/LibraryProfilePanel";
+import LibraryWidgetPreview from "@/app/_components/LibraryWidgetPreview";
 import RatingValue from "@/app/_components/RatingValue";
 import RoughButton from "@/app/_components/RoughButton";
 import RoughDivider from "@/app/_components/RoughDivider";
 import RoughFrame from "@/app/_components/RoughFrame";
-import { RoughInput } from "@/app/_components/RoughInput";
 import WidgetGuideModal from "@/app/_components/WidgetGuideModal";
 
 type ReviewsByMemberDto = components["schemas"]["ReviewsByMemberDto"];
 type BookDto = components["schemas"]["BookDto"];
+type ReviewWithBookImgUrl = NonNullable<
+  ReviewsByMemberDto["results"]
+>[number] & {
+  bookImgUrl?: string | null;
+};
 
 export default function Page() {
   const router = useRouter();
@@ -29,7 +33,6 @@ export default function Page() {
 
   const [reviewData, setReviewData] = useState<ReviewsByMemberDto | null>(null);
   const [wishes, setWishes] = useState<BookDto[] | null>(null);
-  const [bookTitles, setBookTitles] = useState<Record<number, string>>({});
   const [tab, setTab] = useState<"reviews" | "wishes">("reviews");
   const [loadError, setLoadError] = useState<string | null>(null);
   const [isWidgetGuideOpen, setIsWidgetGuideOpen] = useState(false);
@@ -40,17 +43,6 @@ export default function Page() {
       .then((data: ReviewsByMemberDto) => {
         setLoadError(null);
         setReviewData(data);
-
-        const bookIds = [...new Set(data.results.map((r) => r.bookId))];
-        Promise.all(
-          bookIds.map((bookId) =>
-            apiFetch(`/api/v1/books/${bookId}`).then(
-              (book) => [bookId, book.title] as const,
-            ),
-          ),
-        )
-          .then((entries) => setBookTitles(Object.fromEntries(entries)))
-          .catch(() => {});
       })
       .catch((error) => {
         setLoadError(`${error.resultCode} : ${error.message}`);
@@ -137,15 +129,8 @@ export default function Page() {
   };
 
   const handleOpenWidgetGuide = () => {
-    console.log("[mypage] README guide button clicked");
-    console.log("[mypage] widget guide open before:", isWidgetGuideOpen);
-    console.log("[mypage] widget link:", loginMember?.widgetLink);
     setIsWidgetGuideOpen((current) => !current);
   };
-
-  useEffect(() => {
-    console.log("[mypage] widget guide open state changed:", isWidgetGuideOpen);
-  }, [isWidgetGuideOpen]);
 
   if (loadError != null) {
     return (
@@ -164,92 +149,70 @@ export default function Page() {
 
   const average = reviewData.rating?.["average"];
   const averageNumber = typeof average === "number" ? average : null;
+  const widgetLink = loginMember?.githubId
+    ? `${API_BASE_URL}/api/v1/widgets/${loginMember.githubId}`
+    : "";
+  const widgetCodeSnippet = `<img src="${widgetLink}" alt="내 서재 위젯" />`;
 
   return (
     <div className="flex gap-8">
-      <div className="flex flex-col items-center gap-1 w-48 shrink-0">
-        <Avatar
-          label={loginMember?.githubId ?? loginMember?.username ?? null}
-          size="lg"
-        />
-        <div className="mt-2 text-sm">아이디 : {loginMember?.username}</div>
-        <div className="text-sm">닉네임 : {loginMember?.githubId}</div>
-        {loginMember?.githubLink && (
-          <a
-            className="theme-link text-sm underline"
-            href={loginMember.githubLink}
-            target="_blank"
-            rel="noreferrer"
-          >
-            github 주소
-          </a>
-        )}
-
-        {averageNumber != null && (
-          <div
-            className={`text-lg font-bold mt-2 ${ratingColor(averageNumber)}`}
-          >
-            <RatingValue rating={averageNumber} />
-          </div>
-        )}
-        <div className="text-xs theme-muted">내가 준 평균 별점</div>
-        <RatingHistogram rating={reviewData.rating} className="mt-3 w-full" />
-
-        <RoughButton
-          className="mt-4"
-          roughSize="sm"
-          type="button"
-          onClick={handleLogout}
-        >
-          로그아웃
-        </RoughButton>
-        <RoughButton
-          className="mt-2"
-          roughSize="sm"
-          tone="cancel"
-          type="button"
-          onClick={handleWithdraw}
-        >
-          회원 탈퇴
-        </RoughButton>
-      </div>
-
-      <div className="flex-1 flex flex-col gap-4">
-        <div>
-          <div className="flex items-center justify-between gap-2">
-            <h2 className="font-bold">위젯 미리보기</h2>
+      <LibraryProfilePanel
+        avatarLabel={loginMember?.githubId ?? loginMember?.username}
+        username={loginMember?.username}
+        githubId={loginMember?.githubId}
+        githubLink={loginMember?.githubLink}
+        averageLabel="내가 준 평균 별점"
+        averageRating={averageNumber}
+        rating={reviewData.rating}
+        actions={
+          <div className="mt-4 flex w-full gap-2">
             <RoughButton
+              className="flex-1"
               roughSize="sm"
               type="button"
-              onClick={handleOpenWidgetGuide}
+              onClick={handleLogout}
             >
-              README 가이드 보기
+              로그아웃
+            </RoughButton>
+            <RoughButton
+              className="flex-1"
+              roughSize="sm"
+              tone="cancel"
+              type="button"
+              onClick={handleWithdraw}
+            >
+              회원 탈퇴
             </RoughButton>
           </div>
-          <div className="rough-panel-border relative mt-1 flex min-h-24 items-center justify-center bg-transparent p-2">
-            <RoughFrame className="rough-overlay" variant="card" />
-            {loginMember?.githubId ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                src={`${API_BASE_URL}/api/v1/widgets/${loginMember.githubId}`}
-                alt="내 서재 위젯"
-              />
-            ) : (
-              <span className="text-sm theme-muted">위젯 정보가 없습니다</span>
-            )}
-          </div>
-          {loginMember?.widgetLink && (
-            <div className="mt-1">
-              <RoughInput
-                inputClassName="text-xs"
+        }
+      />
+
+      <div className="flex-1 flex flex-col gap-4">
+        <LibraryWidgetPreview
+          githubId={loginMember?.githubId}
+          widgetSrc={`${API_BASE_URL}/api/v1/widgets/${loginMember?.githubId ?? ""}`}
+          widgetLink={loginMember?.widgetLink}
+          actions={
+            <div className="flex flex-wrap justify-end gap-2">
+              <RoughButton
                 roughSize="sm"
-                readOnly
-                value={loginMember.widgetLink}
-                onFocus={(e) => e.currentTarget.select()}
-              />
+                tone="history"
+                type="button"
+                disabled={!widgetLink}
+                onClick={() => handleCopyWidgetLink(widgetCodeSnippet)}
+              >
+                {copiedWidgetLink ? "복사 완료" : "코드 복사"}
+              </RoughButton>
+              <RoughButton
+                roughSize="sm"
+                type="button"
+                onClick={handleOpenWidgetGuide}
+              >
+                README 가이드 보기
+              </RoughButton>
             </div>
-          )}
-        </div>
+          }
+        />
 
         <div className="flex gap-2">
           <div className="theme-tab">
@@ -262,14 +225,6 @@ export default function Page() {
             >
               작성한 리뷰 {reviewData.results.length}
             </button>
-            {tab === "reviews" && (
-              <RoughDivider
-                className="theme-tab-divider"
-                color="var(--foreground)"
-                emphasis
-                strokeWidth={1.25}
-              />
-            )}
           </div>
           <div className="theme-tab">
             <button
@@ -281,14 +236,6 @@ export default function Page() {
             >
               보고 싶어요 {wishes.length}
             </button>
-            {tab === "wishes" && (
-              <RoughDivider
-                className="theme-tab-divider"
-                color="var(--foreground)"
-                emphasis
-                strokeWidth={1.25}
-              />
-            )}
           </div>
         </div>
 
@@ -305,12 +252,32 @@ export default function Page() {
                   className="relative flex items-start gap-3 py-3"
                 >
                   <RoughDivider fullWidth />
+                  <Link
+                    href={`/books/detail?id=${review.bookId}`}
+                    className="rough-book-card relative flex h-20 w-14 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-white"
+                    aria-label={`${review.bookTitle ?? `책 #${review.bookId}`} 상세 보기`}
+                  >
+                    <RoughFrame
+                      className="rough-overlay rough-card-line rough-book-cover-line"
+                      variant="card"
+                    />
+                    {(review as ReviewWithBookImgUrl).bookImgUrl ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        src={(review as ReviewWithBookImgUrl).bookImgUrl ?? ""}
+                        alt=""
+                        className="h-full w-full object-cover"
+                      />
+                    ) : (
+                      <span className="text-xs text-gray-400">표지 없음</span>
+                    )}
+                  </Link>
                   <div className="flex-1 min-w-0">
                     <Link
                       className="font-semibold hover:underline"
                       href={`/books/detail?id=${review.bookId}`}
                     >
-                      {bookTitles[review.bookId] ?? `책 #${review.bookId}`}
+                      {review.bookTitle ?? `책 #${review.bookId}`}
                     </Link>
 
                     <div className="flex flex-wrap gap-1 text-xs theme-tag">
@@ -395,7 +362,7 @@ export default function Page() {
           copiedWidgetLink={copiedWidgetLink}
           onCancel={() => setIsWidgetGuideOpen(false)}
           onCopyWidgetLink={handleCopyWidgetLink}
-          widgetLink={`${API_BASE_URL}/api/v1/widgets/${loginMember?.githubId}`}
+          widgetLink={widgetLink}
         />
       )}
     </div>

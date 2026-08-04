@@ -1,13 +1,21 @@
+const RATING_STYLES = [
+  { min: 4, textClassName: "text-green-600", fill: "#4ade80" },
+  { min: 2.5, textClassName: "text-sky-500", fill: "#38bdf8" },
+  { min: 1.5, textClassName: "text-orange-500", fill: "#fb923c" },
+  { min: 0, textClassName: "text-red-500", fill: "#f87171" },
+] as const;
+
+export function ratingStyle(rating: number) {
+  return (
+    RATING_STYLES.find(({ min }) => rating >= min) ??
+    RATING_STYLES[RATING_STYLES.length - 1]
+  );
+}
+
 export function ratingColor(rating: number) {
-  if (rating >= 4) return "text-green-600";
-  if (rating >= 2.5) return "text-sky-500";
-  if (rating >= 1.5) return "text-orange-500";
-  return "text-red-500";
+  return ratingStyle(rating).textClassName;
 }
 
 export function ratingFillColor(rating: number) {
-  if (rating <= 1) return "#f87171";
-  if (rating <= 2.5) return "#fb923c";
-  if (rating <= 4) return "#38bdf8";
-  return "#4ade80";
+  return ratingStyle(rating).fill;
 }
