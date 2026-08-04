@@ -4,9 +4,10 @@ import com.back.domain.member.dto.MemberDto
 import com.back.domain.review.entity.Review
 import java.time.LocalDateTime
 
-class ReviewDto(
+open class ReviewDto(
     val id: Long,
     val bookId: Long,
+    val bookTitle: String,
     val rating: Float,
     val content: String,
     val modifiedDate: LocalDateTime,
@@ -17,6 +18,7 @@ class ReviewDto(
     constructor(review: Review) : this(
         review.id,
         review.book.id,
+        review.book.title,
         review.rating,
         review.content,
         review.modifiedDate,

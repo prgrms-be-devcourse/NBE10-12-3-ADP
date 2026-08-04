@@ -11,6 +11,7 @@ import org.springframework.data.repository.query.Param
 
 interface ReviewRepository : JpaRepository<Review, Long> {
 
+    fun findAllByOrderByIdDesc(pageable: Pageable): Page<Review>
     fun findByBook(book: Book): List<Review>
     fun findByBook(book: Book, pageable: Pageable): Page<Review>
 
