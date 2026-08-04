@@ -1,5 +1,6 @@
 package com.back.domain.book.controller
 
+import com.back.domain.book.repository.BookOperationalRepository
 import com.back.domain.book.repository.BookRepository
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
@@ -7,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc
 import org.springframework.data.domain.PageRequest
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.security.test.context.support.WithUserDetails
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.servlet.MockMvc
@@ -26,6 +28,8 @@ class ApiV1BookControllerTest {
 
     @Autowired
     private lateinit var bookRepository: BookRepository
+    @Autowired
+    private lateinit var bookOperationalRepository: BookOperationalRepository
 
     @Test
     @DisplayName("도서 단건 조회 - 비인증 사용자")
@@ -99,13 +103,16 @@ class ApiV1BookControllerTest {
 
         for (i in expectedBooks.indices) {
             val expected = expectedBooks[i]
+            val expectedAvgRating =
+                bookRepository.findByIdOrNull(expected.id)?.let {
+                    bookOperationalRepository
+                        .findByIsbn(it.isbn)?.averageRating ?: 0
+                }
             resultActions
                 .andExpect(jsonPath("$[$i].id").value(expected.id))
                 .andExpect(jsonPath("$[$i].title").value(expected.title))
                 .andExpect(jsonPath("$[$i].imgUrl").value(expected.imgUrl))
-                .andExpect(
-                    jsonPath("$[$i].averageRating").value(expected.averageRating)
-                )
+                .andExpect(jsonPath("$[$i].averageRating").value(expectedAvgRating))
         }
     }
 }

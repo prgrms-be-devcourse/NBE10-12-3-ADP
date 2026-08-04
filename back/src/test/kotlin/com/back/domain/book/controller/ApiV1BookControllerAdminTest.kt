@@ -1,5 +1,6 @@
 package com.back.domain.book.controller
 
+import com.back.domain.book.repository.BookOperationalRepository
 import com.back.domain.book.repository.BookRepository
 import com.back.domain.review.repository.ReviewRepository
 import org.assertj.core.api.Assertions
@@ -29,6 +30,9 @@ class ApiV1BookControllerAdminTest {
 
     @Autowired
     private lateinit var bookRepository: BookRepository
+
+    @Autowired
+    private lateinit var bookOperationalRepository: BookOperationalRepository
 
     @Autowired
     private lateinit var reviewRepository: ReviewRepository
@@ -109,8 +113,10 @@ class ApiV1BookControllerAdminTest {
     fun t3() {
         val book = bookRepository.findAll()[0]
         val bookId = book.id
+        val isbn = book.isbn
 
         Assertions.assertThat(reviewRepository.findByBook(book)).isNotEmpty()
+        assertThat(bookOperationalRepository.findByIsbn(isbn)).isNotNull()
 
         val resultActions = mvc
             .perform(
@@ -125,6 +131,7 @@ class ApiV1BookControllerAdminTest {
             .andExpect(jsonPath("$.message").value("도서 삭제를 성공했습니다."))
 
         assertThat(bookRepository.findById(bookId)).isEmpty()
+        assertThat(bookOperationalRepository.findByIsbn(isbn)).isNull()
     }
 
     @Test

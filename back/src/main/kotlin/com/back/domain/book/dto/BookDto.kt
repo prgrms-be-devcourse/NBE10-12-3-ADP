@@ -8,9 +8,9 @@ open class BookDto(
     imgUrl: String?,
     val averageRating: Double
 ) : BookDtoBase(id, title, imgUrl) {
-    constructor(book: Book) : this(
+    constructor(book: Book, averageRating: Double) : this(
         book.id,
         book.title,
         book.imgUrl,
-        book.averageRating)
+        averageRating)
 }

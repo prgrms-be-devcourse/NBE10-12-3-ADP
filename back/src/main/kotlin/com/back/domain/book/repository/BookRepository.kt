@@ -10,6 +10,8 @@ import org.springframework.data.repository.query.Param
 interface BookRepository : JpaRepository<Book, Long> {
 
     fun existsByIsbn(isbn: String): Boolean
+    fun findByIsbn(isbn: String): Book?
+    fun findByIsbnIn(isbns: Collection<String>): List<Book>
 
     fun findByTitleContaining(searchTerm: String, pageable: Pageable): Page<Book>
 
@@ -30,8 +32,4 @@ interface BookRepository : JpaRepository<Book, Long> {
         nativeQuery = true
     )
     fun searchByKeyword(@Param("keyword") keyword: String, pageable: Pageable): Page<Book>
-
-    fun findAllByOrderByAverageRatingDesc(pageable: Pageable?): Page<Book>
-
-    fun findAllByOrderByReviewCountDesc(pageable: Pageable?): Page<Book>
 }

@@ -21,6 +21,7 @@ class BookDetailDto(
 ) : BookDtoBase(id, title, imgUrl) {
     constructor(
         book: Book,
+        reviewCount: Int,
         isWished: Boolean,
         ratingMap: Map<String, Any>,
         tags: List<String>
@@ -34,7 +35,7 @@ class BookDetailDto(
         parseAuthors(book),
         book.publisher,
         listOf<String>(),
-        book.reviewCount,
+        reviewCount,
         ratingMap,
         tags,
         isWished
