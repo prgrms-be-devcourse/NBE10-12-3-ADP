@@ -5,11 +5,12 @@ on:
     branches: [dev, ci/ADP-205]
     paths:
       - ".github/workflows/deploy.yml"
-      - "src/**"
-      - ".env.example"
-      - "build.gradle.kts"
-      - "settings.gradle.kts"
-      - "Dockerfile"
+      - "back/src/**"
+      - "back/.env.example"
+      - "back/build.gradle.kts"
+      - "back/settings.gradle.kts"
+      - "back/Dockerfile"
+      - "terraform/**"
 
 env:
   CONTAINER_REGISTRY: ghcr.io
