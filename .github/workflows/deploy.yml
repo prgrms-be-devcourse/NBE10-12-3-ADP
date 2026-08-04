@@ -2,7 +2,7 @@ name: 🚀 배포!
 
 on:
   push:
-    branches: [dev, ci/ADP-205]
+    branches: [dev, ci/ADP-222]
     paths:
       - ".github/workflows/deploy.yml"
       - "back/src/**"
@@ -64,10 +64,16 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
 
+      - name: Get Instance ID
+        id: get_instance_id
+        run: |
+          INSTANCE_ID=$(aws ec2 describe-instances --filters "Name=tag:Name,Values=terraform-ec2-1" "Name=instance-state-name,Values=running" --query "Reservations[].Instances[].InstanceId" --output text)
+          echo "INSTANCE_ID=$INSTANCE_ID" >> $GITHUB_ENV
+
       - name: Deploy via SSM
         env:
           IMAGE: ${{ env.CONTAINER_REGISTRY }}/${{ env.REPOSITORY_OWNER }}/${{ env.IMAGE_NAME }}:latest
-          INSTANCE_ID: ${{ secrets.AWS_EC2_INSTANCE_ID }}
+          INSTANCE_ID: ${{ env.INSTANCE_ID }}
         run: |
           SCRIPT=$(cat <<DEPLOY
           docker stop application || true
