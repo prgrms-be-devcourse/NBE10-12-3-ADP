@@ -11,8 +11,6 @@ import {
 } from "react";
 
 import { apiFetch } from "@/lib/backend/client";
-import { goToErrorPage } from "@/lib/error/goToErrorPage";
-
 import type { components } from "@/lib/backend/apiV1/schema";
 
 import BookGrid from "@/app/_components/BookGrid";
@@ -340,19 +338,25 @@ export default function Page() {
     null,
   );
   useEffect(() => {
-    Promise.all([
+    Promise.allSettled([
       apiFetch(`/api/v1/books/rank?type=views&page=0&size=10`),
       apiFetch(`/api/v1/reviews/latest?page=0&size=10`),
       apiFetch(`/api/v1/books/rank?type=rating&page=0&size=10`),
       apiFetch(`/api/v1/books/rank?type=reviewCount&page=0&size=10`),
-    ])
-      .then(([popularData, latestReviewData, topRatedData, mostReviewedData]) => {
-        setPopularBooks(popularData);
-        setLatestReviews(latestReviewData);
-        setTopRatedBooks(topRatedData);
-        setMostReviewedBooks(mostReviewedData);
-      })
-      .catch(goToErrorPage);
+    ]).then(([popularData, latestReviewData, topRatedData, mostReviewedData]) => {
+      setPopularBooks(
+        popularData.status === "fulfilled" ? popularData.value : [],
+      );
+      setLatestReviews(
+        latestReviewData.status === "fulfilled" ? latestReviewData.value : [],
+      );
+      setTopRatedBooks(
+        topRatedData.status === "fulfilled" ? topRatedData.value : [],
+      );
+      setMostReviewedBooks(
+        mostReviewedData.status === "fulfilled" ? mostReviewedData.value : [],
+      );
+    });
   }, []);
 
   const rankedSections = [

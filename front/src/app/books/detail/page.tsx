@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 
-import { Suspense, useEffect, useState } from "react";
+import { Suspense, useCallback, useEffect, useState } from "react";
 
 import { apiFetch } from "@/lib/backend/client";
 
@@ -83,7 +83,7 @@ function BookDetail() {
   const [showWriteForm, setShowWriteForm] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false);
 
-  const loadBook = () => {
+  const loadBook = useCallback(() => {
     if (id == null) return;
 
     apiFetch(`/api/v1/books/${id}`)
@@ -91,29 +91,10 @@ function BookDetail() {
         setBook(data);
       })
       .catch(goToErrorPage);
-  };
+  }, [id]);
 
-  const loadReviews = () => {
+  const loadReviews = useCallback(() => {
     if (id == null) return;
-
-    apiFetch(`/api/v1/reviews/book/${id}`)
-      .then((data) => {
-        setReviews(data);
-      })
-      .catch(goToErrorPage);
-  };
-
-  useEffect(() => {
-    if (id == null) {
-      goToErrorPage({ message: "책 ID가 없습니다." });
-      return;
-    }
-
-    apiFetch(`/api/v1/books/${id}`)
-      .then((data) => {
-        setBook(data);
-      })
-      .catch(goToErrorPage);
 
     apiFetch(`/api/v1/reviews/book/${id}`)
       .then((data) => {
@@ -121,6 +102,16 @@ function BookDetail() {
       })
       .catch(goToErrorPage);
   }, [id]);
+
+  useEffect(() => {
+    if (id == null) {
+      goToErrorPage({ message: "책 ID가 없습니다." });
+      return;
+    }
+
+    loadBook();
+    loadReviews();
+  }, [id, loadBook, loadReviews]);
 
   useEffect(() => {
     if (!isLogin) return;

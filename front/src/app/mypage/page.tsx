@@ -94,7 +94,7 @@ export default function Page() {
 
     apiFetch(`/api/v1/reviews/${reviewId}`, { method: "DELETE" })
       .then((data) => {
-        alert(data.message);
+        showToast(data?.message ?? "리뷰를 삭제했습니다.");
         loadReviews();
       })
       .catch(showErrorToast);
