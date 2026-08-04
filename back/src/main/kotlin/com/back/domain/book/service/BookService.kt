@@ -16,7 +16,10 @@ import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
+import org.springframework.transaction.PlatformTransactionManager
+import org.springframework.transaction.annotation.Propagation
 import org.springframework.transaction.annotation.Transactional
+import org.springframework.transaction.support.TransactionTemplate
 import kotlin.collections.iterator
 
 @Service
@@ -29,7 +32,20 @@ class BookService(
     private val bookThumbnailService: BookThumbnailService,
     private val reviewRepository: ReviewRepository,
     private val wishRepository: WishRepository,
+    private val transactionManager: PlatformTransactionManager,
 ) {
+
+    private fun <T> readOnlyTransaction(action: () -> T): T {
+        val transactionTemplate = TransactionTemplate(transactionManager)
+        transactionTemplate.isReadOnly = true
+        return transactionTemplate.execute { action() }
+            ?: throw IllegalStateException("트랜잭션 처리 중 오류가 발생했습니다.")
+    }
+
+    private fun writeTransaction(action: () -> Unit) {
+        val transactionTemplate = TransactionTemplate(transactionManager)
+        transactionTemplate.executeWithoutResult { action() }
+    }
 
     fun getBookById(bookId: Long): Book {
         return bookRepository.findByIdOrNull(bookId)
@@ -111,7 +127,7 @@ class BookService(
             .let { getBookDtosFromOperations(it) }
     }
 
-    @Transactional
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
     fun incrementViewCount(book: Book) {
         if (rq.getCookieValue("viewed-%d".format(book.id), "") == "true") {
             return
@@ -120,7 +136,10 @@ class BookService(
         if (!bookViewCountRedisRepository
             .tryIncreaseViewAtRedis(book.id)
             { getDBBookViewCount(book) }) {
-            updateBookViewCountInDb(book, getDBBookViewCount(book) + 1)
+            writeTransaction {
+                val currentViewCount = getDBBookViewCount(book)
+                updateBookViewCountInDb(book, currentViewCount + 1)
+            }
         }
 
         rq.setCookie("viewed-%d".format(book.id), "true", 60)
@@ -148,20 +167,24 @@ class BookService(
         return book
     }
 
-    @Transactional
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
     fun getBookDetail(id: Long, actor: Member?): BookDetailDto {
 
         val book = getBook(id)
 
         incrementViewCount(book)
 
-        return BookDetailDto(
-            book,
-            getBookOperational(book)?.reviewCount ?: 0,
-            getIsWished(book, actor),
-            getRatingMap(book),
-            getBookTags(book)
-        )
+        return readOnlyTransaction {
+            val foundBook = getBookById(id)
+
+            BookDetailDto(
+                foundBook,
+                getBookOperational(foundBook)?.reviewCount ?: 0,
+                getIsWished(foundBook, actor),
+                getRatingMap(foundBook),
+                getBookTags(foundBook)
+            )
+        }
 
     }
 

@@ -32,7 +32,7 @@ class CosineSimilarityCalcer<I, L> : SimilarityCalcer<I, L> {
         }
 
         val denominator = sqrt(vectorASqrMagnitude * vectorBSqrMagnitude)
-        
+
         if (denominator == 0.0) return 0.0
 
         return ret / denominator
