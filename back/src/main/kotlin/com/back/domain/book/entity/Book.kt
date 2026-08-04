@@ -25,6 +25,9 @@ class Book(
 
 ) : BaseEntity() {
 
+    var imgUrlFetchedAt: LocalDateTime? = null
+        protected set
+
     fun update(title: String, description: String?, authors: String?, publisher: String?, imgUrl: String?) {
         this.title = title
         this.description = description
@@ -35,5 +38,10 @@ class Book(
 
     fun updateImgUrl(imgUrl: String) {
         this.imgUrl = imgUrl
+        this.imgUrlFetchedAt = LocalDateTime.now()
+    }
+
+    fun markImgUrlFetchAttempted() {
+        this.imgUrlFetchedAt = LocalDateTime.now()
     }
 }

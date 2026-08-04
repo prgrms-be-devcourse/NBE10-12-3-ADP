@@ -38,7 +38,7 @@ class BookQueryService(
     fun getBook(id: Long): Book {
         val book = getBookById(id)
 
-        if (book.imgUrl.isNullOrBlank()) {
+        if (book.imgUrl.isNullOrBlank() && book.imgUrlFetchedAt == null) {
             bookThumbnailService.fillMissingImgUrl(book.id, book.isbn)
             return getBookById(id)
         }
