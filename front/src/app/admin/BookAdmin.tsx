@@ -182,6 +182,7 @@ export default function BookAdmin() {
 
       {editingId != null && editingBook != null && (
         <form
+          key={editingBook.id ?? editingId}
           className="sketch-panel flex max-w-md flex-col gap-2 p-3"
           onSubmit={handleEditSubmit}
         >

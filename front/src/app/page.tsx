@@ -375,13 +375,18 @@ export default function Page() {
   return (
     <>
       {(popularBooks == null || popularBooks.length > 0) && (
+        <MainBookSection
+          title="인기 도서"
+          icon={<FireIcon />}
+          books={popularBooks}
+          className="mt-4"
+        />
+      )}
+
+      {(popularBooks == null ||
+        popularBooks.length > 0 ||
+        rankedSections.length > 0) && (
         <>
-          <MainBookSection
-            title="인기 도서"
-            icon={<FireIcon />}
-            books={popularBooks}
-            className="mt-4"
-          />
           <div className="theme-section-divider-bar mt-7 opacity-25">
             <RoughBar
               className="h-full w-full"
@@ -396,7 +401,11 @@ export default function Page() {
 
       {rankedSections.map((section, index) => (
         <Fragment key={section.title}>
-          {(popularBooks == null || popularBooks.length > 0 || index > 0) && (
+          {(popularBooks == null ||
+            popularBooks.length > 0 ||
+            index > 0 ||
+            latestReviews == null ||
+            latestReviews.length > 0) && (
             <div className="theme-section-divider-bar mt-7 opacity-25">
               <RoughBar
                 className="h-full w-full"
@@ -414,11 +423,6 @@ export default function Page() {
           />
         </Fragment>
       ))}
-      {popularBooks != null &&
-        popularBooks.length === 0 &&
-        rankedSections.length === 0 && (
-          <LatestReviewSection reviews={latestReviews} />
-      )}
     </>
   );
 }
