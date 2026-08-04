@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 
 import { apiFetch } from "@/lib/backend/client";
 import { goToErrorPage } from "@/lib/error/goToErrorPage";
@@ -8,6 +8,7 @@ import { useToast } from "@/lib/toast/ToastProvider";
 
 import type { components } from "@/lib/backend/apiV1/schema";
 
+import AdminRoughDivider from "@/app/admin/AdminRoughDivider";
 import RoughButton from "@/app/_components/RoughButton";
 
 type PageAdminMemberDto = components["schemas"]["PageAdminMemberDto"];
@@ -44,10 +45,11 @@ export default function MemberAdmin() {
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="sketch-panel overflow-x-auto p-2">
+      <div className="overflow-x-auto">
+        <AdminRoughDivider />
         <table className="w-full text-left text-sm">
           <thead>
-            <tr className="border-b">
+            <tr>
               <th className="p-2">ID</th>
               <th className="p-2">아이디</th>
               <th className="p-2">닉네임</th>
@@ -57,35 +59,50 @@ export default function MemberAdmin() {
               <th className="p-2">가입일</th>
               <th className="p-2"></th>
             </tr>
+            <tr aria-hidden="true">
+              <td colSpan={8} className="p-0">
+                <AdminRoughDivider />
+              </td>
+            </tr>
           </thead>
           <tbody>
-            {members.map((member) => (
-              <tr key={member.id} className="border-b">
-                <td className="p-2">{member.id}</td>
-                <td className="p-2">{member.username}</td>
-                <td className="p-2">{member.nickname}</td>
-                <td className="p-2">{member.githubId}</td>
-                <td className="p-2">{member.isAdmin ? "관리자" : "일반"}</td>
-                <td className="p-2 theme-muted">
-                  {member.isDeleted ? "탈퇴" : "정상"}
-                </td>
-                <td className="p-2 theme-subtle">{member.createdDate}</td>
-                <td className="p-2">
-                  {!member.isAdmin && !member.isDeleted && (
-                    <RoughButton
-                      roughSize="sm"
-                      tone="cancel"
-                      type="button"
-                      onClick={() => handleForceDelete(member.id)}
-                    >
-                      강제 탈퇴
-                    </RoughButton>
-                  )}
-                </td>
-              </tr>
+            {members.map((member, index) => (
+              <Fragment key={member.id}>
+                <tr>
+                  <td className="p-2">{member.id}</td>
+                  <td className="p-2">{member.username}</td>
+                  <td className="p-2">{member.nickname}</td>
+                  <td className="p-2">{member.githubId}</td>
+                  <td className="p-2">{member.isAdmin ? "관리자" : "일반"}</td>
+                  <td className="p-2 theme-muted">
+                    {member.isDeleted ? "탈퇴" : "정상"}
+                  </td>
+                  <td className="p-2 theme-subtle">{member.createdDate}</td>
+                  <td className="p-2">
+                    {!member.isAdmin && !member.isDeleted && (
+                      <RoughButton
+                        roughSize="sm"
+                        tone="cancel"
+                        type="button"
+                        onClick={() => handleForceDelete(member.id)}
+                      >
+                        강제 탈퇴
+                      </RoughButton>
+                    )}
+                  </td>
+                </tr>
+                {index < members.length - 1 && (
+                  <tr aria-hidden="true">
+                    <td colSpan={8} className="p-0">
+                      <AdminRoughDivider />
+                    </td>
+                  </tr>
+                )}
+              </Fragment>
             ))}
           </tbody>
         </table>
+        <AdminRoughDivider />
       </div>
 
       <div className="flex items-center gap-2">

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 
 import { apiFetch } from "@/lib/backend/client";
 import { goToErrorPage } from "@/lib/error/goToErrorPage";
@@ -8,6 +8,7 @@ import { useToast } from "@/lib/toast/ToastProvider";
 
 import type { components } from "@/lib/backend/apiV1/schema";
 
+import AdminRoughDivider from "@/app/admin/AdminRoughDivider";
 import RoughButton from "@/app/_components/RoughButton";
 import { RoughInput, RoughTextarea } from "@/app/_components/RoughInput";
 
@@ -96,43 +97,59 @@ export default function BookAdmin() {
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="sketch-panel overflow-x-auto p-2">
+      <div className="overflow-x-auto">
+        <AdminRoughDivider />
         <table className="w-full text-left text-sm">
           <thead>
-            <tr className="border-b">
+            <tr>
               <th className="p-2">ID</th>
               <th className="p-2">제목</th>
               <th className="p-2">평점</th>
               <th className="p-2"></th>
             </tr>
+            <tr aria-hidden="true">
+              <td colSpan={4} className="p-0">
+                <AdminRoughDivider />
+              </td>
+            </tr>
           </thead>
           <tbody>
-            {books.map((book) => (
-              <tr key={book.id} className="border-b">
-                <td className="p-2">{book.id}</td>
-                <td className="p-2">{book.title}</td>
-                <td className="p-2">{book.averageRating}</td>
-                <td className="flex gap-2 p-2">
-                  <RoughButton
-                    roughSize="sm"
-                    type="button"
-                    onClick={() => startEdit(book.id)}
-                  >
-                    수정
-                  </RoughButton>
-                  <RoughButton
-                    roughSize="sm"
-                    tone="cancel"
-                    type="button"
-                    onClick={() => handleDelete(book.id)}
-                  >
-                    삭제
-                  </RoughButton>
-                </td>
-              </tr>
+            {books.map((book, index) => (
+              <Fragment key={book.id}>
+                <tr>
+                  <td className="p-2">{book.id}</td>
+                  <td className="p-2">{book.title}</td>
+                  <td className="p-2">{book.averageRating}</td>
+                  <td className="flex gap-2 p-2">
+                    <RoughButton
+                      roughSize="sm"
+                      type="button"
+                      onClick={() => startEdit(book.id)}
+                    >
+                      수정
+                    </RoughButton>
+                    <RoughButton
+                      roughSize="sm"
+                      tone="cancel"
+                      type="button"
+                      onClick={() => handleDelete(book.id)}
+                    >
+                      삭제
+                    </RoughButton>
+                  </td>
+                </tr>
+                {index < books.length - 1 && (
+                  <tr aria-hidden="true">
+                    <td colSpan={4} className="p-0">
+                      <AdminRoughDivider />
+                    </td>
+                  </tr>
+                )}
+              </Fragment>
             ))}
           </tbody>
         </table>
+        <AdminRoughDivider />
       </div>
 
       <div className="flex items-center gap-2">

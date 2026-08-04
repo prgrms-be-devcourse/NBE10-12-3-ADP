@@ -551,19 +551,19 @@ export interface components {
             empty?: boolean;
         };
         PageableObject: {
-            unpaged?: boolean;
             paged?: boolean;
             /** Format: int32 */
             pageNumber?: number;
             /** Format: int32 */
             pageSize?: number;
             sort?: components["schemas"]["SortObject"];
+            unpaged?: boolean;
             /** Format: int64 */
             offset?: number;
         };
         SortObject: {
-            unsorted?: boolean;
             sorted?: boolean;
+            unsorted?: boolean;
             empty?: boolean;
         };
         MemberWithUsernameAndWidgetLinkDto: {
@@ -583,8 +583,8 @@ export interface components {
             nickname?: string | null;
             /** Format: date-time */
             createdDate: string;
-            admin?: boolean;
             deleted?: boolean;
+            admin?: boolean;
         };
         PageAdminMemberDto: {
             /** Format: int64 */
