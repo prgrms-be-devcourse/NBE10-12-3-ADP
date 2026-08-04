@@ -11,6 +11,7 @@ interface BookRepository : JpaRepository<Book, Long> {
 
     fun existsByIsbn(isbn: String): Boolean
     fun findByIsbn(isbn: String): Book?
+    fun findByIsbnIn(isbns: Collection<String>): List<Book>
 
     fun findByTitleContaining(searchTerm: String, pageable: Pageable): Page<Book>
 

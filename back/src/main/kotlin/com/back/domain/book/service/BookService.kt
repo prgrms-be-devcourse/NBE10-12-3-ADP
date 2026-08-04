@@ -42,9 +42,6 @@ class BookService(
         return bookRepository.findByIdOrNull(bookId) ?: throw NoSuchElementException("존재하지 않는 도서입니다.")
     }
 
-    private fun getBookByIsbn(isbn: String)
-        = bookRepository.findByIsbn(isbn)
-
     @Transactional
     fun updateBookViewCountInDb(book: Book, viewCount: Int) {
 
@@ -65,6 +62,26 @@ class BookService(
         return BookDto(book, getBookOperational(book)?.averageRating ?: 0.0)
     }
 
+    private fun getBookDtosFromOperations(operations: List<BookOperational>): List<BookDto> {
+        val booksByIsbn = bookRepository.findByIsbnIn(operations.map { it.isbn })
+            .associateBy { it.isbn }
+
+        return operations.mapNotNull { operation ->
+            booksByIsbn[operation.isbn]?.let { BookDto(it, operation.averageRating) }
+        }
+    }
+
+    private fun getBookDtosByBookIds(bookIds: List<Long>): List<BookDto> {
+        val books = bookRepository.findAllById(bookIds)
+        val booksById = books.associateBy { it.id }
+        val ratingsByIsbn = bookOperationalRepository.findByIsbnIn(books.map { it.isbn })
+            .associate { it.isbn to it.averageRating }
+
+        return bookIds.mapNotNull { bookId ->
+            booksById[bookId]?.let { BookDto(it, ratingsByIsbn[it.isbn] ?: 0.0) }
+        }
+    }
+
     fun getBookViewCount(book: Book): Int {
 
         return bookViewCountRedisRepository
@@ -78,10 +95,9 @@ class BookService(
                 .findAllByOrderByViewCountDesc(
                     PageRequest.of(page, size)
                 ).toList()
-                .mapNotNull { getBookByIsbn(it.isbn)
-                    ?.let { it1 -> getBookDto(it1) } }
+                .let { getBookDtosFromOperations(it) }
 
-        return books.map { getBookDto(getBookById(it)) }
+        return getBookDtosByBookIds(books)
     }
 
     fun getBooksOrderByRank(type: String, page: Int, size: Int): List<BookDto> {
@@ -94,13 +110,11 @@ class BookService(
         if (type == "rating")
             return bookOperationalRepository
                 .findAllByOrderByAverageRatingDesc(pageable).toList()
-                .mapNotNull { getBookByIsbn(it.isbn)
-                    ?.let { it1 -> getBookDto(it1) } }
+                .let { getBookDtosFromOperations(it) }
 
         return bookOperationalRepository
             .findAllByOrderByReviewCountDesc(pageable).toList()
-            .mapNotNull { getBookByIsbn(it.isbn)
-                ?.let { it1 -> getBookDto(it1) } }
+            .let { getBookDtosFromOperations(it) }
     }
 
     @Transactional
