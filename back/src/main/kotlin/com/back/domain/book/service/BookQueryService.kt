@@ -85,11 +85,7 @@ class BookQueryService(
         val books = bookViewCountRedisRepository.findBookIdOrderByTopViewedInLastHout(page, size)
 
         if (books.isNullOrEmpty()) {
-            return bookRepository
-                .findAllOrderByViewCountDesc(
-                    PageRequest.of(page, size)
-                ).toList()
-                .let { getBookDtos(it) }
+            return getBooksOrderByOperationalRank("views", page, size)
         }
 
         return getBookDtosByBookIds(books)
@@ -99,16 +95,29 @@ class BookQueryService(
         if (type == "views")
             return getBooksOrderByTopViewedInLastHour(page, size)
 
-        val pageable = PageRequest.of(page, size)
+        return getBooksOrderByOperationalRank(type, page, size)
+    }
 
-        if (type == "rating")
-            return bookRepository
-                .findAllOrderByAverageRatingDesc(pageable).toList()
-                .let { getBookDtos(it) }
+    private fun getBooksOrderByOperationalRank(type: String, page: Int, size: Int): List<BookDto> {
+        val offset = page * size
+        val rankedBookCount = bookOperationalRepository.count().toInt()
+        val rankedIsbns = when (type) {
+            "rating" -> bookOperationalRepository.findRankedIsbnsByAverageRating(PageRequest.of(page, size))
+            "views" -> bookOperationalRepository.findRankedIsbnsByViewCount(PageRequest.of(page, size))
+            else -> bookOperationalRepository.findRankedIsbnsByReviewCount(PageRequest.of(page, size))
+        }
 
-        return bookRepository
-            .findAllOrderByReviewCountDesc(pageable).toList()
-            .let { getBookDtos(it) }
+        val rankedBooks = getBookDtosByIsbns(rankedIsbns)
+        if (rankedBooks.size == size) return rankedBooks
+
+        val fallbackOffset = (offset - rankedBookCount).coerceAtLeast(0)
+        val fallbackBooks = bookRepository.findBooksWithoutOperationalOrderByIdDesc(
+            PageRequest.of(fallbackOffset / size, size * 2)
+        )
+            .drop(fallbackOffset % size)
+            .take(size - rankedBooks.size)
+
+        return rankedBooks + getBookDtos(fallbackBooks)
     }
 
     fun getTagsByBookId(bookId: Long): List<String> {
@@ -159,6 +168,17 @@ class BookQueryService(
 
         return bookIds.mapNotNull { bookId ->
             booksById[bookId]?.let { BookDto(it, ratingsByIsbn[it.isbn] ?: 0.0) }
+        }
+    }
+
+    private fun getBookDtosByIsbns(isbns: List<String>): List<BookDto> {
+        val books = bookRepository.findByIsbnIn(isbns)
+        val booksByIsbn = books.associateBy { it.isbn }
+        val ratingsByIsbn = bookOperationalRepository.findByIsbnIn(books.map { it.isbn })
+            .associate { it.isbn to it.averageRating }
+
+        return isbns.mapNotNull { isbn ->
+            booksByIsbn[isbn]?.let { BookDto(it, ratingsByIsbn[isbn] ?: 0.0) }
         }
     }
 

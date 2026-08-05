@@ -46,6 +46,20 @@ interface BookRepository : JpaRepository<Book, Long> {
     fun findAllOrderByViewCountDesc(pageable: Pageable): Page<Book>
 
     @Query(
+        """
+            SELECT b
+            FROM Book b
+            WHERE NOT EXISTS (
+                SELECT 1
+                FROM BookOperational bo
+                WHERE bo.isbn = b.isbn
+            )
+            ORDER BY b.id DESC
+        """
+    )
+    fun findBooksWithoutOperationalOrderByIdDesc(pageable: Pageable): List<Book>
+
+    @Query(
         value = """
             SELECT * FROM Book 
             WHERE MATCH(title, authors, publisher) AGAINST(:keyword IN BOOLEAN MODE)

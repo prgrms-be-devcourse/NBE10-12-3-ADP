@@ -1,9 +1,9 @@
 package com.back.domain.book.repository
 
 import com.back.domain.book.entity.BookOperational
-import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.repository.JpaRepository
+import org.springframework.data.jpa.repository.Query
 import org.springframework.stereotype.Repository
 
 @Repository
@@ -13,4 +13,30 @@ interface BookOperationalRepository : JpaRepository<BookOperational, Long> {
     fun findByIsbnIn(isbns: Collection<String>): List<BookOperational>
     fun deleteByIsbn(isbn: String)
 
+    @Query(
+        """
+            SELECT bo.isbn
+            FROM BookOperational bo
+            ORDER BY bo.averageRating DESC, bo.id DESC
+        """
+    )
+    fun findRankedIsbnsByAverageRating(pageable: Pageable): List<String>
+
+    @Query(
+        """
+            SELECT bo.isbn
+            FROM BookOperational bo
+            ORDER BY bo.reviewCount DESC, bo.id DESC
+        """
+    )
+    fun findRankedIsbnsByReviewCount(pageable: Pageable): List<String>
+
+    @Query(
+        """
+            SELECT bo.isbn
+            FROM BookOperational bo
+            ORDER BY bo.viewCount DESC, bo.id DESC
+        """
+    )
+    fun findRankedIsbnsByViewCount(pageable: Pageable): List<String>
 }
