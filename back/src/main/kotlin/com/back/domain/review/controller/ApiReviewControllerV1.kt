@@ -31,7 +31,7 @@ class ApiReviewControllerV1(
     @Operation(summary = "도서별 리뷰 다건 조회")
     fun getReviewsByBookId(
         @PathVariable bookId: Long
-    ) = reviewService.getReviewsByBookId(bookId)
+    ) = reviewService.getReviewsByBookId(bookId, rq.actorOrNull)
 
     @GetMapping("/member/{memberId}")
     @Operation(summary = "회원별 리뷰 다건 조회")

@@ -13,6 +13,7 @@ import org.springframework.security.test.context.support.WithUserDetails
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers.print
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
 import org.springframework.transaction.annotation.Transactional
@@ -36,7 +37,7 @@ class ApiReviewControllerV1GetTest {
     @Throws(Exception::class)
     fun t1() {
         val bookId = 1L
-        val reviews: List<ReviewDto> = reviewService.getReviewsByBookId(bookId)
+        val reviews: List<ReviewDto> = reviewService.getReviewsByBookId(bookId, null)
 
         val resultActions = mvc
             .perform(
@@ -80,6 +81,44 @@ class ApiReviewControllerV1GetTest {
                     .andExpect(jsonPath("$[$i].tags[$j]").value(tags[j]))
             }
         }
+    }
+
+    @Test
+    @DisplayName("리뷰 다건 조회 - 로그인한 사용자가 좋아요한 리뷰는 likedByMe가 true")
+    @WithUserDetails("user1")
+    @Throws(Exception::class)
+    fun t7() {
+        val bookId = 1L
+        val likedReviewId = 1L
+
+        mvc.perform(post("/api/v1/reviews/$likedReviewId/like")).andDo(print())
+
+        val resultActions = mvc
+            .perform(
+                get("/api/v1/reviews/book/$bookId")
+            )
+            .andDo(print())
+
+        resultActions
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$[?(@.id == $likedReviewId)].likedByMe").value(Matchers.contains(true)))
+    }
+
+    @Test
+    @DisplayName("리뷰 다건 조회 - 로그인하지 않으면 likedByMe는 항상 false")
+    @Throws(Exception::class)
+    fun t8() {
+        val bookId = 1L
+
+        val resultActions = mvc
+            .perform(
+                get("/api/v1/reviews/book/$bookId")
+            )
+            .andDo(print())
+
+        resultActions
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$[*].likedByMe").value(Matchers.everyItem(Matchers.`is`(false))))
     }
 
     @Test

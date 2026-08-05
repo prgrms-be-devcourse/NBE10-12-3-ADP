@@ -14,9 +14,10 @@ open class ReviewDto(
     val createdDate: LocalDateTime,
     val reviewer: MemberDto,
     val tags: List<String>,
-    val likeCount: Int
+    val likeCount: Int,
+    val likedByMe: Boolean = false
 ) {
-    constructor(review: Review) : this(
+    constructor(review: Review, likedByMe: Boolean = false) : this(
         review.id,
         review.book.id,
         review.book.title,
@@ -26,6 +27,7 @@ open class ReviewDto(
         review.createdDate,
         MemberDto(review.reviewer),
         review.tags,
-        review.likeCount
+        review.likeCount,
+        likedByMe
     )
 }

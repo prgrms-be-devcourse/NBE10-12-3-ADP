@@ -37,10 +37,10 @@ class BookRankServiceTest(@Autowired private val bookRepository: BookRepository)
 
         if (bookRank.isEmpty()) return
 
-        var upperCnt = reviewService.getReviewsByBookId(bookRank[0].id).size
+        var upperCnt = reviewService.getReviewsByBookId(bookRank[0].id, null).size
 
         for (i in 1..<bookRank.size) {
-            val nowCnt = reviewService.getReviewsByBookId(bookRank[i].id).size
+            val nowCnt = reviewService.getReviewsByBookId(bookRank[i].id, null).size
 
             assertThat(upperCnt).isGreaterThanOrEqualTo(nowCnt)
 

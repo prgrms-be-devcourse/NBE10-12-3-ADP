@@ -84,8 +84,16 @@ class ReviewService(
             .toList()
             .map { ReviewWithBookImgUrlDto(it) }
 
-    fun getReviewsByBookId(bookId: Long) =
-        reviewRepository.findByBook(getBookById(bookId)).map { ReviewDto(it) }
+    fun getReviewsByBookId(bookId: Long, actor: Member?): List<ReviewDto> {
+        val reviews = reviewRepository.findByBook(getBookById(bookId))
+
+        val likedReviewIds =
+            if (actor != null && reviews.isNotEmpty())
+                reviewLikeRepository.findReviewIdsByMemberAndReviewIn(actor, reviews).toSet()
+            else emptySet()
+
+        return reviews.map { ReviewDto(it, it.id in likedReviewIds) }
+    }
 
     fun getReviewsByMemberId(memberId: Long): ReviewsByMemberDto {
         val member = getMemberById(memberId)
