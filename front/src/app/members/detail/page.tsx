@@ -9,6 +9,7 @@ import { API_BASE_URL, apiFetch } from "@/lib/backend/client";
 
 import type { components } from "@/lib/backend/apiV1/schema";
 import { goToErrorPage } from "@/lib/error/goToErrorPage";
+import { formatDateTime } from "@/lib/formatDate";
 import { ratingColor } from "@/lib/ratingColor";
 
 import LibraryProfilePanel from "@/app/_components/LibraryProfilePanel";
@@ -130,7 +131,7 @@ function MemberDetail() {
         {member.githubId && (
           <LibraryWidgetPreview
             githubId={member.githubId}
-            widgetSrc={`${API_BASE_URL}/api/v1/widgets/${member.githubId}`}
+            widgetSrc={`${API_BASE_URL}/api/v2/widgets/${member.githubId}`}
           />
         )}
 
@@ -192,7 +193,7 @@ function MemberDetail() {
 
                   <div className="text-sm mt-1">{review.content}</div>
                   <div className="mt-1 text-xs theme-subtle">
-                    {review.createdDate}
+                    {formatDateTime(review.createdDate)}
                   </div>
                 </div>
 

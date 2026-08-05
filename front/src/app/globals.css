@@ -436,6 +436,7 @@ button:hover {
   width: 18px;
   height: 18px;
   opacity: 0.75;
+  transform: translateY(-4px);
 }
 
 .rough-github-inline:hover {

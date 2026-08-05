@@ -10,6 +10,7 @@ import { apiFetch } from "@/lib/backend/client";
 import { useAuth } from "@/lib/auth/AuthProvider";
 import type { components } from "@/lib/backend/apiV1/schema";
 import { goToErrorPage } from "@/lib/error/goToErrorPage";
+import { formatDateTime } from "@/lib/formatDate";
 import { ratingColor } from "@/lib/ratingColor";
 import { ratingFillColor } from "@/lib/ratingColor";
 import { useToast } from "@/lib/toast/ToastProvider";
@@ -124,6 +125,23 @@ function WishIcon() {
   );
 }
 
+function HeartIcon() {
+  return (
+    <svg
+      aria-hidden="true"
+      className="inline-block h-4 w-4 shrink-0 align-[-0.125em]"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8Z" />
+    </svg>
+  );
+}
+
 function ReviewIcon() {
   return (
     <svg
@@ -152,6 +170,9 @@ function BookDetail() {
   const [reviews, setReviews] = useState<ReviewDto[] | null>(null);
   const [recommendBooks, setRecommendBooks] = useState<BookDto[] | null>(null);
   const [editingReviewId, setEditingReviewId] = useState<number | null>(null);
+  const [likedReviewIds, setLikedReviewIds] = useState<Set<number>>(
+    new Set(),
+  );
   const [showWriteForm, setShowWriteForm] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false);
 
@@ -169,8 +190,15 @@ function BookDetail() {
     if (id == null) return;
 
     apiFetch(`/api/v1/reviews/book/${id}`)
-      .then((data) => {
+      .then((data: ReviewDto[]) => {
         setReviews(data);
+        setLikedReviewIds(
+          new Set(
+            data
+              .filter((review) => review.likedByMe && review.id != null)
+              .map((review) => review.id as number),
+          ),
+        );
       })
       .catch(goToErrorPage);
   }, [id]);
@@ -329,6 +357,46 @@ function BookDetail() {
 
   const closeLoginModal = () => {
     setShowLoginModal(false);
+  };
+
+  const handleToggleLike = (review: ReviewDto) => {
+    if (!isLogin) {
+      openLoginModal();
+      return;
+    }
+
+    const reviewId = review.id;
+    if (reviewId == null) return;
+
+    const isLiked = likedReviewIds.has(reviewId);
+
+    apiFetch(`/api/v1/reviews/${reviewId}/like`, {
+      method: isLiked ? "DELETE" : "POST",
+    })
+      .then((data) => {
+        showToast(
+          data?.message ?? (isLiked ? "좋아요를 취소했습니다." : "좋아요를 눌렀습니다."),
+        );
+        setLikedReviewIds((current) => {
+          const next = new Set(current);
+          if (isLiked) {
+            next.delete(reviewId);
+          } else {
+            next.add(reviewId);
+          }
+          return next;
+        });
+        setReviews((current) =>
+          current == null
+            ? current
+            : current.map((r) =>
+                r.id === reviewId
+                  ? { ...r, likeCount: (r.likeCount ?? 0) + (isLiked ? -1 : 1) }
+                  : r,
+              ),
+        );
+      })
+      .catch(showErrorToast);
   };
 
   const handleDelete = (reviewId: number) => {
@@ -610,13 +678,13 @@ function BookDetail() {
                           {review.reviewer?.githubId ?? "탈퇴한 사용자"}
                         </span>
                       )}
-                      {review.reviewer?.githubLink && (
+                      {review.reviewer?.githubId && (
                         <a
                           className="rough-github-inline"
-                          href={review.reviewer.githubLink}
+                          href={`https://github.com/${review.reviewer.githubId}`}
                           target="_blank"
                           rel="noreferrer"
-                          aria-label={`${review.reviewer?.githubId ?? "사용자"} GitHub`}
+                          aria-label={`${review.reviewer.githubId} GitHub`}
                         >
                           {/* eslint-disable-next-line @next/next/no-img-element */}
                           <img
@@ -636,7 +704,24 @@ function BookDetail() {
 
                     <div className="mt-1 text-sm">{review.content}</div>
                     <div className="mt-1 text-xs theme-subtle">
-                      {review.createdDate}
+                      {formatDateTime(review.createdDate)}
+                    </div>
+
+                    <div className="flex gap-2 mt-1">
+                      <RoughButton
+                        className="px-2"
+                        roughSize="sm"
+                        tone={
+                          review.id != null && likedReviewIds.has(review.id)
+                            ? "wishActive"
+                            : "wish"
+                        }
+                        type="button"
+                        onClick={() => handleToggleLike(review)}
+                      >
+                        <HeartIcon />
+                        좋아요 {review.likeCount ?? 0}
+                      </RoughButton>
                     </div>
 
                     {loginMember?.id != null && loginMember.id === review.reviewer?.id && (
