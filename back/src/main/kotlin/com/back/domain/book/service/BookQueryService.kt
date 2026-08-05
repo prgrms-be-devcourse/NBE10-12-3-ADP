@@ -111,11 +111,26 @@ class BookQueryService(
         if (rankedBooks.size == size) return rankedBooks
 
         val fallbackOffset = (offset - rankedBookCount).coerceAtLeast(0)
-        val fallbackBooks = bookRepository.findBooksWithoutOperationalOrderByIdDesc(
-            PageRequest.of(fallbackOffset / size, size * 2)
+        val fallbackPage = fallbackOffset / size
+        val fallbackPageOffset = fallbackOffset % size
+        val neededFallbackSize = size - rankedBooks.size
+
+        val currentFallbackPage = bookRepository.findBooksWithoutOperationalOrderByIdDesc(
+            PageRequest.of(fallbackPage, size)
         )
-            .drop(fallbackOffset % size)
-            .take(size - rankedBooks.size)
+        val fallbackBooks = currentFallbackPage
+            .drop(fallbackPageOffset)
+            .let { currentPageBooks ->
+                if (currentPageBooks.size >= neededFallbackSize || fallbackPageOffset == 0) {
+                    currentPageBooks.take(neededFallbackSize)
+                } else {
+                    val nextFallbackPage = bookRepository.findBooksWithoutOperationalOrderByIdDesc(
+                        PageRequest.of(fallbackPage + 1, size)
+                    )
+
+                    (currentPageBooks + nextFallbackPage).take(neededFallbackSize)
+                }
+            }
 
         return rankedBooks + getBookDtos(fallbackBooks)
     }

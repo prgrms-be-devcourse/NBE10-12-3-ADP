@@ -172,4 +172,57 @@ class BookRankServiceTest(@Autowired private val bookRepository: BookRepository)
         assertThat(actualIds).containsOnly(first.id, second.id)
         assertThat(actualIds).isEqualTo(expectedFallbackIds)
     }
+
+    @Test
+    @DisplayName("도서 순위 fallback은 중간 오프셋에서도 누락 없이 다음 페이지를 이어서 채운다")
+    fun t6() {
+        bookRepository.save(
+            Book(
+                "운영 정보 없는 책 5",
+                "설명",
+                "isbn-rank-without-operational-5",
+                "작가",
+                LocalDateTime.now(),
+                "출판사",
+                ""
+            )
+        )
+        bookRepository.save(
+            Book(
+                "운영 정보 없는 책 6",
+                "설명",
+                "isbn-rank-without-operational-6",
+                "작가",
+                LocalDateTime.now(),
+                "출판사",
+                ""
+            )
+        )
+        bookRepository.save(
+            Book(
+                "운영 정보 없는 책 7",
+                "설명",
+                "isbn-rank-without-operational-7",
+                "작가",
+                LocalDateTime.now(),
+                "출판사",
+                ""
+            )
+        )
+
+        val rankedCount = bookOperationalRepository.count().toInt()
+        val pageSize = rankedCount + 1
+        val page = 1
+
+        val expectedFallbackIds = bookRepository.findAll(Sort.by(Sort.Direction.DESC, "id"))
+            .filter { bookOperationalRepository.findByIsbn(it.isbn) == null }
+            .drop(1)
+            .take(pageSize)
+            .map { it.id }
+
+        val actualIds = bookService.getBooksOrderByRank("reviewCnt", page, pageSize)
+            .map { it.id }
+
+        assertThat(actualIds).isEqualTo(expectedFallbackIds)
+    }
 }
