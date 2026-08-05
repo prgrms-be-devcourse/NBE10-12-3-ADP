@@ -6,6 +6,7 @@ import com.back.domain.review.entity.Review
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.repository.JpaRepository
+import org.springframework.data.jpa.repository.Modifying
 import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.query.Param
 
@@ -37,4 +38,8 @@ interface ReviewRepository : JpaRepository<Review, Long> {
     fun countByBookAndRating(book: Book?, rating: Float): Int
 
     fun findFirstByBookAndReviewer(book: Book, reviewer: Member): Review?
+
+    @Modifying(clearAutomatically = true)
+    @Query("UPDATE Review r SET r.likeCount = r.likeCount + 1 WHERE r.id = :reviewId")
+    fun increaseLikeCount(@Param("reviewId") reviewId: Long): Int
 }

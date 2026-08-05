@@ -17,6 +17,7 @@ import com.back.domain.review.repository.ReviewRepository
 import com.back.domain.tag.entity.Tag
 import com.back.domain.tag.repository.TagRepository
 import com.back.global.exception.ServiceException
+import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
@@ -160,7 +161,12 @@ class ReviewService(
         if (reviewLikeRepository.existsByReviewAndMember(review, actor))
             throw ServiceException("409-1", "이미 존재하는 좋아요입니다.")
 
-        reviewLikeRepository.save(ReviewLike(review, actor))
-        review.increaseLikeCount()
+        try {
+            reviewLikeRepository.save(ReviewLike(review, actor))
+        } catch (e: DataIntegrityViolationException) {
+            throw ServiceException("409-1", "이미 존재하는 좋아요입니다.")
+        }
+
+        reviewRepository.increaseLikeCount(reviewId)
     }
 }

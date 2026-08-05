@@ -34,10 +34,6 @@ class Review(
         }
     }
 
-    fun increaseLikeCount() {
-        this.likeCount++
-    }
-
     val tags: MutableList<String>
         get() = reviewTags.stream()
             .map { tag: ReviewTag -> tag.tag.name }
