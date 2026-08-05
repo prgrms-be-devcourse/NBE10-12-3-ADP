@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { type RefObject, useEffect, useState } from "react";
 
 import { apiFetch } from "@/lib/backend/client";
 
@@ -13,6 +13,7 @@ type BookThumbnailProps = {
   placeholderText?: string;
   altClassName?: string;
   imgClassName?: string;
+  imgRef?: RefObject<HTMLImageElement | null>;
   onLoad?: () => void;
 };
 
@@ -25,6 +26,7 @@ export default function BookThumbnail({
   placeholderText = "표지 없음",
   altClassName,
   imgClassName,
+  imgRef,
   onLoad,
 }: BookThumbnailProps) {
   const normalizedImgUrl = imgUrl?.trim() || null;
@@ -37,25 +39,15 @@ export default function BookThumbnail({
       return;
     }
 
-    let cancelled = false;
-
     apiFetch(`/api/v1/books/${bookId}/thumbnail`)
       .then((data) => {
-        if (cancelled) return;
-
-        if (typeof data === "string" && data.trim() !== "") {
-          setThumbnailUrl(data);
+        if (data?.imgUrl && data.imgUrl.trim() !== "") {
+          setThumbnailUrl(data.imgUrl);
         }
       })
       .catch(() => {
-        if (!cancelled) {
-          setThumbnailUrl(null);
-        }
+        // 실패 시 아무 동작도 하지 않는다 (placeholder 유지)
       });
-
-    return () => {
-      cancelled = true;
-    };
   }, [bookId, normalizedImgUrl]);
 
   if (thumbnailUrl == null) {
@@ -71,6 +63,7 @@ export default function BookThumbnail({
   return (
     // eslint-disable-next-line @next/next/no-img-element
     <img
+      ref={imgRef}
       src={thumbnailUrl}
       alt={title ?? ""}
       className={imgClassName ?? className}

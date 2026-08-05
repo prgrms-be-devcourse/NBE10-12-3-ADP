@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 
-import { type RefObject, useEffect, useMemo, useState } from "react";
+import { type RefObject, useEffect, useMemo, useRef, useState } from "react";
 
 import type { components } from "@/lib/backend/apiV1/schema";
 import { ratingColor } from "@/lib/ratingColor";
@@ -52,6 +52,14 @@ function BookGridItem({
   layout,
 }: BookGridItemProps) {
   const [isImageLoaded, setIsImageLoaded] = useState(false);
+  const imgRef = useRef<HTMLImageElement>(null);
+
+  useEffect(() => {
+    if (imgRef.current?.complete) {
+      setIsImageLoaded(true);
+    }
+  });
+
   const averageRating =
     typeof book.averageRating === "number" ? book.averageRating : 0;
 
@@ -72,6 +80,7 @@ function BookGridItem({
             bookId={book.id}
             imgUrl={book.imgUrl}
             title={book.title}
+            imgRef={imgRef}
             onLoad={() => setIsImageLoaded(true)}
             placeholderClassName="text-sm text-gray-400"
             altClassName="text-sm text-gray-400"
