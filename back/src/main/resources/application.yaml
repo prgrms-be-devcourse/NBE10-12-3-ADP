@@ -9,8 +9,8 @@ spring:
     active: ${SPRING__PROFILES__ACTIVE}
   data:
     redis:
-      host: ${REDIS__HOST}
-      port: ${REDIS__PORT:6379}
+      host: ${SPRING__REDIS__HOST}
+      port: ${SPRING__REDIS__PORT:6379}
   output:
     ansi:
       enabled: always
