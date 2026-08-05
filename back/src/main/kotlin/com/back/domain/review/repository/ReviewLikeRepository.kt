@@ -14,4 +14,7 @@ interface ReviewLikeRepository : JpaRepository<ReviewLike, Long> {
     @Modifying
     @Query("DELETE FROM ReviewLike rl WHERE rl.review = :review AND rl.member = :member")
     fun deleteByReviewAndMember(@Param("review") review: Review, @Param("member") member: Member): Int
+
+    @Query("SELECT rl.review.id FROM ReviewLike rl WHERE rl.member = :member AND rl.review IN :reviews")
+    fun findReviewIdsByMemberAndReviewIn(@Param("member") member: Member, @Param("reviews") reviews: List<Review>): List<Long>
 }
