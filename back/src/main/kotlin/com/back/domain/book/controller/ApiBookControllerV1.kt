@@ -3,6 +3,7 @@ package com.back.domain.book.controller
 import com.back.domain.book.controller.request.BookUpdateRequest
 import com.back.domain.book.dto.BookDetailDto
 import com.back.domain.book.dto.BookDto
+import com.back.domain.book.dto.ThumbnailDto
 import com.back.domain.book.service.BookRecommendService
 import com.back.domain.book.service.BookService
 import com.back.domain.book.service.BookThumbnailService
@@ -57,10 +58,9 @@ class ApiBookControllerV1(
     }
 
     @GetMapping("/{id}/thumbnail")
-    @Operation(summary = "도서 썸네일 조회")
-    fun getBookThumbnail(@PathVariable id: Long): String? {
-        return bookThumbnailService.getOrFetchThumbnail(id)
-    }
+    @Operation(summary = "도서 썸네일 지연 조회")
+    fun getBookThumbnail(@PathVariable id: Long) =
+        bookThumbnailService.getOrFetchThumbnail(id)
 
     @GetMapping("/search")
     @Operation(summary = "도서 검색 다건 조회")

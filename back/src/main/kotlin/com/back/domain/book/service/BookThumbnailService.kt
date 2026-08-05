@@ -1,7 +1,9 @@
 package com.back.domain.book.service
 
 import com.back.domain.book.client.KakaoBookClient
+import com.back.domain.book.dto.ThumbnailDto
 import com.back.domain.book.repository.BookRepository
+import com.back.global.exception.ServiceException
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 
@@ -12,21 +14,24 @@ class BookThumbnailService(
     private val bookRepository: BookRepository,
 ) {
 
-    fun getOrFetchThumbnail(bookId: Long): String? {
-        val book = bookRepository.findByIdOrNull(bookId) ?: return null
+    fun getOrFetchThumbnail(bookId: Long): ThumbnailDto {
+        val book = bookRepository.findByIdOrNull(bookId)
+            ?: throw ServiceException("404-1", "존재하지 않는 도서입니다.")
 
-        if (!book.imgUrl.isNullOrBlank()) {
-            return book.imgUrl
+        if (!book.imgUrl.isNullOrEmpty())
+            throw ServiceException("409-1", "이미 존재하는 썸네일입니다.")
+
+        book.imgUrlFetchedAt?.let {
+            throw ServiceException("404-2", "존재하지 않는 썸네일입니다.")
         }
 
         val thumbnail = kakaoBookClient.getThumbnailByIsbn(book.isbn)
         if (thumbnail == null) {
             bookThumbnailWriter.markFetchAttempted(bookId)
-            return null
+            return ThumbnailDto("")
+        } else {
+            bookThumbnailWriter.updateImgUrl(bookId, thumbnail)
+            return ThumbnailDto(thumbnail)
         }
-
-        bookThumbnailWriter.updateImgUrl(bookId, thumbnail)
-
-        return thumbnail
     }
 }
