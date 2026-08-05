@@ -149,24 +149,31 @@ class BookQueryService(
             .toList()
     }
 
-    fun getBooksBySearch(
+    fun getBooksByFullTextSearch(
         searchTerm: String,
         page: Int,
         size: Int
     ): List<BookDto> {
         val pageable = PageRequest.of(page, size)
 
-        try {
-            return getBookDtos(
-                bookRepository.searchByKeyword(searchTerm, pageable).toList()
-            )
+        return getBookDtos(
+            bookRepository
+                .searchByKeyword(searchTerm, pageable)
+                .toList()
+        )
+    }
 
-        } catch (_: java.lang.Exception) {
-            // handler();
-        }
+    fun getBooksByLikeSearch(
+        searchTerm: String,
+        page: Int,
+        size: Int
+    ): List<BookDto> {
+        val pageable = PageRequest.of(page, size)
 
         return getBookDtos(
-            bookRepository.findByTitleContaining(searchTerm, pageable).toList()
+            bookRepository
+                .findByTitleContaining(searchTerm, pageable)
+                .toList()
         )
     }
 
