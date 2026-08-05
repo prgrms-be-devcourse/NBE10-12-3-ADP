@@ -15,28 +15,28 @@ interface BookOperationalRepository : JpaRepository<BookOperational, Long> {
 
     @Query(
         """
-            SELECT bo.isbn
+            SELECT bo.isbn AS isbn, bo.averageRating AS averageRating
             FROM BookOperational bo
             ORDER BY bo.averageRating DESC, bo.id DESC
         """
     )
-    fun findRankedIsbnsByAverageRating(pageable: Pageable): List<String>
+    fun findRankedBooksByAverageRating(pageable: Pageable): List<BookRankRow>
 
     @Query(
         """
-            SELECT bo.isbn
+            SELECT bo.isbn AS isbn, bo.averageRating AS averageRating
             FROM BookOperational bo
             ORDER BY bo.reviewCount DESC, bo.id DESC
         """
     )
-    fun findRankedIsbnsByReviewCount(pageable: Pageable): List<String>
+    fun findRankedBooksByReviewCount(pageable: Pageable): List<BookRankRow>
 
     @Query(
         """
-            SELECT bo.isbn
+            SELECT bo.isbn AS isbn, bo.averageRating AS averageRating
             FROM BookOperational bo
             ORDER BY bo.viewCount DESC, bo.id DESC
         """
     )
-    fun findRankedIsbnsByViewCount(pageable: Pageable): List<String>
+    fun findRankedBooksByViewCount(pageable: Pageable): List<BookRankRow>
 }

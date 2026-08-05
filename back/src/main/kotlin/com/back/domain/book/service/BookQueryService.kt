@@ -3,6 +3,7 @@ package com.back.domain.book.service
 import com.back.domain.book.dto.BookDetailDto
 import com.back.domain.book.dto.BookDto
 import com.back.domain.book.entity.Book
+import com.back.domain.book.repository.BookRankRow
 import com.back.domain.book.repository.BookOperationalRepository
 import com.back.domain.book.repository.BookRepository
 import com.back.domain.book.repository.BookViewCountRedisRepository
@@ -100,16 +101,20 @@ class BookQueryService(
 
     private fun getBooksOrderByOperationalRank(type: String, page: Int, size: Int): List<BookDto> {
         val offset = page * size
-        val rankedIsbns = when (type) {
-            "rating" -> bookOperationalRepository.findRankedIsbnsByAverageRating(PageRequest.of(page, size))
-            "views" -> bookOperationalRepository.findRankedIsbnsByViewCount(PageRequest.of(page, size))
-            else -> bookOperationalRepository.findRankedIsbnsByReviewCount(PageRequest.of(page, size))
+        val rankedRows = when (type) {
+            "rating" -> bookOperationalRepository.findRankedBooksByAverageRating(PageRequest.of(page, size))
+            "views" -> bookOperationalRepository.findRankedBooksByViewCount(PageRequest.of(page, size))
+            else -> bookOperationalRepository.findRankedBooksByReviewCount(PageRequest.of(page, size))
         }
 
-        val rankedBooks = getBookDtosByIsbns(rankedIsbns)
+        val rankedBooks = getBookDtosByRankRows(rankedRows)
         if (rankedBooks.size == size) return rankedBooks
 
-        val rankedBookCount = bookOperationalRepository.count().toInt()
+        val rankedBookCount = if (rankedRows.isEmpty() && offset > 0) {
+            bookOperationalRepository.count().toInt()
+        } else {
+            offset + rankedRows.size
+        }
         val fallbackOffset = (offset - rankedBookCount).coerceAtLeast(0)
         val fallbackPage = fallbackOffset / size
         val fallbackPageOffset = fallbackOffset % size
@@ -186,11 +191,11 @@ class BookQueryService(
         }
     }
 
-    private fun getBookDtosByIsbns(isbns: List<String>): List<BookDto> {
+    private fun getBookDtosByRankRows(rankRows: List<BookRankRow>): List<BookDto> {
+        val isbns = rankRows.map { it.isbn }
         val books = bookRepository.findByIsbnIn(isbns)
         val booksByIsbn = books.associateBy { it.isbn }
-        val ratingsByIsbn = bookOperationalRepository.findByIsbnIn(books.map { it.isbn })
-            .associate { it.isbn to it.averageRating }
+        val ratingsByIsbn = rankRows.associate { it.isbn to it.averageRating }
 
         return isbns.mapNotNull { isbn ->
             booksByIsbn[isbn]?.let { BookDto(it, ratingsByIsbn[isbn] ?: 0.0) }
