@@ -1,16 +1,16 @@
 server:
   forward-headers-strategy: native
 spring:
-  data:
-    redis:
-      host: 127.0.0.1
-      port: 6379
   application:
     name: back
   config:
     import: optional:file:.env[.properties]
   profiles:
     active: ${SPRING__PROFILES__ACTIVE}
+  data:
+    redis:
+      host: ${REDIS__HOST}
+      port: ${REDIS__PORT}6379
   output:
     ansi:
       enabled: always
