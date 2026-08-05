@@ -14,6 +14,7 @@ import {
 } from "@/lib/auth/authReturnPath";
 import type { components } from "@/lib/backend/apiV1/schema";
 import { goToErrorPage } from "@/lib/error/goToErrorPage";
+import { formatDateTime } from "@/lib/formatDate";
 import { ratingColor } from "@/lib/ratingColor";
 import { useToast } from "@/lib/toast/ToastProvider";
 
@@ -225,7 +226,7 @@ export default function Page() {
   const averageNumber = typeof average === "number" ? average : null;
   const reviewResults = reviewData.results ?? [];
   const widgetLink = loginMember?.githubId
-    ? `${API_BASE_URL}/api/v1/widgets/${loginMember.githubId}`
+    ? `${API_BASE_URL}/api/v2/widgets/${loginMember.githubId}`
     : "";
   const widgetCodeSnippet = `<img src="${widgetLink}" alt="내 서재 위젯" />`;
 
@@ -265,7 +266,7 @@ export default function Page() {
       <div className="flex-1 flex flex-col gap-4">
         <LibraryWidgetPreview
           githubId={loginMember?.githubId}
-          widgetSrc={`${API_BASE_URL}/api/v1/widgets/${loginMember?.githubId ?? ""}`}
+          widgetSrc={`${API_BASE_URL}/api/v2/widgets/${loginMember?.githubId ?? ""}`}
           widgetLink={loginMember?.widgetLink}
           actions={
             <div className="flex flex-wrap justify-end gap-2">
@@ -363,7 +364,7 @@ export default function Page() {
 
                     <div className="text-sm mt-1">{review.content}</div>
                     <div className="mt-1 text-xs theme-subtle">
-                      {review.createdDate}
+                      {formatDateTime(review.createdDate)}
                     </div>
 
                     <RoughButton

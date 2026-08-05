@@ -75,6 +75,24 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/reviews/{id}/like": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 좋아요 생성 */
+        post: operations["createReviewLike"];
+        /** 좋아요 삭제 */
+        delete: operations["deleteReviewLike"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/reviews/book/{bookId}": {
         parameters: {
             query?: never;
@@ -288,7 +306,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** 도서 썸네일 조회 */
+        /** 도서 썸네일 지연 조회 */
         get: operations["getBookThumbnail"];
         put?: never;
         post?: never;
@@ -448,6 +466,9 @@ export interface components {
             createdDate?: string;
             reviewer?: components["schemas"]["MemberDto"];
             tags?: string[];
+            /** Format: int32 */
+            likeCount?: number;
+            likedByMe?: boolean;
         };
         RsDataReviewDto: {
             resultCode?: string;
@@ -540,6 +561,9 @@ export interface components {
             createdDate?: string;
             reviewer?: components["schemas"]["MemberDto"];
             tags?: string[];
+            /** Format: int32 */
+            likeCount?: number;
+            likedByMe?: boolean;
             bookImgUrl?: string | null;
         };
         ReviewsByMemberDto: {
@@ -559,40 +583,42 @@ export interface components {
             createdDate?: string;
             reviewer?: components["schemas"]["MemberDto"];
             tags?: string[];
+            /** Format: int32 */
+            likeCount?: number;
         };
         PageAdminReviewDto: {
-            /** Format: int64 */
-            totalElements?: number;
             /** Format: int32 */
             totalPages?: number;
-            pageable?: components["schemas"]["PageableObject"];
-            sort?: components["schemas"]["SortObject"];
-            /** Format: int32 */
-            numberOfElements?: number;
+            /** Format: int64 */
+            totalElements?: number;
             /** Format: int32 */
             size?: number;
             content?: components["schemas"]["AdminReviewDto"][];
             /** Format: int32 */
             number?: number;
+            /** Format: int32 */
+            numberOfElements?: number;
+            pageable?: components["schemas"]["PageableObject"];
+            sort?: components["schemas"]["SortObject"];
             first?: boolean;
             last?: boolean;
             empty?: boolean;
         };
         PageableObject: {
-            paged?: boolean;
-            /** Format: int32 */
-            pageNumber?: number;
-            /** Format: int32 */
-            pageSize?: number;
-            unpaged?: boolean;
-            sort?: components["schemas"]["SortObject"];
             /** Format: int64 */
             offset?: number;
+            /** Format: int32 */
+            pageSize?: number;
+            /** Format: int32 */
+            pageNumber?: number;
+            paged?: boolean;
+            sort?: components["schemas"]["SortObject"];
+            unpaged?: boolean;
         };
         SortObject: {
-            unsorted?: boolean;
-            sorted?: boolean;
             empty?: boolean;
+            sorted?: boolean;
+            unsorted?: boolean;
         };
         MemberWithUsernameAndWidgetLinkDto: {
             /** Format: int64 */
@@ -611,23 +637,23 @@ export interface components {
             nickname?: string | null;
             /** Format: date-time */
             createdDate: string;
-            admin?: boolean;
             deleted?: boolean;
+            admin?: boolean;
         };
         PageAdminMemberDto: {
-            /** Format: int64 */
-            totalElements?: number;
             /** Format: int32 */
             totalPages?: number;
-            pageable?: components["schemas"]["PageableObject"];
-            sort?: components["schemas"]["SortObject"];
-            /** Format: int32 */
-            numberOfElements?: number;
+            /** Format: int64 */
+            totalElements?: number;
             /** Format: int32 */
             size?: number;
             content?: components["schemas"]["AdminMemberDto"][];
             /** Format: int32 */
             number?: number;
+            /** Format: int32 */
+            numberOfElements?: number;
+            pageable?: components["schemas"]["PageableObject"];
+            sort?: components["schemas"]["SortObject"];
             first?: boolean;
             last?: boolean;
             empty?: boolean;
@@ -652,20 +678,23 @@ export interface components {
             /** Format: int64 */
             wishId?: number | null;
         };
+        ThumbnailDto: {
+            imgUrl?: string | null;
+        };
         PageBookDto: {
-            /** Format: int64 */
-            totalElements?: number;
             /** Format: int32 */
             totalPages?: number;
-            pageable?: components["schemas"]["PageableObject"];
-            sort?: components["schemas"]["SortObject"];
-            /** Format: int32 */
-            numberOfElements?: number;
+            /** Format: int64 */
+            totalElements?: number;
             /** Format: int32 */
             size?: number;
             content?: components["schemas"]["BookDto"][];
             /** Format: int32 */
             number?: number;
+            /** Format: int32 */
+            numberOfElements?: number;
+            pageable?: components["schemas"]["PageableObject"];
+            sort?: components["schemas"]["SortObject"];
             first?: boolean;
             last?: boolean;
             empty?: boolean;
@@ -831,6 +860,50 @@ export interface operations {
                 "application/json": components["schemas"]["TagCreateRequest"];
             };
         };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json;charset=UTF-8": components["schemas"]["RsDataUnit"];
+                };
+            };
+        };
+    };
+    createReviewLike: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json;charset=UTF-8": components["schemas"]["RsDataUnit"];
+                };
+            };
+        };
+    };
+    deleteReviewLike: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
         responses: {
             /** @description OK */
             200: {
@@ -1171,7 +1244,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json;charset=UTF-8": string;
+                    "application/json;charset=UTF-8": components["schemas"]["ThumbnailDto"];
                 };
             };
         };
