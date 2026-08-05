@@ -86,7 +86,6 @@ class ApiReviewControllerV1GetTest {
     @Test
     @DisplayName("리뷰 다건 조회 - 로그인한 사용자가 좋아요한 리뷰는 likedByMe가 true")
     @WithUserDetails("user1")
-    @Throws(Exception::class)
     fun t7() {
         val bookId = 1L
         val likedReviewId = 1L
@@ -106,7 +105,6 @@ class ApiReviewControllerV1GetTest {
 
     @Test
     @DisplayName("리뷰 다건 조회 - 로그인하지 않으면 likedByMe는 항상 false")
-    @Throws(Exception::class)
     fun t8() {
         val bookId = 1L
 
