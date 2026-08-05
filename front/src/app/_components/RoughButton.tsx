@@ -60,7 +60,9 @@ export default function RoughButton({
       <span className="rough-action-button-frame">
         <RoughFrame className="rough-overlay" variant="search" />
       </span>
-      <span className="relative z-10">{children}</span>
+      <span className="relative z-10 inline-flex items-center justify-center gap-1.5 whitespace-nowrap">
+        {children}
+      </span>
     </button>
   );
 }

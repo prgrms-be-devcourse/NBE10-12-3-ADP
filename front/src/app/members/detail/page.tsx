@@ -8,16 +8,75 @@ import { Suspense, useEffect, useState } from "react";
 import { API_BASE_URL, apiFetch } from "@/lib/backend/client";
 
 import type { components } from "@/lib/backend/apiV1/schema";
+import { goToErrorPage } from "@/lib/error/goToErrorPage";
 import { ratingColor } from "@/lib/ratingColor";
 
-import Avatar from "@/app/_components/Avatar";
-import RatingHistogram from "@/app/_components/RatingHistogram";
+import LibraryProfilePanel from "@/app/_components/LibraryProfilePanel";
+import LibraryWidgetPreview from "@/app/_components/LibraryWidgetPreview";
 import RatingValue from "@/app/_components/RatingValue";
 import RoughDivider from "@/app/_components/RoughDivider";
 import RoughFrame from "@/app/_components/RoughFrame";
 
 type MemberDto = components["schemas"]["MemberDto"];
 type ReviewsByMemberDto = components["schemas"]["ReviewsByMemberDto"];
+type ReviewWithBookImgUrl = NonNullable<
+  ReviewsByMemberDto["results"]
+>[number] & {
+  bookImgUrl?: string | null;
+};
+
+function MemberDetailSkeleton() {
+  return (
+    <div className="flex gap-8">
+      <aside className="flex w-48 shrink-0 flex-col items-center gap-1 pt-6">
+        <div className="book-skeleton h-24 w-24 rounded-full" />
+        <div className="mt-6 w-full space-y-2">
+          <div className="book-skeleton h-5 w-28 rounded" />
+          <div className="book-skeleton h-5 w-24 rounded" />
+          <div className="book-skeleton h-5 w-32 rounded" />
+        </div>
+        <div className="mt-3 w-full space-y-2">
+          <div className="book-skeleton h-4 w-20 rounded" />
+          <div className="book-skeleton h-24 w-full rounded" />
+        </div>
+      </aside>
+
+      <div className="flex-1 flex flex-col gap-4">
+        <div>
+          <div className="flex items-center justify-between gap-2">
+            <div className="book-skeleton h-6 w-28 rounded" />
+          </div>
+          <div className="rough-panel-border relative mt-1 min-h-24 p-2">
+            <div className="book-skeleton h-20 w-full rounded" />
+          </div>
+        </div>
+
+        <div className="flex gap-2">
+          <div className="book-skeleton h-10 w-28 rounded" />
+        </div>
+
+        <ul className="flex w-full flex-col">
+          {Array.from({ length: 3 }).map((_, index) => (
+            <li
+              key={index}
+              className="relative flex items-start gap-3 py-3"
+            >
+              {index < 2 && <RoughDivider fullWidth />}
+              <div className="book-skeleton h-20 w-14 shrink-0 rounded-lg" />
+              <div className="min-w-0 flex-1 space-y-2">
+                <div className="book-skeleton h-5 w-40 rounded" />
+                <div className="book-skeleton h-4 w-24 rounded" />
+                <div className="book-skeleton h-4 w-full rounded" />
+                <div className="book-skeleton h-4 w-28 rounded" />
+              </div>
+              <div className="book-skeleton h-6 w-14 shrink-0 rounded" />
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
+  );
+}
 
 function MemberDetail() {
   const searchParams = useSearchParams();
@@ -25,151 +84,126 @@ function MemberDetail() {
 
   const [member, setMember] = useState<MemberDto | null>(null);
   const [reviewData, setReviewData] = useState<ReviewsByMemberDto | null>(null);
-  const [bookTitles, setBookTitles] = useState<Record<number, string>>({});
-  const [loadError, setLoadError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (id == null) return;
+    if (id == null) {
+      goToErrorPage({ message: "회원 ID가 없습니다." });
+      return;
+    }
 
     apiFetch(`/api/v1/members/${id}`)
       .then((data) => {
-        setLoadError(null);
         setMember(data);
       })
-      .catch((error) => {
-        setLoadError(`${error.resultCode} : ${error.message}`);
-      });
+      .catch(goToErrorPage);
 
     apiFetch(`/api/v1/reviews/member/${id}`)
       .then((data: ReviewsByMemberDto) => {
-        setLoadError(null);
         setReviewData(data);
-
-        const bookIds = [...new Set(data.results.map((r) => r.bookId))];
-        Promise.all(
-          bookIds.map((bookId) =>
-            apiFetch(`/api/v1/books/${bookId}`).then(
-              (book) => [bookId, book.title] as const,
-            ),
-          ),
-        )
-          .then((entries) => setBookTitles(Object.fromEntries(entries)))
-          .catch(() => {});
       })
-      .catch((error) => {
-        setLoadError(`${error.resultCode} : ${error.message}`);
-      });
+      .catch(goToErrorPage);
   }, [id]);
 
   if (id == null) {
-    return <div>오류가 발생했습니다: 회원 ID가 없습니다.</div>;
+    return <MemberDetailSkeleton />;
   }
 
-  if (loadError != null) {
-    return (
-      <div>오류가 발생했습니다: {loadError} (백엔드 확인이 필요합니다)</div>
-    );
-  }
-
-  if (member == null || reviewData == null) return <div>로딩중...</div>;
+  if (member == null || reviewData == null) return <MemberDetailSkeleton />;
 
   const average = reviewData.rating?.["average"];
   const averageNumber = typeof average === "number" ? average : null;
+  const reviewResults = reviewData.results ?? [];
 
   return (
     <div className="flex gap-8">
-      <div className="flex flex-col items-center gap-1 w-48 shrink-0">
-        <Avatar label={member.githubId} size="lg" />
-        <div className="mt-2 text-sm font-semibold">{member.githubId}</div>
-        {member.githubLink && (
-          <a
-            className="theme-link text-sm underline"
-            href={member.githubLink}
-            target="_blank"
-            rel="noreferrer"
-          >
-            github 주소
-          </a>
-        )}
-
-        {averageNumber != null && (
-          <div
-            className={`text-lg font-bold mt-2 ${ratingColor(averageNumber)}`}
-          >
-            <RatingValue rating={averageNumber} />
-          </div>
-        )}
-        <div className="text-xs theme-muted">
-          {member.githubId}님이 준 평균 별점
-        </div>
-        <RatingHistogram rating={reviewData.rating} className="mt-3 w-full" />
-      </div>
+      <LibraryProfilePanel
+        avatarLabel={member.githubId}
+        username={member.githubId}
+        githubId={member.githubId}
+        githubLink={member.githubLink}
+        averageLabel="평균 별점"
+        averageRating={averageNumber}
+        rating={reviewData.rating}
+      />
 
       <div className="flex-1 flex flex-col gap-4">
         {member.githubId && (
-          <div>
-            <h2 className="font-bold">위젯 미리보기</h2>
-            <div className="rough-panel-border mt-1 bg-transparent p-2">
-              <RoughFrame className="rough-overlay" variant="card" />
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={`${API_BASE_URL}/api/v1/widgets/${member.githubId}`}
-                alt="위젯 미리보기"
-              />
-            </div>
-          </div>
+          <LibraryWidgetPreview
+            githubId={member.githubId}
+            widgetSrc={`${API_BASE_URL}/api/v1/widgets/${member.githubId}`}
+          />
         )}
 
         <div>
-          <div className="theme-tab inline-flex">
-            <h2 className="px-3 py-2 text-sm font-bold">
-              작성한 리뷰 {reviewData.results.length}
-            </h2>
-            <RoughDivider
-              className="theme-tab-divider"
-              color="var(--line)"
-              emphasis
-              strokeWidth={1.35}
-            />
+          <div className="flex gap-2">
+            <div className="theme-tab">
+              <div className="theme-tab-active px-3 py-2 text-sm">
+                작성한 리뷰 {reviewResults.length}
+              </div>
+            </div>
           </div>
 
-          {reviewData.results.length === 0 && (
+          {reviewResults.length === 0 && (
             <div className="mt-2 text-sm theme-muted">
               작성한 리뷰가 없습니다.
             </div>
           )}
 
           <ul className="flex w-full flex-col">
-            {reviewData.results.map((review) => (
+            {reviewResults.map((review, index) => (
               <li
-                key={review.id}
+                key={review.id ?? review.bookId}
                 className="relative flex items-start gap-3 py-3"
               >
-                <RoughDivider fullWidth />
+                {index < reviewResults.length - 1 && <RoughDivider fullWidth />}
+                <Link
+                  href={`/books/detail?id=${review.bookId}`}
+                  className="rough-book-card review-book-thumbnail relative flex h-20 w-14 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-white"
+                  aria-label={`${review.bookTitle ?? `책 #${review.bookId}`} 상세 보기`}
+                >
+                  <RoughFrame
+                    className="rough-overlay rough-card-line rough-book-cover-line"
+                    variant="card"
+                  />
+                  {(review as ReviewWithBookImgUrl).bookImgUrl ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={(review as ReviewWithBookImgUrl).bookImgUrl ?? ""}
+                      alt=""
+                      className="h-full w-full object-cover"
+                    />
+                  ) : (
+                    <span className="text-xs text-gray-400">표지 없음</span>
+                  )}
+                </Link>
                 <div className="flex-1 min-w-0">
                   <Link
                     className="font-semibold hover:underline"
                     href={`/books/detail?id=${review.bookId}`}
                   >
-                    {bookTitles[review.bookId] ?? `책 #${review.bookId}`}
+                    {review.bookTitle ?? `책 #${review.bookId}`}
                   </Link>
 
                   <div className="flex flex-wrap gap-1 text-xs theme-tag">
-                    {review.tags.map((tag) => (
+                    {(review.tags ?? []).map((tag) => (
                       <span key={tag}>#{tag}</span>
                     ))}
                   </div>
 
-                  <div className="mt-1 text-sm">{review.content}</div>
+                  <div className="text-sm mt-1">{review.content}</div>
                   <div className="mt-1 text-xs theme-subtle">
                     {review.createdDate}
                   </div>
                 </div>
 
                 <span
-                  className={`font-bold shrink-0 ${ratingColor(review.rating)}`}
+                  className={`font-bold shrink-0 ${
+                    typeof review.rating === "number"
+                      ? ratingColor(review.rating)
+                      : ""
+                  }`}
                 >
-                  <RatingValue rating={review.rating} />
+                  <RatingValue rating={review.rating ?? 0} />
                 </span>
               </li>
             ))}
@@ -179,10 +213,9 @@ function MemberDetail() {
     </div>
   );
 }
-
 export default function Page() {
   return (
-    <Suspense fallback={<div>로딩중...</div>}>
+    <Suspense fallback={<MemberDetailSkeleton />}>
       <MemberDetail />
     </Suspense>
   );

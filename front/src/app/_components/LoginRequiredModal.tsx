@@ -1,5 +1,7 @@
 "use client";
 
+import { buildGitHubLoginUrl } from "@/lib/auth/authReturnPath";
+
 import RoughButton from "@/app/_components/RoughButton";
 import RoughFrame from "@/app/_components/RoughFrame";
 
@@ -11,7 +13,7 @@ export default function LoginRequiredModal({
   onCancel,
 }: LoginRequiredModalProps) {
   const handleGitHubLogin = () => {
-    window.location.href = `${process.env.NEXT_PUBLIC_API_BASE_URL}/oauth2/authorization/github?redirectUrl=${process.env.NEXT_PUBLIC_FRONTEND_BASE_URL}`;
+    window.location.href = buildGitHubLoginUrl();
   };
 
   return (

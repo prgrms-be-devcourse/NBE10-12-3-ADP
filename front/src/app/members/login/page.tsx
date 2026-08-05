@@ -5,6 +5,8 @@ import { useRouter } from "next/navigation";
 import { apiFetch } from "@/lib/backend/client";
 
 import { useAuth } from "@/lib/auth/AuthProvider";
+import { consumeAuthReturnPath } from "@/lib/auth/authReturnPath";
+import { useToast } from "@/lib/toast/ToastProvider";
 
 import RoughButton from "@/app/_components/RoughButton";
 import { RoughInput } from "@/app/_components/RoughInput";
@@ -12,6 +14,7 @@ import { RoughInput } from "@/app/_components/RoughInput";
 export default function Page() {
   const router = useRouter();
   const { refresh } = useAuth();
+  const { showErrorToast } = useToast();
 
   const handleSubmit = (e: React.SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -65,11 +68,9 @@ export default function Page() {
         return refresh();
       })
       .then(() => {
-        router.replace(`/`);
+        router.replace(consumeAuthReturnPath());
       })
-      .catch((error) => {
-        alert(`${error.resultCode} : ${error.message}`);
-      });
+      .catch(showErrorToast);
   };
 
   return (

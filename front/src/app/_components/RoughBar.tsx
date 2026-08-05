@@ -9,9 +9,15 @@ import { useTheme } from "@/lib/theme/ThemeProvider";
 export default function RoughBar({
   className = "",
   fill,
+  variant = "bar",
+  orientation = "horizontal",
+  lineInset,
 }: {
   className?: string;
   fill: string;
+  variant?: "bar" | "line";
+  orientation?: "horizontal" | "vertical";
+  lineInset?: number;
 }) {
   const svgRef = useRef<SVGSVGElement | null>(null);
   const { theme } = useTheme();
@@ -29,8 +35,49 @@ export default function RoughBar({
       const inset = 1;
       svg.setAttribute("width", `${width}`);
       svg.setAttribute("height", `${height}`);
-      svg.setAttribute("viewBox", `0 0 ${width} ${height}`);
+      svg.setAttribute("preserveAspectRatio", "none");
       svg.replaceChildren();
+      const stroke = theme === "dark" ? "#f4f1ea" : "#1f1f1f";
+
+      if (variant === "line") {
+        svg.setAttribute("viewBox", `0 0 ${width} ${height}`);
+        svg.style.overflow = "visible";
+
+        const resolvedLineInset =
+          lineInset ?? Math.max(2, Math.min(width, height) * 0.25);
+        const line =
+          orientation === "vertical"
+            ? rc.line(
+                width / 2,
+                resolvedLineInset,
+                width / 2,
+                height - resolvedLineInset,
+                {
+                  stroke,
+                  strokeWidth: 1,
+                  roughness: 1.8,
+                  bowing: 1.4,
+                },
+              )
+            : rc.line(
+                resolvedLineInset,
+                height / 2,
+                width - resolvedLineInset,
+                height / 2,
+                {
+                  stroke,
+                  strokeWidth: 1,
+                  roughness: 1.8,
+                  bowing: 1.4,
+                },
+              );
+
+        svg.append(line);
+        return;
+      }
+
+      svg.setAttribute("viewBox", `0 0 ${width} ${height}`);
+      svg.style.overflow = "";
 
       const left = inset;
       const top = inset;
@@ -52,7 +99,7 @@ export default function RoughBar({
 
       svg.append(
         rc.path(roundedRect, {
-          stroke: theme === "dark" ? "#f4f1ea" : "#1f1f1f",
+          stroke,
           strokeWidth: 1,
           roughness: 1.25,
           bowing: 1.1,
@@ -70,7 +117,14 @@ export default function RoughBar({
     return () => {
       resizeObserver.disconnect();
     };
-  }, [fill, theme]);
+  }, [fill, lineInset, orientation, theme, variant]);
 
-  return <svg ref={svgRef} aria-hidden="true" className={className} />;
+  return (
+    <svg
+      ref={svgRef}
+      aria-hidden="true"
+      className={className}
+      preserveAspectRatio="none"
+    />
+  );
 }

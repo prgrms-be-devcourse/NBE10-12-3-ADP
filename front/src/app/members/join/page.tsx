@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { apiFetch } from "@/lib/backend/client";
 
 import { useAuth } from "@/lib/auth/AuthProvider";
+import { useToast } from "@/lib/toast/ToastProvider";
 
 import RoughButton from "@/app/_components/RoughButton";
 import { RoughInput } from "@/app/_components/RoughInput";
@@ -12,6 +13,7 @@ import { RoughInput } from "@/app/_components/RoughInput";
 export default function Page() {
   const router = useRouter();
   const { refresh } = useAuth();
+  const { showErrorToast } = useToast();
 
   const handleSubmit = (e: React.SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -67,9 +69,7 @@ export default function Page() {
       .then(() => {
         router.replace(`/`);
       })
-      .catch((error) => {
-        alert(`${error.resultCode} : ${error.message}`);
-      });
+      .catch(showErrorToast);
   };
 
   return (

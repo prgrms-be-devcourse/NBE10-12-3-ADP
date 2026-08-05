@@ -1,5 +1,7 @@
 import RoughBar from "@/app/_components/RoughBar";
 
+import { ratingFillColor } from "@/lib/ratingColor";
+
 const RATING_BUCKETS = [
   "5.0",
   "4.5",
@@ -12,14 +14,6 @@ const RATING_BUCKETS = [
   "1.0",
   "0.5",
 ];
-
-function ratingBarFill(bucket: string) {
-  const rating = Number(bucket);
-  if (rating <= 1) return "#f87171";
-  if (rating <= 2.5) return "#fb923c";
-  if (rating <= 4) return "#38bdf8";
-  return "#4ade80";
-}
 
 export default function RatingHistogram({
   rating,
@@ -43,7 +37,7 @@ export default function RatingHistogram({
             >
               <RoughBar
                 className="rough-overlay"
-                fill={ratingBarFill(bucket)}
+                fill={ratingFillColor(Number(bucket))}
               />
             </div>
           </div>

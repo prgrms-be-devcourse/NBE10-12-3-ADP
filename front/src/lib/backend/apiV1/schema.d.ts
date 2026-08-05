@@ -550,8 +550,8 @@ export interface components {
             totalPages?: number;
             /** Format: int32 */
             numberOfElements?: number;
-            sort?: components["schemas"]["SortObject"];
             pageable?: components["schemas"]["PageableObject"];
+            sort?: components["schemas"]["SortObject"];
             /** Format: int32 */
             size?: number;
             content?: components["schemas"]["AdminReviewDto"][];
@@ -562,12 +562,12 @@ export interface components {
             empty?: boolean;
         };
         PageableObject: {
-            /** Format: int32 */
-            pageNumber?: number;
-            sort?: components["schemas"]["SortObject"];
             paged?: boolean;
             /** Format: int32 */
+            pageNumber?: number;
+            /** Format: int32 */
             pageSize?: number;
+            sort?: components["schemas"]["SortObject"];
             unpaged?: boolean;
             /** Format: int64 */
             offset?: number;
@@ -604,8 +604,8 @@ export interface components {
             totalPages?: number;
             /** Format: int32 */
             numberOfElements?: number;
-            sort?: components["schemas"]["SortObject"];
             pageable?: components["schemas"]["PageableObject"];
+            sort?: components["schemas"]["SortObject"];
             /** Format: int32 */
             size?: number;
             content?: components["schemas"]["AdminMemberDto"][];
@@ -642,8 +642,8 @@ export interface components {
             totalPages?: number;
             /** Format: int32 */
             numberOfElements?: number;
-            sort?: components["schemas"]["SortObject"];
             pageable?: components["schemas"]["PageableObject"];
+            sort?: components["schemas"]["SortObject"];
             /** Format: int32 */
             size?: number;
             content?: components["schemas"]["BookDto"][];

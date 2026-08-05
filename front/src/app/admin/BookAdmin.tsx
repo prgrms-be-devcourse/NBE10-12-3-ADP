@@ -1,11 +1,14 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 
 import { apiFetch } from "@/lib/backend/client";
+import { goToErrorPage } from "@/lib/error/goToErrorPage";
+import { useToast } from "@/lib/toast/ToastProvider";
 
 import type { components } from "@/lib/backend/apiV1/schema";
 
+import AdminRoughDivider from "@/app/admin/AdminRoughDivider";
 import RoughButton from "@/app/_components/RoughButton";
 import { RoughInput, RoughTextarea } from "@/app/_components/RoughInput";
 
@@ -13,13 +16,16 @@ type PageBookDto = components["schemas"]["PageBookDto"];
 type BookDetailDto = components["schemas"]["BookDetailDto"];
 
 export default function BookAdmin() {
+  const { showToast, showErrorToast } = useToast();
   const [pageData, setPageData] = useState<PageBookDto | null>(null);
   const [pageNumber, setPageNumber] = useState(0);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [editingBook, setEditingBook] = useState<BookDetailDto | null>(null);
 
   const loadBooks = (page: number) => {
-    apiFetch(`/api/v1/books/admin?page=${page}&size=10`).then(setPageData);
+    apiFetch(`/api/v1/books/admin?page=${page}&size=10`)
+      .then(setPageData)
+      .catch(goToErrorPage);
   };
 
   useEffect(() => {
@@ -27,10 +33,12 @@ export default function BookAdmin() {
   }, [pageNumber]);
 
   const startEdit = (id: number) => {
-    apiFetch(`/api/v1/books/${id}`).then((data) => {
-      setEditingId(id);
-      setEditingBook(data);
-    });
+    apiFetch(`/api/v1/books/${id}`)
+      .then((data) => {
+        setEditingId(id);
+        setEditingBook(data);
+      })
+      .catch(showErrorToast);
   };
 
   const cancelEdit = () => {
@@ -65,13 +73,11 @@ export default function BookAdmin() {
       }),
     })
       .then((data) => {
-        alert(data.message);
+        showToast(data?.message ?? "도서 정보를 수정했습니다.");
         cancelEdit();
         loadBooks(pageNumber);
       })
-      .catch((error) => {
-        alert(`${error.resultCode} : ${error.message}`);
-      });
+      .catch(showErrorToast);
   };
 
   const handleDelete = (id: number) => {
@@ -79,12 +85,10 @@ export default function BookAdmin() {
 
     apiFetch(`/api/v1/books/${id}`, { method: "DELETE" })
       .then((data) => {
-        alert(data.message);
+        showToast(data?.message ?? "도서를 삭제했습니다.");
         loadBooks(pageNumber);
       })
-      .catch((error) => {
-        alert(`${error.resultCode} : ${error.message}`);
-      });
+      .catch(showErrorToast);
   };
 
   if (pageData == null) return <div>로딩중...</div>;
@@ -93,43 +97,65 @@ export default function BookAdmin() {
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="sketch-panel overflow-x-auto p-2">
+      <div className="overflow-x-auto">
+        <AdminRoughDivider />
         <table className="w-full text-left text-sm">
           <thead>
-            <tr className="border-b">
+            <tr>
               <th className="p-2">ID</th>
               <th className="p-2">제목</th>
               <th className="p-2">평점</th>
               <th className="p-2"></th>
             </tr>
+            <tr aria-hidden="true">
+              <td colSpan={4} className="p-0">
+                <AdminRoughDivider />
+              </td>
+            </tr>
           </thead>
           <tbody>
-            {books.map((book) => (
-              <tr key={book.id} className="border-b">
-                <td className="p-2">{book.id}</td>
-                <td className="p-2">{book.title}</td>
-                <td className="p-2">{book.averageRating}</td>
-                <td className="flex gap-2 p-2">
-                  <RoughButton
-                    roughSize="sm"
-                    type="button"
-                    onClick={() => startEdit(book.id)}
-                  >
-                    수정
-                  </RoughButton>
-                  <RoughButton
-                    roughSize="sm"
-                    tone="cancel"
-                    type="button"
-                    onClick={() => handleDelete(book.id)}
-                  >
-                    삭제
-                  </RoughButton>
-                </td>
-              </tr>
+            {books.map((book, index) => (
+              <Fragment key={book.id}>
+                <tr>
+                  <td className="p-2">{book.id}</td>
+                  <td className="p-2">{book.title}</td>
+                  <td className="p-2">{book.averageRating}</td>
+                  <td className="flex gap-2 p-2">
+                      <RoughButton
+                      roughSize="sm"
+                      type="button"
+                      onClick={() => {
+                        if (book.id == null) return;
+                        startEdit(book.id);
+                      }}
+                    >
+                      수정
+                    </RoughButton>
+                    <RoughButton
+                      roughSize="sm"
+                      tone="cancel"
+                      type="button"
+                      onClick={() => {
+                        if (book.id == null) return;
+                        handleDelete(book.id);
+                      }}
+                    >
+                      삭제
+                    </RoughButton>
+                  </td>
+                </tr>
+                {index < books.length - 1 && (
+                  <tr aria-hidden="true">
+                    <td colSpan={4} className="p-0">
+                      <AdminRoughDivider />
+                    </td>
+                  </tr>
+                )}
+              </Fragment>
             ))}
           </tbody>
         </table>
+        <AdminRoughDivider />
       </div>
 
       <div className="flex items-center gap-2">
@@ -156,6 +182,7 @@ export default function BookAdmin() {
 
       {editingId != null && editingBook != null && (
         <form
+          key={editingBook.id ?? editingId}
           className="sketch-panel flex max-w-md flex-col gap-2 p-3"
           onSubmit={handleEditSubmit}
         >
@@ -169,26 +196,26 @@ export default function BookAdmin() {
           <RoughTextarea
             name="description"
             placeholder="설명"
-            defaultValue={editingBook.description}
+            defaultValue={editingBook.description ?? ""}
             rows={3}
           />
           <RoughInput
             type="text"
             name="authors"
             placeholder="저자 (쉼표로 구분)"
-            defaultValue={editingBook.authors.join(", ")}
+            defaultValue={(editingBook.authors ?? []).join(", ")}
           />
           <RoughInput
             type="text"
             name="publisher"
             placeholder="출판사"
-            defaultValue={editingBook.publisher}
+            defaultValue={editingBook.publisher ?? ""}
           />
           <RoughInput
             type="text"
             name="imgUrl"
             placeholder="표지 이미지 URL"
-            defaultValue={editingBook.imgUrl}
+            defaultValue={editingBook.imgUrl ?? ""}
           />
           <div className="flex gap-2">
             <RoughButton tone="submit" type="submit">
