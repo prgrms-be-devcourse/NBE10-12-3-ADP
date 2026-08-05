@@ -82,6 +82,7 @@ jobs:
           docker run -d \
             --name application \
             --network common \
+            --restart unless-stopped \
             --env-file .env \
             -p 8080:8080 \
             $IMAGE
