@@ -5,17 +5,20 @@ on:
     branches: [dev, ci/ADP-222]
     paths:
       - ".github/workflows/deploy.yml"
+      - "widget/**"
       - "back/src/**"
       - "back/.env.example"
       - "back/build.gradle.kts"
       - "back/settings.gradle.kts"
       - "back/Dockerfile"
+      - "widget/Dockerfile"
       - "terraform/**"
 
 env:
   CONTAINER_REGISTRY: ghcr.io
   REPOSITORY_OWNER: prgrms-be-devcourse
-  IMAGE_NAME: nbe10-12-3-adp
+  BACK_IMAGE_NAME: nbe10-12-3-adp
+  WIDGET_IMAGE_NAME: nbe10-12-3-adp-widget
 
 concurrency:
   group: deploy
@@ -43,13 +46,21 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v4
 
-      - name: Build and push
+      - name: Build and push back image
         uses: docker/build-push-action@v6
         with:
           context: ./back
           platforms: linux/arm64
           push: true
-          tags: ${{ env.CONTAINER_REGISTRY }}/${{ env.REPOSITORY_OWNER }}/${{ env.IMAGE_NAME }}
+          tags: ${{ env.CONTAINER_REGISTRY }}/${{ env.REPOSITORY_OWNER }}/${{ env.BACK_IMAGE_NAME }}
+
+      - name: Build and push widget image
+        uses: docker/build-push-action@v6
+        with:
+          context: ./widget
+          platforms: linux/arm64
+          push: true
+          tags: ${{ env.CONTAINER_REGISTRY }}/${{ env.REPOSITORY_OWNER }}/${{ env.WIDGET_IMAGE_NAME }}
 
   deploy:
     name: 2. EC2에서 도커 이미지 풀 및 컨테이너 실행
@@ -72,20 +83,33 @@ jobs:
 
       - name: Deploy via SSM
         env:
-          IMAGE: ${{ env.CONTAINER_REGISTRY }}/${{ env.REPOSITORY_OWNER }}/${{ env.IMAGE_NAME }}:latest
+          BACK_IMAGE: ${{ env.CONTAINER_REGISTRY }}/${{ env.REPOSITORY_OWNER }}/${{ env.BACK_IMAGE_NAME }}:latest
+          WIDGET_IMAGE: ${{ env.CONTAINER_REGISTRY }}/${{ env.REPOSITORY_OWNER }}/${{ env.WIDGET_IMAGE_NAME }}:latest
           INSTANCE_ID: ${{ env.INSTANCE_ID }}
         run: |
           SCRIPT=$(cat <<DEPLOY
+          docker stop widget || true
+          docker rm widget || true
+          docker rmi $WIDGET_IMAGE || true
+          docker run -d \
+            --name widget \
+            --network common \
+            --restart unless-stopped \
+            -e PORT=3001 \
+            -p 3001:3001 \
+            $WIDGET_IMAGE
+
           docker stop application || true
           docker rm application || true
-          docker rmi $IMAGE || true
+          docker rmi $BACK_IMAGE || true
           docker run -d \
             --name application \
             --network common \
             --restart unless-stopped \
             --env-file .env \
+            -e CUSTOM__WIDGET__RENDERER__BASE_URL=http://widget:3001 \
             -p 8080:8080 \
-            $IMAGE
+            $BACK_IMAGE
           DEPLOY
           )
           PARAMS=$(jq -n --arg cmd "$SCRIPT" '{"commands":[$cmd]}')
