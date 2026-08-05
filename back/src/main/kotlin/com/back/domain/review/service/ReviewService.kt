@@ -169,4 +169,14 @@ class ReviewService(
 
         reviewRepository.increaseLikeCount(reviewId)
     }
+
+    @Transactional
+    fun deleteReviewLike(actor: Member, reviewId: Long) {
+        val review = getReview(reviewId)
+
+        if (reviewLikeRepository.deleteByReviewAndMember(review, actor) == 0)
+            throw ServiceException("404-1", "존재하지 않는 좋아요입니다.")
+
+        reviewRepository.decreaseLikeCount(reviewId)
+    }
 }
