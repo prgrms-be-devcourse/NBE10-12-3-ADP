@@ -100,7 +100,6 @@ class BookQueryService(
 
     private fun getBooksOrderByOperationalRank(type: String, page: Int, size: Int): List<BookDto> {
         val offset = page * size
-        val rankedBookCount = bookOperationalRepository.count().toInt()
         val rankedIsbns = when (type) {
             "rating" -> bookOperationalRepository.findRankedIsbnsByAverageRating(PageRequest.of(page, size))
             "views" -> bookOperationalRepository.findRankedIsbnsByViewCount(PageRequest.of(page, size))
@@ -110,6 +109,7 @@ class BookQueryService(
         val rankedBooks = getBookDtosByIsbns(rankedIsbns)
         if (rankedBooks.size == size) return rankedBooks
 
+        val rankedBookCount = bookOperationalRepository.count().toInt()
         val fallbackOffset = (offset - rankedBookCount).coerceAtLeast(0)
         val fallbackPage = fallbackOffset / size
         val fallbackPageOffset = fallbackOffset % size
