@@ -2,8 +2,11 @@ import type { Metadata } from "next";
 
 import { AuthProvider } from "@/lib/auth/AuthProvider";
 import { ThemeProvider } from "@/lib/theme/ThemeProvider";
+import { ToastProvider } from "@/lib/toast/ToastProvider";
 
+import AuthReturnPathRestorer from "@/app/_components/AuthReturnPathRestorer";
 import Header from "@/app/_components/Header";
+import RoughBar from "@/app/_components/RoughBar";
 
 import "./globals.css";
 
@@ -39,36 +42,39 @@ export default function RootLayout({
     <html lang="ko" suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link
-          rel="preconnect"
-          href="https://fonts.gstatic.com"
-          crossOrigin="anonymous"
-        />
-        {/* eslint-disable-next-line @next/next/no-page-custom-font -- this is the root layout, applies to every page */}
-        <link
-          href="https://fonts.googleapis.com/css2?family=Gaegu:wght@400;700&display=swap"
-          rel="stylesheet"
-        />
+        <link rel="preconnect" href="https://cdn.jsdelivr.net" />
       </head>
       <body className="flex min-h-screen flex-col antialiased">
         <ThemeProvider>
-          <AuthProvider>
-            <Header />
-            <main className="mx-auto flex w-full max-w-4xl flex-grow flex-col p-4">
-              <div className="relative flex flex-1 flex-col">{children}</div>
-            </main>
-            <footer className="px-2 py-10 text-center text-sm theme-muted">
-              <a
-                href="https://github.com/prgrms-be-devcourse/NBE10-12-2-ADP"
-                target="_blank"
-                rel="noreferrer"
-                className="theme-link"
-              >
-                GitHub Repository
-              </a>
-            </footer>
-          </AuthProvider>
+          <ToastProvider>
+            <AuthProvider>
+              <AuthReturnPathRestorer />
+              <Header />
+              <main className="relative z-0 mx-auto flex w-full max-w-4xl flex-grow flex-col p-4">
+                <div className="relative flex flex-1 flex-col">{children}</div>
+              </main>
+              <footer className="theme-site-footer text-center text-sm theme-muted">
+                <div className="theme-rough-divider-bar">
+                  <RoughBar
+                    className="h-full w-full"
+                    fill="transparent"
+                    lineInset={0}
+                    variant="line"
+                  />
+                </div>
+                <div className="px-2 py-6">
+                  <a
+                    href="https://github.com/prgrms-be-devcourse/NBE10-12-3-ADP"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="theme-link"
+                  >
+                    GitHub Repository
+                  </a>
+                </div>
+              </footer>
+            </AuthProvider>
+          </ToastProvider>
         </ThemeProvider>
       </body>
     </html>

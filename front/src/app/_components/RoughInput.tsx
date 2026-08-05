@@ -1,6 +1,7 @@
 "use client";
 
 import type { InputHTMLAttributes, TextareaHTMLAttributes } from "react";
+import { forwardRef } from "react";
 
 import RoughFrame from "@/app/_components/RoughFrame";
 
@@ -27,37 +28,43 @@ type RoughInputProps = InputHTMLAttributes<HTMLInputElement> & {
   tone?: RoughInputTone;
 };
 
-export function RoughInput({
-  wrapperClassName = "",
-  inputClassName = "",
-  roughSize = "md",
-  tone = "neutral",
-  ...props
-}: RoughInputProps) {
-  return (
-    <span
-      className={[
-        "rough-input-border",
-        inputSizeClass[roughSize],
-        inputToneClass[tone],
-        wrapperClassName,
-      ]
-        .filter(Boolean)
-        .join(" ")}
-    >
-      <RoughFrame className="rough-overlay" variant="search" />
-      <input
+export const RoughInput = forwardRef<HTMLInputElement, RoughInputProps>(
+  function RoughInput(
+    {
+      wrapperClassName = "",
+      inputClassName = "",
+      roughSize = "md",
+      tone = "neutral",
+      ...props
+    },
+    ref,
+  ) {
+    return (
+      <span
         className={[
-          "relative z-10 h-full w-full border-0 bg-transparent px-3 py-1 text-sm outline-none",
-          inputClassName,
+          "rough-input-border",
+          inputSizeClass[roughSize],
+          inputToneClass[tone],
+          wrapperClassName,
         ]
           .filter(Boolean)
           .join(" ")}
-        {...props}
-      />
-    </span>
-  );
-}
+      >
+        <RoughFrame className="rough-overlay" variant="search" />
+        <input
+          ref={ref}
+          className={[
+            "relative z-10 h-full w-full border-0 bg-transparent px-3 py-1 text-sm outline-none",
+            inputClassName,
+          ]
+            .filter(Boolean)
+            .join(" ")}
+          {...props}
+        />
+      </span>
+    );
+  },
+);
 
 type RoughTextareaProps = TextareaHTMLAttributes<HTMLTextAreaElement> & {
   wrapperClassName?: string;

@@ -8,7 +8,14 @@ import { useTheme } from "@/lib/theme/ThemeProvider";
 
 type RoughFrameProps = {
   className?: string;
-  variant?: "frame" | "highlight" | "divider" | "search" | "card" | "circle";
+  variant?:
+    | "frame"
+    | "highlight"
+    | "divider"
+    | "softDivider"
+    | "search"
+    | "card"
+    | "circle";
 };
 
 export default function RoughFrame({
@@ -77,6 +84,41 @@ export default function RoughFrame({
             strokeWidth: 0.75,
             roughness: 1.35,
             bowing: 1.2,
+          },
+        );
+        svg.append(firstStroke, secondStroke);
+        return;
+      }
+
+      if (variant === "softDivider") {
+        const overrun = Math.max(6, width * 0.015);
+        svg.setAttribute(
+          "viewBox",
+          `${-overrun} 0 ${width + overrun * 2} ${height}`,
+        );
+        const strokeColor = theme === "dark" ? "#a8a29e" : "#9ca3af";
+        const firstStroke = rc.line(
+          -overrun,
+          height / 2,
+          width + overrun,
+          height / 2 - 0.5,
+          {
+            stroke: strokeColor,
+            strokeWidth: 0.85,
+            roughness: 0.8,
+            bowing: 0.65,
+          },
+        );
+        const secondStroke = rc.line(
+          -overrun,
+          height / 2 + 1.25,
+          width + overrun,
+          height / 2 + 0.75,
+          {
+            stroke: strokeColor,
+            strokeWidth: 0.4,
+            roughness: 0.7,
+            bowing: 0.55,
           },
         );
         svg.append(firstStroke, secondStroke);

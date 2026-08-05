@@ -27,6 +27,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const refresh = () => {
     return apiFetch(`/api/v1/members/me`)
       .then((data) => {
+        if (data == null) {
+          setLoginMember(null);
+          setIsAdmin(false);
+          return;
+        }
+
         setLoginMember(data);
 
         return apiFetch(`/api/v1/members/admin?page=0&size=1`)

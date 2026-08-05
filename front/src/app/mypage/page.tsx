@@ -8,64 +8,137 @@ import { useEffect, useState } from "react";
 import { API_BASE_URL, apiFetch } from "@/lib/backend/client";
 
 import { useAuth } from "@/lib/auth/AuthProvider";
+import {
+  consumeAuthReturnPath,
+  saveCurrentAuthReturnPath,
+} from "@/lib/auth/authReturnPath";
 import type { components } from "@/lib/backend/apiV1/schema";
+import { goToErrorPage } from "@/lib/error/goToErrorPage";
 import { ratingColor } from "@/lib/ratingColor";
+import { useToast } from "@/lib/toast/ToastProvider";
 
-import Avatar from "@/app/_components/Avatar";
-import RatingHistogram from "@/app/_components/RatingHistogram";
+import LibraryProfilePanel from "@/app/_components/LibraryProfilePanel";
+import LibraryWidgetPreview from "@/app/_components/LibraryWidgetPreview";
 import RatingValue from "@/app/_components/RatingValue";
 import RoughButton from "@/app/_components/RoughButton";
 import RoughDivider from "@/app/_components/RoughDivider";
 import RoughFrame from "@/app/_components/RoughFrame";
-import { RoughInput } from "@/app/_components/RoughInput";
 import WidgetGuideModal from "@/app/_components/WidgetGuideModal";
 
 type ReviewsByMemberDto = components["schemas"]["ReviewsByMemberDto"];
-type BookDto = components["schemas"]["BookDto"];
+type BookWithWishIdAndTagsDto =
+  components["schemas"]["BookWithWishIdAndTagsDto"];
+type ReviewWithBookImgUrl = NonNullable<
+  ReviewsByMemberDto["results"]
+>[number] & {
+  bookImgUrl?: string | null;
+};
 
+function MyPageSkeleton() {
+  return (
+    <div className="flex gap-8">
+      <aside className="flex w-48 shrink-0 flex-col items-center gap-1 pt-6">
+        <div className="book-skeleton h-24 w-24 rounded-full" />
+        <div className="mt-6 w-full space-y-2">
+          <div className="book-skeleton h-5 w-28 rounded" />
+          <div className="book-skeleton h-5 w-24 rounded" />
+          <div className="book-skeleton h-5 w-32 rounded" />
+        </div>
+        <div className="mt-3 w-full space-y-2">
+          <div className="book-skeleton h-4 w-24 rounded" />
+          <div className="book-skeleton h-24 w-full rounded" />
+        </div>
+        <div className="mt-4 flex w-full gap-2">
+          <div className="book-skeleton h-9 flex-1 rounded" />
+          <div className="book-skeleton h-9 flex-1 rounded" />
+        </div>
+      </aside>
+
+      <div className="flex-1 flex flex-col gap-4">
+        <div>
+          <div className="flex items-center justify-between gap-2">
+            <div className="book-skeleton h-6 w-28 rounded" />
+            <div className="flex gap-2">
+              <div className="book-skeleton h-8 w-20 rounded" />
+              <div className="book-skeleton h-8 w-28 rounded" />
+            </div>
+          </div>
+          <div className="rough-panel-border relative mt-1 min-h-24 p-2">
+            <div className="book-skeleton h-20 w-full rounded" />
+          </div>
+          <div className="mt-1 book-skeleton h-9 w-full rounded" />
+        </div>
+
+        <div className="flex gap-2">
+          <div className="book-skeleton h-10 w-28 rounded" />
+          <div className="book-skeleton h-10 w-28 rounded" />
+        </div>
+
+        <ul className="flex w-full flex-col">
+          {Array.from({ length: 3 }).map((_, index) => (
+            <li
+              key={index}
+              className="relative flex items-start gap-3 py-3"
+            >
+              {index < 2 && <RoughDivider fullWidth />}
+              <div className="book-skeleton h-20 w-14 shrink-0 rounded-lg" />
+              <div className="min-w-0 flex-1 space-y-2">
+                <div className="book-skeleton h-5 w-40 rounded" />
+                <div className="book-skeleton h-4 w-24 rounded" />
+                <div className="book-skeleton h-4 w-full rounded" />
+                <div className="book-skeleton h-4 w-28 rounded" />
+                <div className="book-skeleton h-8 w-16 rounded" />
+              </div>
+              <div className="book-skeleton h-6 w-14 shrink-0 rounded" />
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
+  );
+}
+
+function WishIcon() {
+  return (
+    <svg
+      aria-hidden="true"
+      className="inline-block h-4 w-4 shrink-0 align-[-0.125em]"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M19 21l-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />
+    </svg>
+  );
+}
 export default function Page() {
   const router = useRouter();
   const { loginMember, isLogin, isLoginMemberPending, refresh } = useAuth();
+  const { showToast, showErrorToast } = useToast();
 
   const [reviewData, setReviewData] = useState<ReviewsByMemberDto | null>(null);
-  const [wishes, setWishes] = useState<BookDto[] | null>(null);
-  const [bookTitles, setBookTitles] = useState<Record<number, string>>({});
+  const [wishes, setWishes] = useState<BookWithWishIdAndTagsDto[] | null>(null);
   const [tab, setTab] = useState<"reviews" | "wishes">("reviews");
-  const [loadError, setLoadError] = useState<string | null>(null);
   const [isWidgetGuideOpen, setIsWidgetGuideOpen] = useState(false);
   const [copiedWidgetLink, setCopiedWidgetLink] = useState(false);
 
   const loadReviews = () => {
     apiFetch(`/api/v1/reviews/member/mine`)
       .then((data: ReviewsByMemberDto) => {
-        setLoadError(null);
         setReviewData(data);
-
-        const bookIds = [...new Set(data.results.map((r) => r.bookId))];
-        Promise.all(
-          bookIds.map((bookId) =>
-            apiFetch(`/api/v1/books/${bookId}`).then(
-              (book) => [bookId, book.title] as const,
-            ),
-          ),
-        )
-          .then((entries) => setBookTitles(Object.fromEntries(entries)))
-          .catch(() => {});
       })
-      .catch((error) => {
-        setLoadError(`${error.resultCode} : ${error.message}`);
-      });
+      .catch(goToErrorPage);
   };
 
   const loadWishes = () => {
     apiFetch(`/api/v1/wishes/mine`)
       .then((data) => {
-        setLoadError(null);
         setWishes(data);
       })
-      .catch((error) => {
-        setLoadError(`${error.resultCode} : ${error.message}`);
-      });
+      .catch(goToErrorPage);
   };
 
   useEffect(() => {
@@ -85,23 +158,19 @@ export default function Page() {
 
     apiFetch(`/api/v1/reviews/${reviewId}`, { method: "DELETE" })
       .then((data) => {
-        alert(data.message);
+        showToast(data?.message ?? "리뷰를 삭제했습니다.");
         loadReviews();
       })
-      .catch((error) => {
-        alert(`${error.resultCode} : ${error.message}`);
-      });
+      .catch(showErrorToast);
   };
 
-  const handleRemoveWish = (bookId: number) => {
-    apiFetch(`/api/v1/wishes/book/${bookId}`, { method: "DELETE" })
+  const handleRemoveWish = (wishId: number) => {
+    apiFetch(`/api/v1/wishes/${wishId}`, { method: "DELETE" })
       .then((data) => {
-        alert(data.message);
+        showToast(data?.message ?? "보고 싶어요를 취소했습니다.");
         loadWishes();
       })
-      .catch((error) => {
-        alert(`${error.resultCode} : ${error.message}`);
-      });
+      .catch(showErrorToast);
   };
 
   const handleWithdraw = () => {
@@ -109,21 +178,24 @@ export default function Page() {
 
     apiFetch(`/api/v1/members`, { method: "DELETE" })
       .then((data) => {
-        alert(data.message);
+        showToast(data?.message ?? "회원 탈퇴가 완료되었습니다.");
         return refresh();
       })
       .then(() => {
         router.replace(`/`);
       })
-      .catch((error) => {
-        alert(`${error.resultCode} : ${error.message}`);
-      });
+      .catch(showErrorToast);
   };
 
   const handleLogout = () => {
-    apiFetch(`/api/v1/members/logout`, { method: "DELETE" }).then(() => {
-      refresh().then(() => router.replace(`/`));
-    });
+    saveCurrentAuthReturnPath();
+
+    apiFetch(`/api/v1/members/logout`, { method: "DELETE" })
+      .then(() => {
+        showToast("로그아웃되었습니다.");
+        return refresh().then(() => router.replace(consumeAuthReturnPath()));
+      })
+      .catch(showErrorToast);
   };
 
   const handleCopyWidgetLink = async (code: string) => {
@@ -137,21 +209,8 @@ export default function Page() {
   };
 
   const handleOpenWidgetGuide = () => {
-    console.log("[mypage] README guide button clicked");
-    console.log("[mypage] widget guide open before:", isWidgetGuideOpen);
-    console.log("[mypage] widget link:", loginMember?.widgetLink);
     setIsWidgetGuideOpen((current) => !current);
   };
-
-  useEffect(() => {
-    console.log("[mypage] widget guide open state changed:", isWidgetGuideOpen);
-  }, [isWidgetGuideOpen]);
-
-  if (loadError != null) {
-    return (
-      <div>오류가 발생했습니다: {loadError} (백엔드 확인이 필요합니다)</div>
-    );
-  }
 
   if (
     isLoginMemberPending ||
@@ -159,97 +218,76 @@ export default function Page() {
     reviewData == null ||
     wishes == null
   ) {
-    return <div>로딩중...</div>;
+    return <MyPageSkeleton />;
   }
 
   const average = reviewData.rating?.["average"];
   const averageNumber = typeof average === "number" ? average : null;
+  const reviewResults = reviewData.results ?? [];
+  const widgetLink = loginMember?.githubId
+    ? `${API_BASE_URL}/api/v1/widgets/${loginMember.githubId}`
+    : "";
+  const widgetCodeSnippet = `<img src="${widgetLink}" alt="내 서재 위젯" />`;
 
   return (
     <div className="flex gap-8">
-      <div className="flex flex-col items-center gap-1 w-48 shrink-0">
-        <Avatar
-          label={loginMember?.githubId ?? loginMember?.username ?? null}
-          size="lg"
-        />
-        <div className="mt-2 text-sm">아이디 : {loginMember?.username}</div>
-        <div className="text-sm">닉네임 : {loginMember?.githubId}</div>
-        {loginMember?.githubLink && (
-          <a
-            className="theme-link text-sm underline"
-            href={loginMember.githubLink}
-            target="_blank"
-            rel="noreferrer"
-          >
-            github 주소
-          </a>
-        )}
-
-        {averageNumber != null && (
-          <div
-            className={`text-lg font-bold mt-2 ${ratingColor(averageNumber)}`}
-          >
-            <RatingValue rating={averageNumber} />
-          </div>
-        )}
-        <div className="text-xs theme-muted">내가 준 평균 별점</div>
-        <RatingHistogram rating={reviewData.rating} className="mt-3 w-full" />
-
-        <RoughButton
-          className="mt-4"
-          roughSize="sm"
-          type="button"
-          onClick={handleLogout}
-        >
-          로그아웃
-        </RoughButton>
-        <RoughButton
-          className="mt-2"
-          roughSize="sm"
-          tone="cancel"
-          type="button"
-          onClick={handleWithdraw}
-        >
-          회원 탈퇴
-        </RoughButton>
-      </div>
-
-      <div className="flex-1 flex flex-col gap-4">
-        <div>
-          <div className="flex items-center justify-between gap-2">
-            <h2 className="font-bold">위젯 미리보기</h2>
+      <LibraryProfilePanel
+        avatarLabel={loginMember?.githubId ?? loginMember?.username}
+        username={loginMember?.username}
+        githubId={loginMember?.githubId}
+        githubLink={loginMember?.githubLink}
+        averageLabel="내가 준 평균 별점"
+        averageRating={averageNumber}
+        rating={reviewData.rating}
+        actions={
+          <div className="mt-4 flex w-full gap-2">
             <RoughButton
+              className="flex-1"
               roughSize="sm"
               type="button"
-              onClick={handleOpenWidgetGuide}
+              onClick={handleLogout}
             >
-              README 가이드 보기
+              로그아웃
+            </RoughButton>
+            <RoughButton
+              className="flex-1"
+              roughSize="sm"
+              tone="cancel"
+              type="button"
+              onClick={handleWithdraw}
+            >
+              회원 탈퇴
             </RoughButton>
           </div>
-          <div className="rough-panel-border relative mt-1 flex min-h-24 items-center justify-center bg-transparent p-2">
-            <RoughFrame className="rough-overlay" variant="card" />
-            {loginMember?.githubId ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                src={`${API_BASE_URL}/api/v1/widgets/${loginMember.githubId}`}
-                alt="내 서재 위젯"
-              />
-            ) : (
-              <span className="text-sm theme-muted">위젯 정보가 없습니다</span>
-            )}
-          </div>
-          {loginMember?.widgetLink && (
-            <div className="mt-1">
-              <RoughInput
-                inputClassName="text-xs"
+        }
+      />
+
+      <div className="flex-1 flex flex-col gap-4">
+        <LibraryWidgetPreview
+          githubId={loginMember?.githubId}
+          widgetSrc={`${API_BASE_URL}/api/v1/widgets/${loginMember?.githubId ?? ""}`}
+          widgetLink={loginMember?.widgetLink}
+          actions={
+            <div className="flex flex-wrap justify-end gap-2">
+              <RoughButton
                 roughSize="sm"
-                readOnly
-                value={loginMember.widgetLink}
-                onFocus={(e) => e.currentTarget.select()}
-              />
+                tone="history"
+                type="button"
+                disabled={!widgetLink}
+                onClick={() => handleCopyWidgetLink(widgetCodeSnippet)}
+              >
+                {copiedWidgetLink ? "복사 완료" : "코드 복사"}
+              </RoughButton>
+              <RoughButton
+                roughSize="sm"
+                type="button"
+                onClick={handleOpenWidgetGuide}
+              >
+                README 가이드 보기
+              </RoughButton>
             </div>
-          )}
-        </div>
+          }
+        />
 
         <div className="flex gap-2">
           <div className="theme-tab">
@@ -260,16 +298,8 @@ export default function Page() {
               }`}
               onClick={() => setTab("reviews")}
             >
-              작성한 리뷰 {reviewData.results.length}
+              작성한 리뷰 {reviewResults.length}
             </button>
-            {tab === "reviews" && (
-              <RoughDivider
-                className="theme-tab-divider"
-                color="var(--foreground)"
-                emphasis
-                strokeWidth={1.25}
-              />
-            )}
           </div>
           <div className="theme-tab">
             <button
@@ -281,40 +311,52 @@ export default function Page() {
             >
               보고 싶어요 {wishes.length}
             </button>
-            {tab === "wishes" && (
-              <RoughDivider
-                className="theme-tab-divider"
-                color="var(--foreground)"
-                emphasis
-                strokeWidth={1.25}
-              />
-            )}
           </div>
         </div>
 
         {tab === "reviews" && (
           <>
-            {reviewData.results.length === 0 && (
+            {reviewResults.length === 0 && (
               <div className="text-sm theme-muted">작성한 리뷰가 없습니다.</div>
             )}
 
             <ul className="flex w-full flex-col">
-              {reviewData.results.map((review) => (
+              {reviewResults.map((review, index) => (
                 <li
-                  key={review.id}
+                  key={review.id ?? review.bookId}
                   className="relative flex items-start gap-3 py-3"
                 >
-                  <RoughDivider fullWidth />
+                  {index < reviewResults.length - 1 && <RoughDivider fullWidth />}
+                  <Link
+                    href={`/books/detail?id=${review.bookId}`}
+                    className="rough-book-card review-book-thumbnail relative flex h-20 w-14 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-white"
+                    aria-label={`${review.bookTitle ?? `책 #${review.bookId}`} 상세 보기`}
+                  >
+                    <RoughFrame
+                      className="rough-overlay rough-card-line rough-book-cover-line"
+                      variant="card"
+                    />
+                    {(review as ReviewWithBookImgUrl).bookImgUrl ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        src={(review as ReviewWithBookImgUrl).bookImgUrl ?? ""}
+                        alt=""
+                        className="h-full w-full object-cover"
+                      />
+                    ) : (
+                      <span className="text-xs text-gray-400">표지 없음</span>
+                    )}
+                  </Link>
                   <div className="flex-1 min-w-0">
                     <Link
                       className="font-semibold hover:underline"
                       href={`/books/detail?id=${review.bookId}`}
                     >
-                      {bookTitles[review.bookId] ?? `책 #${review.bookId}`}
+                      {review.bookTitle ?? `책 #${review.bookId}`}
                     </Link>
 
                     <div className="flex flex-wrap gap-1 text-xs theme-tag">
-                      {review.tags.map((tag) => (
+                      {(review.tags ?? []).map((tag) => (
                         <span key={tag}>#{tag}</span>
                       ))}
                     </div>
@@ -329,16 +371,23 @@ export default function Page() {
                       roughSize="sm"
                       tone="cancel"
                       type="button"
-                      onClick={() => handleDeleteReview(review.id)}
+                      onClick={() => {
+                        if (review.id == null) return;
+                        handleDeleteReview(review.id);
+                      }}
                     >
                       삭제
                     </RoughButton>
                   </div>
 
                   <span
-                    className={`font-bold shrink-0 ${ratingColor(review.rating)}`}
+                    className={`font-bold shrink-0 ${
+                      typeof review.rating === "number"
+                        ? ratingColor(review.rating)
+                        : ""
+                    }`}
                   >
-                    <RatingValue rating={review.rating} />
+                    <RatingValue rating={review.rating ?? 0} />
                   </span>
                 </li>
               ))}
@@ -355,36 +404,61 @@ export default function Page() {
             )}
 
             <ul className="flex w-full flex-col">
-              {wishes.map((book) => (
-                <li
-                  key={book.id}
-                  className="relative flex items-center justify-between gap-3 py-3"
-                >
-                  <RoughDivider fullWidth />
-                  <Link
-                    href={`/books/detail?id=${book.id}`}
-                    className="font-semibold"
+              {wishes.map((book, index) => {
+                const averageRating =
+                  typeof book.averageRating === "number"
+                    ? book.averageRating
+                    : null;
+                const title = book.title ?? "제목 없음";
+
+                return (
+                  <li
+                    key={book.wishId ?? book.id ?? index}
+                    className="relative flex items-center justify-between gap-3 py-3"
                   >
-                    {book.title}
-                  </Link>
-                  <div className="flex items-center gap-3">
-                    <span
-                      className={`font-bold ${ratingColor(book.averageRating)}`}
-                    >
-                      <RatingValue rating={book.averageRating} />
-                    </span>
-                    <RoughButton
-                      className="px-2"
-                      roughSize="sm"
-                      tone="wishActive"
-                      type="button"
-                      onClick={() => handleRemoveWish(book.id)}
-                    >
-                      보고 싶어요 취소
-                    </RoughButton>
-                  </div>
-                </li>
-              ))}
+                    {index < wishes.length - 1 && <RoughDivider fullWidth />}
+                    {book.id != null ? (
+                      <Link
+                        href={`/books/detail?id=${book.id}`}
+                        className="font-semibold"
+                      >
+                        {title}
+                      </Link>
+                    ) : (
+                      <span className="font-semibold">{title}</span>
+                    )}
+                    <div className="flex items-center gap-3">
+                      <span
+                        className={`font-bold ${
+                          averageRating != null
+                            ? ratingColor(averageRating)
+                            : ""
+                        }`}
+                      >
+                        {averageRating != null ? (
+                          <RatingValue rating={averageRating} />
+                        ) : (
+                          "-"
+                        )}
+                      </span>
+                      <RoughButton
+                        className="px-2"
+                        roughSize="sm"
+                        tone="wishActive"
+                        type="button"
+                        disabled={book.wishId == null}
+                        onClick={() => {
+                          if (book.wishId == null) return;
+                          handleRemoveWish(book.wishId);
+                        }}
+                      >
+                        <WishIcon />
+                        보고 싶어요 취소
+                      </RoughButton>
+                    </div>
+                  </li>
+                );
+              })}
             </ul>
           </>
         )}
@@ -395,7 +469,7 @@ export default function Page() {
           copiedWidgetLink={copiedWidgetLink}
           onCancel={() => setIsWidgetGuideOpen(false)}
           onCopyWidgetLink={handleCopyWidgetLink}
-          widgetLink={`${API_BASE_URL}/api/v1/widgets/${loginMember?.githubId}`}
+          widgetLink={widgetLink}
         />
       )}
     </div>
