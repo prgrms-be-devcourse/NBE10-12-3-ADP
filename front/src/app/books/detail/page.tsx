@@ -16,6 +16,7 @@ import { useToast } from "@/lib/toast/ToastProvider";
 
 import Avatar from "@/app/_components/Avatar";
 import BookGrid from "@/app/_components/BookGrid";
+import BookThumbnail from "@/app/_components/BookThumbnail";
 import LoginRequiredModal from "@/app/_components/LoginRequiredModal";
 import RatingHistogram from "@/app/_components/RatingHistogram";
 import RatingValue from "@/app/_components/RatingValue";
@@ -376,16 +377,13 @@ function BookDetail() {
             }`}
           >
             <RoughFrame className="rough-overlay" variant="card" />
-            {book.imgUrl ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                src={book.imgUrl}
-                alt={book.title}
-                className="w-full h-full object-cover"
-              />
-            ) : (
-              <span className="text-gray-400 text-sm">표지 없음</span>
-            )}
+            <BookThumbnail
+              bookId={book.id}
+              imgUrl={book.imgUrl}
+              title={book.title}
+              className="w-full h-full object-cover"
+              placeholderClassName="flex h-full w-full items-center justify-center text-sm text-gray-400"
+            />
           </div>
 
           {isLogin ? (
@@ -492,18 +490,13 @@ function BookDetail() {
                           recommendBook.imgUrl ? "" : "book-cover-placeholder"
                         }`}
                       >
-                        {recommendBook.imgUrl ? (
-                          // eslint-disable-next-line @next/next/no-img-element
-                          <img
-                            src={recommendBook.imgUrl}
-                            alt={recommendBook.title}
-                            className="h-full w-full object-cover"
-                          />
-                        ) : (
-                          <span className="text-sm text-gray-400">
-                            표지 없음
-                          </span>
-                        )}
+                        <BookThumbnail
+                          bookId={recommendBook.id}
+                          imgUrl={recommendBook.imgUrl}
+                          title={recommendBook.title}
+                          className="h-full w-full object-cover"
+                          placeholderClassName="flex h-full w-full items-center justify-center text-sm text-gray-400"
+                        />
                       </div>
                     </div>
 
