@@ -10,7 +10,7 @@ spring:
   data:
     redis:
       host: ${REDIS__HOST}
-      port: ${REDIS__PORT}6379
+      port: ${REDIS__PORT:6379}
   output:
     ansi:
       enabled: always
