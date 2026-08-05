@@ -62,7 +62,7 @@ interface BookRepository : JpaRepository<Book, Long> {
     @Query(
         value = """
             SELECT b.*
-            FROM Book b
+            FROM book b
             WHERE MATCH(b.title, b.authors, b.publisher)
                   AGAINST(:keyword IN BOOLEAN MODE)
             ORDER BY
@@ -72,7 +72,7 @@ interface BookRepository : JpaRepository<Book, Long> {
         """,
         countQuery = """
             SELECT COUNT(*)
-            FROM Book b
+            FROM book b
             WHERE MATCH(b.title, b.authors, b.publisher)
                   AGAINST(:keyword IN BOOLEAN MODE)
         """,
