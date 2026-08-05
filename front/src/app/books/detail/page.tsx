@@ -108,13 +108,13 @@ function BookDetailSkeleton() {
   );
 }
 
-function WishIcon() {
+function WishIcon({ filled = false }: { filled?: boolean }) {
   return (
     <svg
       aria-hidden="true"
       className="inline-block h-4 w-4 shrink-0 align-[-0.125em]"
       viewBox="0 0 24 24"
-      fill="none"
+      fill={filled ? "currentColor" : "none"}
       stroke="currentColor"
       strokeWidth="2"
       strokeLinecap="round"
@@ -125,13 +125,13 @@ function WishIcon() {
   );
 }
 
-function HeartIcon() {
+function HeartIcon({ filled = false }: { filled?: boolean }) {
   return (
     <svg
       aria-hidden="true"
       className="inline-block h-4 w-4 shrink-0 align-[-0.125em]"
       viewBox="0 0 24 24"
-      fill="none"
+      fill={filled ? "currentColor" : "none"}
       stroke="currentColor"
       strokeWidth="2"
       strokeLinecap="round"
@@ -462,7 +462,7 @@ function BookDetail() {
               type="button"
               onClick={handleToggleWish}
             >
-              <WishIcon />
+              <WishIcon filled={isBookWished} />
               {isBookWished ? "보고 싶어요 취소" : "보고 싶어요"}
             </RoughButton>
           ) : (
@@ -719,7 +719,11 @@ function BookDetail() {
                         type="button"
                         onClick={() => handleToggleLike(review)}
                       >
-                        <HeartIcon />
+                        <HeartIcon
+                          filled={
+                            review.id != null && likedReviewIds.has(review.id)
+                          }
+                        />
                         좋아요 {review.likeCount ?? 0}
                       </RoughButton>
                     </div>

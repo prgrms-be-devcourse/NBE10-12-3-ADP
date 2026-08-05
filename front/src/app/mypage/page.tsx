@@ -105,7 +105,7 @@ function WishIcon() {
       aria-hidden="true"
       className="inline-block h-4 w-4 shrink-0 align-[-0.125em]"
       viewBox="0 0 24 24"
-      fill="none"
+      fill="currentColor"
       stroke="currentColor"
       strokeWidth="2"
       strokeLinecap="round"
