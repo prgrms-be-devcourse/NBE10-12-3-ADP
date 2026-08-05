@@ -11,7 +11,8 @@ class AdminReviewDto(
     val content: String,
     val createdDate: LocalDateTime,
     val reviewer: MemberDto,
-    val tags: List<String>
+    val tags: List<String>,
+    val likeCount: Int
 ) {
     constructor(review: Review) : this(
         review.id,
@@ -20,6 +21,7 @@ class AdminReviewDto(
         review.content,
         review.createdDate,
         MemberDto(review.reviewer),
-        review.tags
+        review.tags,
+        review.likeCount
     )
 }

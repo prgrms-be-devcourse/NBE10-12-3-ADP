@@ -97,4 +97,15 @@ class ApiReviewControllerV1(
 
         return RsData("200-1", "리뷰 삭제를 성공했습니다.")
     }
+
+    @PostMapping("/{id}/like")
+    @Operation(summary = "좋아요 생성")
+    @SecurityRequirement(name = "bearerAuth")
+    fun createReviewLike(
+        @PathVariable id: Long
+    ): RsData<Unit> {
+        reviewService.createReviewLike(rq.actor, id)
+
+        return RsData("201-1", "좋아요 생성을 성공했습니다.")
+    }
 }
