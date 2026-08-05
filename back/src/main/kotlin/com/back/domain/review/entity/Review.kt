@@ -26,6 +26,8 @@ class Review(
     @OneToMany(mappedBy = "review", cascade = [CascadeType.ALL], orphanRemoval = true)
     private val reviewTags: MutableList<ReviewTag> = mutableListOf()
 
+    var likeCount: Int = 0
+
     init {
         for (i in tags.indices) {
             this.reviewTags.add(ReviewTag(this, tags[i]))

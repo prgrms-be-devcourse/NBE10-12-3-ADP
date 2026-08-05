@@ -3,6 +3,7 @@ package com.back.domain.book.service
 import com.back.domain.book.dto.BookDetailDto
 import com.back.domain.book.dto.BookDto
 import com.back.domain.book.entity.Book
+import com.back.domain.book.repository.BookRankRow
 import com.back.domain.book.repository.BookOperationalRepository
 import com.back.domain.book.repository.BookRepository
 import com.back.domain.book.repository.BookViewCountRedisRepository
@@ -68,11 +69,7 @@ class BookQueryService(
         val books = bookViewCountRedisRepository.findBookIdOrderByTopViewedInLastHout(page, size)
 
         if (books.isNullOrEmpty()) {
-            return bookRepository
-                .findAllOrderByViewCountDesc(
-                    PageRequest.of(page, size)
-                ).toList()
-                .let { getBookDtos(it) }
+            return getBooksOrderByOperationalRank("views", page, size)
         }
 
         return getBookDtosByBookIds(books)
@@ -82,16 +79,48 @@ class BookQueryService(
         if (type == "views")
             return getBooksOrderByTopViewedInLastHour(page, size)
 
-        val pageable = PageRequest.of(page, size)
+        return getBooksOrderByOperationalRank(type, page, size)
+    }
 
-        if (type == "rating")
-            return bookRepository
-                .findAllOrderByAverageRatingDesc(pageable).toList()
-                .let { getBookDtos(it) }
+    private fun getBooksOrderByOperationalRank(type: String, page: Int, size: Int): List<BookDto> {
+        val offset = page * size
+        val rankedRows = when (type) {
+            "rating" -> bookOperationalRepository.findRankedBooksByAverageRating(PageRequest.of(page, size))
+            "views" -> bookOperationalRepository.findRankedBooksByViewCount(PageRequest.of(page, size))
+            else -> bookOperationalRepository.findRankedBooksByReviewCount(PageRequest.of(page, size))
+        }
 
-        return bookRepository
-            .findAllOrderByReviewCountDesc(pageable).toList()
-            .let { getBookDtos(it) }
+        val rankedBooks = getBookDtosByRankRows(rankedRows)
+        if (rankedBooks.size == size) return rankedBooks
+
+        val rankedBookCount = if (rankedRows.isEmpty() && offset > 0) {
+            bookOperationalRepository.countRankedBooks().toInt()
+        } else {
+            offset + rankedRows.size
+        }
+        val fallbackOffset = (offset - rankedBookCount).coerceAtLeast(0)
+        val fallbackPage = fallbackOffset / size
+        val fallbackPageOffset = fallbackOffset % size
+        val neededFallbackSize = size - rankedBooks.size
+
+        val currentFallbackPage = bookRepository.findBooksWithoutOperationalOrderByIdDesc(
+            PageRequest.of(fallbackPage, size)
+        )
+        val fallbackBooks = currentFallbackPage
+            .drop(fallbackPageOffset)
+            .let { currentPageBooks ->
+                if (currentPageBooks.size >= neededFallbackSize || fallbackPageOffset == 0) {
+                    currentPageBooks.take(neededFallbackSize)
+                } else {
+                    val nextFallbackPage = bookRepository.findBooksWithoutOperationalOrderByIdDesc(
+                        PageRequest.of(fallbackPage + 1, size)
+                    )
+
+                    (currentPageBooks + nextFallbackPage).take(neededFallbackSize)
+                }
+            }
+
+        return rankedBooks + getBookDtos(fallbackBooks)
     }
 
     fun getTagsByBookId(bookId: Long): List<String> {
@@ -142,6 +171,17 @@ class BookQueryService(
 
         return bookIds.mapNotNull { bookId ->
             booksById[bookId]?.let { BookDto(it, ratingsByIsbn[it.isbn] ?: 0.0) }
+        }
+    }
+
+    private fun getBookDtosByRankRows(rankRows: List<BookRankRow>): List<BookDto> {
+        val isbns = rankRows.map { it.isbn }
+        val books = bookRepository.findByIsbnIn(isbns)
+        val booksByIsbn = books.associateBy { it.isbn }
+        val ratingsByIsbn = rankRows.associate { it.isbn to it.averageRating }
+
+        return isbns.mapNotNull { isbn ->
+            booksByIsbn[isbn]?.let { BookDto(it, ratingsByIsbn[isbn] ?: 0.0) }
         }
     }
 
