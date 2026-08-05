@@ -111,7 +111,7 @@ class BookQueryService(
         if (rankedBooks.size == size) return rankedBooks
 
         val rankedBookCount = if (rankedRows.isEmpty() && offset > 0) {
-            bookOperationalRepository.count().toInt()
+            bookOperationalRepository.countRankedBooks().toInt()
         } else {
             offset + rankedRows.size
         }

@@ -10,9 +10,9 @@ import kotlin.math.roundToInt
 @Entity
 @Table(
     indexes = [
-        Index(name = "idx_book_average_rating_id", columnList = "averageRating, id"),
-        Index(name = "idx_book_review_count_id", columnList = "reviewCount, id"),
-        Index(name = "idx_book_view_count_id", columnList = "viewCount, id")]
+        Index(name = "idx_book_average_rating_id", columnList = "averageRating DESC, id DESC"),
+        Index(name = "idx_book_review_count_id", columnList = "reviewCount DESC, id DESC"),
+        Index(name = "idx_book_view_count_id", columnList = "viewCount DESC, id DESC")]
 )
 class BookOperational(
     @field:Column(unique = true)

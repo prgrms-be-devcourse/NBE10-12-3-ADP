@@ -41,9 +41,14 @@ class BookOperationalRepositoryExplainTest {
         val explainRows = jdbcTemplate.queryForList(
             """
                 EXPLAIN
-                SELECT ISBN
-                FROM BOOK_OPERATIONAL
-                ORDER BY VIEW_COUNT DESC, ID DESC
+                SELECT bo.ISBN, bo.AVERAGE_RATING
+                FROM BOOK_OPERATIONAL bo
+                WHERE EXISTS (
+                    SELECT 1
+                    FROM BOOK b
+                    WHERE b.ISBN = bo.ISBN
+                )
+                ORDER BY bo.VIEW_COUNT DESC, bo.ID DESC
                 LIMIT 10
             """.trimIndent()
         )
