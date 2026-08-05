@@ -38,17 +38,19 @@ class BookOperationalRepositoryExplainTest {
     @Test
     @DisplayName("BookOperational 조회수 정렬 쿼리는 인덱스 사용 계획을 가진다")
     fun t2() {
-        val plan = jdbcTemplate.queryForObject(
+        val explainRows = jdbcTemplate.queryForList(
             """
                 EXPLAIN
                 SELECT ISBN
                 FROM BOOK_OPERATIONAL
                 ORDER BY VIEW_COUNT DESC, ID DESC
                 LIMIT 10
-            """.trimIndent(),
-            String::class.java
-        ) ?: ""
+            """.trimIndent()
+        )
+        val explainText = explainRows.joinToString(" ") { row ->
+            row.values.joinToString(" ") { it?.toString().orEmpty() }
+        }
 
-        assertThat(plan).contains("IDX_BOOK_VIEW_COUNT_ID")
+        assertThat(explainText).contains("IDX_BOOK_VIEW_COUNT_ID")
     }
 }

@@ -17,6 +17,11 @@ interface BookOperationalRepository : JpaRepository<BookOperational, Long> {
         """
             SELECT bo.isbn AS isbn, bo.averageRating AS averageRating
             FROM BookOperational bo
+            WHERE EXISTS (
+                SELECT 1
+                FROM Book b
+                WHERE b.isbn = bo.isbn
+            )
             ORDER BY bo.averageRating DESC, bo.id DESC
         """
     )
@@ -26,6 +31,11 @@ interface BookOperationalRepository : JpaRepository<BookOperational, Long> {
         """
             SELECT bo.isbn AS isbn, bo.averageRating AS averageRating
             FROM BookOperational bo
+            WHERE EXISTS (
+                SELECT 1
+                FROM Book b
+                WHERE b.isbn = bo.isbn
+            )
             ORDER BY bo.reviewCount DESC, bo.id DESC
         """
     )
@@ -35,6 +45,11 @@ interface BookOperationalRepository : JpaRepository<BookOperational, Long> {
         """
             SELECT bo.isbn AS isbn, bo.averageRating AS averageRating
             FROM BookOperational bo
+            WHERE EXISTS (
+                SELECT 1
+                FROM Book b
+                WHERE b.isbn = bo.isbn
+            )
             ORDER BY bo.viewCount DESC, bo.id DESC
         """
     )
