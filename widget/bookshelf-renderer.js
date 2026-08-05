@@ -147,8 +147,22 @@ function appendExtraStars(svg, rc) {
 function appendDefsAndStyle(doc, svg) {
   const style = doc.createElementNS(SVG_NS, "style");
   style.appendChild(doc.createTextNode(`
-    @import url('https://fonts.googleapis.com/css2?family=Gaegu:wght@400;700&display=swap');
-    svg { font-family: "Gaegu", "Pretendard", "Noto Sans KR", sans-serif; }
+    @font-face {
+      font-family: 'GangwonEducationModuche';
+      src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2201-2@1.0/GangwonEdu_OTFLightA.woff') format('woff');
+      font-weight: 300;
+      font-display: swap;
+    }
+    @font-face {
+      font-family: 'GangwonEducationModuche';
+      src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2201-2@1.0/GangwonEdu_OTFBoldA.woff') format('woff');
+      font-weight: 700;
+      font-display: swap;
+    }
+    svg {
+      font-family: "GangwonEducationModuche", "Pretendard", "Noto Sans KR", "Apple SD Gothic Neo", sans-serif;
+      font-synthesis: none;
+    }
     text { paint-order: stroke fill; stroke-linejoin: round; stroke-linecap: round; }
     .main-title { font-size: 72px; font-weight: 700; fill: #171717; stroke: rgba(255, 253, 247, 0.45); stroke-width: 1.8px; }
     .subtitle { font-size: 38px; font-weight: 700; fill: #525252; letter-spacing: 2px; stroke: rgba(255, 253, 247, 0.35); stroke-width: 1px; }
