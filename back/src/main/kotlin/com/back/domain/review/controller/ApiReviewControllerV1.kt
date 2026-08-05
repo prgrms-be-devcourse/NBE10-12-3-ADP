@@ -108,4 +108,15 @@ class ApiReviewControllerV1(
 
         return RsData("201-1", "좋아요 생성을 성공했습니다.")
     }
+
+    @DeleteMapping("/{id}/like")
+    @Operation(summary = "좋아요 삭제")
+    @SecurityRequirement(name = "bearerAuth")
+    fun deleteReviewLike(
+        @PathVariable id: Long
+    ): RsData<Unit> {
+        reviewService.deleteReviewLike(rq.actor, id)
+
+        return RsData("200-1", "좋아요 삭제를 성공했습니다.")
+    }
 }
