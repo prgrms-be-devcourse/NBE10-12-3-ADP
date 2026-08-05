@@ -15,7 +15,6 @@ import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
-import org.springframework.transaction.annotation.Propagation
 import org.springframework.transaction.annotation.Transactional
 
 @Service
@@ -24,7 +23,6 @@ class BookQueryService(
     private val bookRepository: BookRepository,
     private val bookOperationalRepository: BookOperationalRepository,
     private val bookViewCountRedisRepository: BookViewCountRedisRepository,
-    private val bookThumbnailService: BookThumbnailService,
     private val reviewRepository: ReviewRepository,
     private val wishRepository: WishRepository,
 ) {
@@ -34,23 +32,8 @@ class BookQueryService(
             ?: throw NoSuchElementException("존재하지 않는 도서입니다.")
     }
 
-    @Transactional(propagation = Propagation.NOT_SUPPORTED)
     fun getBook(id: Long): Book {
-        val book = getBookById(id)
-
-        // 재조회 대신 이미 들고 있는 book을 직접 갱신함
-        // (findById는 1차 캐시에 book이 이미 올라가 있으면 DB를 다시 읽지 않고 캐시된 객체를 그대로 반환하므로,
-        //  REQUIRES_NEW로 커밋된 최신 imgUrl이 재조회 결과에 반영되지 않을 수 있음)
-        if (book.imgUrl.isNullOrBlank() && book.imgUrlFetchedAt == null) {
-            val thumbnail = bookThumbnailService.fillMissingImgUrl(book.id, book.isbn)
-            if (thumbnail != null) {
-                book.updateImgUrl(thumbnail)
-            } else {
-                book.markImgUrlFetchAttempted()
-            }
-        }
-
-        return book
+        return getBookById(id)
     }
 
     fun getBookDetailDto(bookId: Long, actor: Member?): BookDetailDto {

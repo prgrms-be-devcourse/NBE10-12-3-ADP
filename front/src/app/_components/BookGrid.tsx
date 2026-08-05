@@ -2,11 +2,12 @@
 
 import Link from "next/link";
 
-import { type RefObject, useEffect, useMemo, useState } from "react";
+import { type RefObject, useEffect, useMemo, useRef, useState } from "react";
 
 import type { components } from "@/lib/backend/apiV1/schema";
 import { ratingColor } from "@/lib/ratingColor";
 
+import BookThumbnail from "@/app/_components/BookThumbnail";
 import RatingValue from "@/app/_components/RatingValue";
 import RoughFrame from "@/app/_components/RoughFrame";
 
@@ -51,6 +52,14 @@ function BookGridItem({
   layout,
 }: BookGridItemProps) {
   const [isImageLoaded, setIsImageLoaded] = useState(false);
+  const imgRef = useRef<HTMLImageElement>(null);
+
+  useEffect(() => {
+    if (imgRef.current?.complete) {
+      setIsImageLoaded(true);
+    }
+  });
+
   const averageRating =
     typeof book.averageRating === "number" ? book.averageRating : 0;
 
@@ -67,19 +76,18 @@ function BookGridItem({
         <div
           className={`${coverClassName} ${book.imgUrl ? "" : "book-cover-placeholder"}`}
         >
-          {book.imgUrl ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={book.imgUrl}
-              alt={book.title}
-              className={`relative z-0 h-full w-full object-cover transition-opacity duration-500 ease-out ${
-                isImageLoaded ? "opacity-100" : "opacity-0"
-              }`}
-              onLoad={() => setIsImageLoaded(true)}
-            />
-          ) : (
-            <span className="text-sm text-gray-400">표지 없음</span>
-          )}
+          <BookThumbnail
+            bookId={book.id}
+            imgUrl={book.imgUrl}
+            title={book.title}
+            imgRef={imgRef}
+            onLoad={() => setIsImageLoaded(true)}
+            placeholderClassName="text-sm text-gray-400"
+            altClassName="text-sm text-gray-400"
+            imgClassName={`relative z-0 h-full w-full object-cover transition-opacity duration-500 ease-out ${
+              isImageLoaded ? "opacity-100" : "opacity-0"
+            }`}
+          />
           {layout === "horizontal" && (
             <>
               <span className="book-rank-overlay" />

@@ -3,8 +3,10 @@ package com.back.domain.book.controller
 import com.back.domain.book.controller.request.BookUpdateRequest
 import com.back.domain.book.dto.BookDetailDto
 import com.back.domain.book.dto.BookDto
+import com.back.domain.book.dto.ThumbnailDto
 import com.back.domain.book.service.BookRecommendService
 import com.back.domain.book.service.BookService
+import com.back.domain.book.service.BookThumbnailService
 import com.back.global.rq.Rq
 import com.back.global.rsData.RsData
 import io.swagger.v3.oas.annotations.Operation
@@ -29,7 +31,8 @@ import org.springframework.web.bind.annotation.RestController
 class ApiBookControllerV1(
     private val rq: Rq,
     private val bookService: BookService,
-    private val bookRecommendService: BookRecommendService
+    private val bookRecommendService: BookRecommendService,
+    private val bookThumbnailService: BookThumbnailService
 ) {
 
     @GetMapping("/admin")
@@ -53,6 +56,11 @@ class ApiBookControllerV1(
 
         return result.bookDetail
     }
+
+    @GetMapping("/{id}/thumbnail")
+    @Operation(summary = "도서 썸네일 지연 조회")
+    fun getBookThumbnail(@PathVariable id: Long) =
+        bookThumbnailService.getOrFetchThumbnail(id)
 
     @GetMapping("/search")
     @Operation(summary = "도서 검색 다건 조회")

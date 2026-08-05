@@ -281,6 +281,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/books/{id}/thumbnail": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** 도서 썸네일 조회 */
+        get: operations["getBookThumbnail"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/books/search": {
         parameters: {
             query?: never;
@@ -548,10 +565,10 @@ export interface components {
             totalElements?: number;
             /** Format: int32 */
             totalPages?: number;
-            /** Format: int32 */
-            numberOfElements?: number;
             pageable?: components["schemas"]["PageableObject"];
             sort?: components["schemas"]["SortObject"];
+            /** Format: int32 */
+            numberOfElements?: number;
             /** Format: int32 */
             size?: number;
             content?: components["schemas"]["AdminReviewDto"][];
@@ -567,14 +584,14 @@ export interface components {
             pageNumber?: number;
             /** Format: int32 */
             pageSize?: number;
-            sort?: components["schemas"]["SortObject"];
             unpaged?: boolean;
+            sort?: components["schemas"]["SortObject"];
             /** Format: int64 */
             offset?: number;
         };
         SortObject: {
-            sorted?: boolean;
             unsorted?: boolean;
+            sorted?: boolean;
             empty?: boolean;
         };
         MemberWithUsernameAndWidgetLinkDto: {
@@ -594,18 +611,18 @@ export interface components {
             nickname?: string | null;
             /** Format: date-time */
             createdDate: string;
-            deleted?: boolean;
             admin?: boolean;
+            deleted?: boolean;
         };
         PageAdminMemberDto: {
             /** Format: int64 */
             totalElements?: number;
             /** Format: int32 */
             totalPages?: number;
-            /** Format: int32 */
-            numberOfElements?: number;
             pageable?: components["schemas"]["PageableObject"];
             sort?: components["schemas"]["SortObject"];
+            /** Format: int32 */
+            numberOfElements?: number;
             /** Format: int32 */
             size?: number;
             content?: components["schemas"]["AdminMemberDto"][];
@@ -640,10 +657,10 @@ export interface components {
             totalElements?: number;
             /** Format: int32 */
             totalPages?: number;
-            /** Format: int32 */
-            numberOfElements?: number;
             pageable?: components["schemas"]["PageableObject"];
             sort?: components["schemas"]["SortObject"];
+            /** Format: int32 */
+            numberOfElements?: number;
             /** Format: int32 */
             size?: number;
             content?: components["schemas"]["BookDto"][];
@@ -1133,6 +1150,28 @@ export interface operations {
                 };
                 content: {
                     "application/json;charset=UTF-8": components["schemas"]["PageAdminMemberDto"];
+                };
+            };
+        };
+    };
+    getBookThumbnail: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json;charset=UTF-8": string;
                 };
             };
         };

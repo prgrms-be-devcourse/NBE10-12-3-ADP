@@ -45,6 +45,7 @@ class SecurityConfig(
                 authorize(HttpMethod.GET, "/api/*/reviews/book/{id:\\d+}", permitAll)
                 authorize(HttpMethod.GET, "/api/*/reviews/member/{id:\\d+}", permitAll)
                 authorize(HttpMethod.GET, "/api/*/books/{id:\\d+}", permitAll)
+                authorize(HttpMethod.GET, "/api/*/books/{id:\\d+}/thumbnail", permitAll)
                 authorize(HttpMethod.GET, "/api/*/books/rank", permitAll)
                 authorize(HttpMethod.GET, "/api/*/books/search", permitAll)
 
