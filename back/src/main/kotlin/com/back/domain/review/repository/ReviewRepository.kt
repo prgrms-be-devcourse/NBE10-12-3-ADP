@@ -42,4 +42,8 @@ interface ReviewRepository : JpaRepository<Review, Long> {
     @Modifying(clearAutomatically = true)
     @Query("UPDATE Review r SET r.likeCount = r.likeCount + 1 WHERE r.id = :reviewId")
     fun increaseLikeCount(@Param("reviewId") reviewId: Long): Int
+
+    @Modifying(clearAutomatically = true)
+    @Query("UPDATE Review r SET r.likeCount = r.likeCount - 1 WHERE r.id = :reviewId")
+    fun decreaseLikeCount(@Param("reviewId") reviewId: Long): Int
 }

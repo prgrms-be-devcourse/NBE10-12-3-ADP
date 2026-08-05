@@ -61,19 +61,25 @@ interface BookRepository : JpaRepository<Book, Long> {
 
     @Query(
         value = """
-            SELECT * FROM Book 
-            WHERE MATCH(title, authors, publisher) AGAINST(:keyword IN BOOLEAN MODE)
-            LIMIT :#{pageable.pageSize}
-            OFFSET :#{pageable.offset}
-            
-            """,
+            SELECT b.*
+            FROM book b
+            WHERE MATCH(b.title, b.authors, b.publisher)
+                  AGAINST(:keyword IN BOOLEAN MODE)
+            ORDER BY
+                MATCH(b.title, b.authors, b.publisher)
+                AGAINST(:keyword IN BOOLEAN MODE) DESC,
+                b.id DESC
+        """,
         countQuery = """
             SELECT COUNT(*)
-            FROM Book
-            WHERE MATCH(title, authors, publisher) AGAINST(:keyword IN BOOLEAN MODE)
-            
-            """,
+            FROM book b
+            WHERE MATCH(b.title, b.authors, b.publisher)
+                  AGAINST(:keyword IN BOOLEAN MODE)
+        """,
         nativeQuery = true
     )
-    fun searchByKeyword(@Param("keyword") keyword: String, pageable: Pageable): Page<Book>
+    fun searchByKeyword(
+        @Param("keyword") keyword: String,
+        pageable: Pageable
+    ): Page<Book>
 }

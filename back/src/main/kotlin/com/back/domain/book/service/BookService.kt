@@ -4,6 +4,7 @@ import com.back.domain.book.dto.BookDetailDto
 import com.back.domain.book.dto.BookDto
 import com.back.domain.book.entity.Book
 import com.back.domain.member.entity.Member
+import org.slf4j.LoggerFactory
 import org.springframework.data.domain.Page
 import org.springframework.stereotype.Service
 
@@ -18,6 +19,10 @@ class BookService(
     private val bookCommandService: BookCommandService,
     private val bookViewCountService: BookViewCountService,
 ) {
+
+    companion object {
+        private val log = LoggerFactory.getLogger(Companion::class.java)
+    }
 
     fun getBookById(bookId: Long): Book {
         return bookQueryService.getBookById(bookId)
@@ -82,6 +87,12 @@ class BookService(
         page: Int,
         size: Int
     ): List<BookDto> {
-        return bookQueryService.getBooksBySearch(searchTerm, page, size)
+
+        try {
+            return bookQueryService.getBooksByFullTextSearch(searchTerm, page, size)
+        } catch (e: Exception) {
+            log.error("FULLTEXT search failed", e)
+            return bookQueryService.getBooksByLikeSearch(searchTerm, page, size)
+        }
     }
 }
