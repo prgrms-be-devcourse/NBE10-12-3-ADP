@@ -223,7 +223,7 @@ locals {
 
 resource "aws_instance" "ec2_1" {
   ami                         = data.aws_ssm_parameter.ubuntu_ami.value
-  instance_type               = "t4g.nano"
+  instance_type               = "t4g.micro"
   subnet_id                   = aws_subnet.subnet_1.id
   vpc_security_group_ids      = [aws_security_group.ec2_sg_1.id]
   associate_public_ip_address = true
@@ -231,7 +231,7 @@ resource "aws_instance" "ec2_1" {
   user_data_replace_on_change = true
   root_block_device {
     volume_type = "gp3"
-    volume_size = 12
+    volume_size = 16
   }
   user_data = <<-EOF
     ${local.ec2_bootstrap}
