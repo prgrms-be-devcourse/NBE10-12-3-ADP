@@ -13,6 +13,10 @@ spring:
           github:
             client-id: dummy
             client-secret: dummy
+  data:
+    redis:
+      host: 127.0.0.1
+      port: 6379
 custom:
   jwt:
     secretKey: dummydummydummydummydummydummydummy
