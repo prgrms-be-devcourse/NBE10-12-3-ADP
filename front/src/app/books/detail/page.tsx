@@ -245,37 +245,32 @@ function BookDetail() {
   }, [isLogin]);
 
   const extractReviewFields = (form: HTMLFormElement) => {
-    const ratingInput = form.elements.namedItem("rating") as HTMLInputElement;
-    const contentInput = form.elements.namedItem(
-      "content",
-    ) as HTMLTextAreaElement;
-    const tagsInput = form.elements.namedItem("tags") as HTMLInputElement;
+    const formData = new FormData(form);
+    const ratingValue = String(formData.get("rating") ?? "").trim();
+    const contentValue = String(formData.get("content") ?? "").trim();
+    const tagsValue = String(formData.get("tags") ?? "");
 
-    contentInput.value = contentInput.value.trim();
     /*
-    if (contentInput.value.length < 2) {
+    if (contentValue.length < 2) {
       alert("리뷰 내용을 2자 이상 입력해주세요.");
-      contentInput.focus();
       return null;
     }
     */
 
-    if (contentInput.value.length > 500) {
+    if (contentValue.length > 500) {
       showToast("리뷰 내용은 500자 이하로 입력해주세요.");
-      contentInput.focus();
       return null;
     }
 
-    const tags = tagsInput.value
+    const tags = tagsValue
       .split(",")
       .map((tag) => tag.trim())
       .filter((tag) => tag.length > 0);
 
-    const ratingValue = ratingInput.value.trim();
     const rating = ratingValue === "" ? undefined : Number(ratingValue);
 
     return {
-      content: contentInput.value,
+      content: contentValue,
       tags,
       ...(rating != null ? { rating } : {}),
     };
@@ -688,7 +683,7 @@ function BookDetail() {
 
         <ul className="mt-2 flex w-full flex-col">
           {reviews.map((review, index) => (
-            <li key={review.id ?? review.createdDate} className="relative py-3">
+            <li key={review.id ?? review.createdDate ?? index} className="relative py-3">
               <ReviewDetailCard
                 review={review}
                 memberLink={
