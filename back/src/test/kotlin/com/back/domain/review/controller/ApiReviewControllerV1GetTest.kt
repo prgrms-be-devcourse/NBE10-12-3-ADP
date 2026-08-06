@@ -120,6 +120,112 @@ class ApiReviewControllerV1GetTest {
     }
 
     @Test
+    @DisplayName("리뷰 좋아요순 조회")
+    @Throws(Exception::class)
+    fun t9() {
+        val result = reviewService.getReviewsOrderByLikeCount(0, 10)
+
+        val resultActions = mvc
+            .perform(
+                get("/api/v1/reviews/likeCount")
+            )
+            .andDo(print())
+
+        resultActions
+            .andExpect(status().isOk())
+
+        for (i in result.indices) {
+            val review = result[i]
+            resultActions
+                .andExpect(jsonPath("$[$i].id").value(review.id))
+                .andExpect(jsonPath("$[$i].rating").value(review.rating))
+                .andExpect(jsonPath("$[$i].content").value(review.content))
+                .andExpect(
+                    jsonPath("$[$i].modifiedDate")
+                        .value(Matchers.startsWith(review.modifiedDate.toString().take(20)))
+                )
+                .andExpect(
+                    jsonPath("$[$i].createdDate")
+                        .value(Matchers.startsWith(review.createdDate.toString().take(20)))
+                )
+                .andExpect(jsonPath("$[$i].reviewer").exists())
+                .andExpect(jsonPath("$[$i].reviewer.id").value(review.reviewer.id))
+                .andExpect(
+                    jsonPath("$[$i].reviewer.githubId")
+                        .value(review.reviewer.githubId)
+                )
+                .andExpect(
+                    jsonPath("$[$i].reviewer.githubLink")
+                        .value(review.reviewer.githubLink)
+                )
+                .andExpect(jsonPath("$[$i].tags").exists())
+
+            val tags: List<String> = review.tags
+
+            for (j in tags.indices) {
+                resultActions
+                    .andExpect(jsonPath("$[$i].tags[$j]").value(tags[j]))
+            }
+        }
+    }
+
+    @Test
+    @DisplayName("내가 좋아요한 리뷰 목록 조회")
+    @WithUserDetails("user2")
+    @Throws(Exception::class)
+    fun t10() {
+        val member = memberService.getMemberByUsername("user2")
+        val likedReviewId = 1L
+
+        mvc.perform(post("/api/v1/reviews/$likedReviewId/like")).andDo(print())
+
+        val expected = reviewService.getReviewsWithMyLike(member.id)
+
+        val resultActions = mvc
+            .perform(
+                get("/api/v1/reviews/member/mine/liked")
+            )
+            .andDo(print())
+
+        resultActions
+            .andExpect(status().isOk())
+
+        for (i in expected.indices) {
+            val review = expected[i]
+            resultActions
+                .andExpect(jsonPath("$[$i].id").value(review.id))
+                .andExpect(jsonPath("$[$i].rating").value(review.rating))
+                .andExpect(jsonPath("$[$i].content").value(review.content))
+                .andExpect(
+                    jsonPath("$[$i].modifiedDate")
+                        .value(Matchers.startsWith(review.modifiedDate.toString().take(20)))
+                )
+                .andExpect(
+                    jsonPath("$[$i].createdDate")
+                        .value(Matchers.startsWith(review.createdDate.toString().take(20)))
+                )
+                .andExpect(jsonPath("$[$i].reviewer").exists())
+                .andExpect(jsonPath("$[$i].reviewer.id").value(review.reviewer.id))
+                .andExpect(
+                    jsonPath("$[$i].reviewer.githubId")
+                        .value(review.reviewer.githubId)
+                )
+                .andExpect(
+                    jsonPath("$[$i].reviewer.githubLink")
+                        .value(review.reviewer.githubLink)
+                )
+                .andExpect(jsonPath("$[$i].tags").exists())
+
+            val tags: List<String> = review.tags
+
+            for (j in tags.indices) {
+                resultActions
+                    .andExpect(jsonPath("$[$i].tags[$j]").value(tags[j]))
+            }
+        }
+    }
+
+    @Test
     @DisplayName("리뷰 다건 조회 - 실패: 존재하지 않는 도서")
     @Throws(Exception::class)
     fun t4() {

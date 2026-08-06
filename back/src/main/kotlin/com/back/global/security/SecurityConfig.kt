@@ -42,6 +42,7 @@ class SecurityConfig(
                 authorize(HttpMethod.GET, "/api/*/widgets/{githubId}", permitAll)
                 authorize(HttpMethod.GET, "/api/*/widgets/{githubId}/raw", permitAll)
                 authorize(HttpMethod.GET, "/api/*/reviews/latest", permitAll)
+                authorize(HttpMethod.GET, "/api/*/reviews/likeCount", permitAll)
                 authorize(HttpMethod.GET, "/api/*/reviews/book/{id:\\d+}", permitAll)
                 authorize(HttpMethod.GET, "/api/*/reviews/member/{id:\\d+}", permitAll)
                 authorize(HttpMethod.GET, "/api/*/books/{id:\\d+}", permitAll)

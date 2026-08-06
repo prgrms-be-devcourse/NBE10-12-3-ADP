@@ -27,6 +27,13 @@ class ApiReviewControllerV1(
         @RequestParam(defaultValue = "10") size: Int
     ) = reviewService.getReviewsOrderByLatest(page, size)
 
+    @GetMapping("/likeCount")
+    @Operation(summary = "리뷰 좋아요순 다건 조회")
+    fun getReviewsOrderByLikeCount(
+        @RequestParam(defaultValue = "0") page: Int,
+        @RequestParam(defaultValue = "10") size: Int
+    ) = reviewService.getReviewsOrderByLikeCount(page, size)
+
     @GetMapping("/book/{bookId}")
     @Operation(summary = "도서별 리뷰 다건 조회")
     fun getReviewsByBookId(
@@ -38,6 +45,12 @@ class ApiReviewControllerV1(
     fun getReviewsByMemberId(
         @PathVariable memberId: Long
     ) = reviewService.getReviewsByMemberId(memberId)
+
+    @GetMapping("/member/mine/liked")
+    @SecurityRequirement(name = "bearerAuth")
+    @Operation(summary = "내 좋아요 누른 리뷰 다건 조회")
+    fun getReviewsWithMyLike()
+        = reviewService.getReviewsWithMyLike(rq.actor.id)
 
     @GetMapping("/member/mine")
     @Operation(summary = "내 리뷰 다건 조회")
