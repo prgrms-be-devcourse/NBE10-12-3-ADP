@@ -9,7 +9,7 @@ import org.hibernate.annotations.BatchSize
 
 @Entity
 @Table(
-    indexes = [Index(name = "idx_like_count", columnList = "like_count")]
+    indexes = [Index(name = "idx_like_count_id", columnList = "like_count DESC, id DESC")]
 )
 class Review(
     @field:JoinColumn(name = "book_id")
