@@ -203,6 +203,12 @@ export default function Page() {
           reviewData == null ? null : { ...reviewData, results: nextReviews };
         pageCacheRef.current.reviews = nextReviewData ?? undefined;
         setReviewData(nextReviewData);
+
+        const nextLikedReviews = (likedReviews ?? []).filter(
+          (review) => review.id !== reviewId,
+        );
+        pageCacheRef.current.likedReviews = nextLikedReviews;
+        setLikedReviews(nextLikedReviews);
       })
       .catch(showErrorToast);
   };
@@ -244,9 +250,22 @@ export default function Page() {
       "content",
     ) as HTMLTextAreaElement;
     const tagsInput = form.elements.namedItem("tags") as HTMLInputElement;
+    const ratingValue = ratingInput.value.trim();
+    const parsedRating =
+      ratingValue === "" ? null : Number.parseFloat(ratingValue);
+
+    if (parsedRating == null || Number.isNaN(parsedRating)) {
+      showToast("평점을 선택해주세요.");
+      return;
+    }
+
+    if (parsedRating * 2 !== Math.round(parsedRating * 2)) {
+      showToast("평점은 0.5 단위로만 입력할 수 있습니다.");
+      return;
+    }
 
     const body = {
-      rating: Number(ratingInput.value),
+      rating: parsedRating,
       content: contentInput.value.trim(),
       tags: tagsInput.value
         .split(",")
