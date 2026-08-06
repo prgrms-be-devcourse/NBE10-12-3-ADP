@@ -84,6 +84,13 @@ class ReviewService(
             .toList()
             .map { ReviewWithBookImgUrlDto(it) }
 
+    fun getReviewsOrderByLikeCount(page: Int, size: Int)
+            = reviewRepository
+                .findAllByOrderByLikeCountDesc(
+                    PageRequest.of(page, size))
+                .toList()
+                .map { ReviewWithBookImgUrlDto(it) }
+
     fun getReviewsByBookId(bookId: Long, actor: Member?): List<ReviewDto> {
         val reviews = reviewRepository.findByBook(getBookById(bookId))
 
@@ -93,6 +100,12 @@ class ReviewService(
             else emptySet()
 
         return reviews.map { ReviewDto(it, it.id in likedReviewIds) }
+    }
+
+    fun getReviewsWithMyLike(memberId: Long): List<ReviewWithBookImgUrlDto> {
+        return reviewRepository.findByIdIn(
+            reviewLikeRepository.findReviewIdsByMember(getMemberById(memberId)))
+            .map { ReviewWithBookImgUrlDto(it) }
     }
 
     fun getReviewsByMemberId(memberId: Long): ReviewsByMemberDto {
