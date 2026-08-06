@@ -298,9 +298,9 @@ function PopularReviewSection({
                   <div className="book-skeleton h-32 rounded-lg" />
                 </li>
               ))
-            : reviews.map((review) => (
+            : reviews.map((review, index) => (
                 <li
-                  key={review.id}
+                  key={`${review.id ?? "popular-review"}-${review.bookId ?? "book"}-${index}`}
                   className="w-[calc((100%-1rem)/2)] shrink-0 max-[900px]:w-full"
                   data-review-item="true"
                 >
@@ -396,9 +396,9 @@ function LatestReviewBookSection({
                   <div className="book-skeleton h-36 w-28 rounded-lg" />
                 </li>
               ))
-            : reviews.map((review) => (
+            : reviews.map((review, index) => (
                 <li
-                  key={review.id}
+                  key={`${review.id ?? "latest-review"}-${review.bookId ?? "book"}-${index}`}
                   className="w-[calc((100%-3.75rem)/6)] shrink-0"
                   data-review-item="true"
                 >
