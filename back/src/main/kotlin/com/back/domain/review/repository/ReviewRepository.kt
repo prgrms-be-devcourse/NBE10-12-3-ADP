@@ -13,6 +13,7 @@ import org.springframework.data.repository.query.Param
 interface ReviewRepository : JpaRepository<Review, Long> {
 
     fun findAllByOrderByIdDesc(pageable: Pageable): Page<Review>
+    fun findAllByOrderByLikeCountDesc(pageable: Pageable): Page<Review>
     fun findByBook(book: Book): List<Review>
     fun findByBook(book: Book, pageable: Pageable): Page<Review>
 
@@ -20,6 +21,8 @@ interface ReviewRepository : JpaRepository<Review, Long> {
 
     fun findByReviewer(member: Member): List<Review>
     fun findByReviewer(member: Member, pageable: Pageable): Page<Review>
+
+    fun findByIdIn(ids: Collection<Long>): List<Review>
 
     fun countByReviewerAndRating(member: Member, rating: Float): Int
     fun countByReviewer(member: Member): Int

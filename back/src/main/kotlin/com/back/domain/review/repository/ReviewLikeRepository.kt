@@ -17,4 +17,7 @@ interface ReviewLikeRepository : JpaRepository<ReviewLike, Long> {
 
     @Query("SELECT rl.review.id FROM ReviewLike rl WHERE rl.member = :member AND rl.review IN :reviews")
     fun findReviewIdsByMemberAndReviewIn(@Param("member") member: Member, @Param("reviews") reviews: List<Review>): List<Long>
+
+    @Query("SELECT rl.review.id FROM ReviewLike rl WHERE rl.member = :member")
+    fun findReviewIdsByMember(@Param("member") member: Member): List<Long>
 }
