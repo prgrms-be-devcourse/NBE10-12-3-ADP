@@ -28,11 +28,15 @@ interface ReviewRepository : JpaRepository<Review, Long> {
     fun findByReviewer(member: Member): List<Review>
     fun findByReviewer(member: Member, pageable: Pageable): Page<Review>
 
-    @EntityGraph(attributePaths = ["book", "reviewer", "reviewTags", "reviewTags.tag"])
     @Query(
-        "SELECT DISTINCT rl.review FROM ReviewLike rl " +
+        "SELECT DISTINCT r FROM Review r " +
+            "JOIN ReviewLike rl ON rl.review = r " +
+            "LEFT JOIN FETCH r.book " +
+            "LEFT JOIN FETCH r.reviewer " +
+            "LEFT JOIN FETCH r.reviewTags rt " +
+            "LEFT JOIN FETCH rt.tag " +
             "WHERE rl.member = :member " +
-            "ORDER BY rl.review.id DESC"
+            "ORDER BY r.id DESC"
     )
     fun findLikedReviewsByMember(@Param("member") member: Member): List<Review>
 
