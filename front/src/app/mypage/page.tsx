@@ -18,17 +18,17 @@ import { formatDateTime } from "@/lib/formatDate";
 import { ratingColor } from "@/lib/ratingColor";
 import { useToast } from "@/lib/toast/ToastProvider";
 
+import Avatar from "@/app/_components/Avatar";
+import BookTape from "@/app/_components/BookTape";
+import BookThumbnail from "@/app/_components/BookThumbnail";
 import LibraryProfilePanel from "@/app/_components/LibraryProfilePanel";
 import LibraryWidgetPreview from "@/app/_components/LibraryWidgetPreview";
-import Avatar from "@/app/_components/Avatar";
-import BookThumbnail from "@/app/_components/BookThumbnail";
 import RatingValue from "@/app/_components/RatingValue";
+import ReviewDetailCard from "@/app/_components/ReviewDetailCard";
+import ReviewFormModal from "@/app/_components/ReviewFormModal";
 import RoughButton from "@/app/_components/RoughButton";
 import RoughDivider from "@/app/_components/RoughDivider";
 import RoughFrame from "@/app/_components/RoughFrame";
-import ReviewFormModal from "@/app/_components/ReviewFormModal";
-import ReviewDetailCard from "@/app/_components/ReviewDetailCard";
-import BookTape from "@/app/_components/BookTape";
 import WidgetGuideModal from "@/app/_components/WidgetGuideModal";
 
 type ReviewsByMemberDto = components["schemas"]["ReviewsByMemberDto"];
@@ -43,7 +43,12 @@ type LikedReview = ReviewWithBookImgUrl;
 
 function resolveAvatarUrl(source: unknown, context: string) {
   const candidate = source as
-    | { imgUrl?: string | null; avatarUrl?: string | null; profileImgUrl?: string | null; iconUrl?: string | null }
+    | {
+        imgUrl?: string | null;
+        avatarUrl?: string | null;
+        profileImgUrl?: string | null;
+        iconUrl?: string | null;
+      }
     | null
     | undefined;
 
@@ -106,10 +111,7 @@ function MyPageSkeleton() {
 
         <ul className="flex w-full flex-col">
           {Array.from({ length: 3 }).map((_, index) => (
-            <li
-              key={index}
-              className="relative flex items-start gap-3 py-3"
-            >
+            <li key={index} className="relative flex items-start gap-3 py-3">
               {index < 2 && <RoughDivider fullWidth />}
               <div className="book-skeleton h-20 w-14 shrink-0 rounded-lg" />
               <div className="min-w-0 flex-1 space-y-2">
@@ -145,22 +147,6 @@ function WishIcon() {
   );
 }
 
-function HeartIcon({ filled = false }: { filled?: boolean }) {
-  return (
-    <svg
-      aria-hidden="true"
-      className="inline-block h-4 w-4 shrink-0 align-[-0.125em]"
-      viewBox="0 0 24 24"
-      fill={filled ? "currentColor" : "none"}
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8Z" />
-    </svg>
-  );
-}
 export default function Page() {
   const router = useRouter();
   const { loginMember, isLogin, isLoginMemberPending, refresh } = useAuth();
@@ -170,7 +156,8 @@ export default function Page() {
   const [wishes, setWishes] = useState<BookWithWishIdAndTagsDto[] | null>(null);
   const [likedReviews, setLikedReviews] = useState<LikedReview[] | null>(null);
   const [tab, setTab] = useState<"reviews" | "liked" | "wishes">("reviews");
-  const [editingReview, setEditingReview] = useState<ReviewWithBookImgUrl | null>(null);
+  const [editingReview, setEditingReview] =
+    useState<ReviewWithBookImgUrl | null>(null);
   const [isWidgetGuideOpen, setIsWidgetGuideOpen] = useState(false);
   const [copiedWidgetLink, setCopiedWidgetLink] = useState(false);
   const pageCacheRef = useRef<{
@@ -280,7 +267,9 @@ export default function Page() {
 
     const form = e.currentTarget;
     const ratingInput = form.elements.namedItem("rating") as HTMLInputElement;
-    const contentInput = form.elements.namedItem("content") as HTMLTextAreaElement;
+    const contentInput = form.elements.namedItem(
+      "content",
+    ) as HTMLTextAreaElement;
     const tagsInput = form.elements.namedItem("tags") as HTMLInputElement;
 
     const body = {
@@ -299,9 +288,7 @@ export default function Page() {
       .then((data) => {
         showToast(data?.message ?? "리뷰를 수정했습니다.");
         const updateReview = (review: ReviewWithBookImgUrl) =>
-          review.id === editingReview.id
-            ? { ...review, ...body }
-            : review;
+          review.id === editingReview.id ? { ...review, ...body } : review;
 
         if (reviewData != null) {
           const nextReviews = (reviewData.results ?? []).map(updateReview);
@@ -513,7 +500,7 @@ export default function Page() {
                 }`}
                 onClick={() => setTab("wishes")}
               >
-                보고 싶어요 {wishes.length}
+                보고 싶어요 {wishes?.length ?? 0}
               </button>
             </div>
           </div>
@@ -626,7 +613,10 @@ export default function Page() {
 
               <ul className="flex w-full flex-col">
                 {likedReviewResults.map((review, index) => (
-                  <li key={review.id ?? review.bookId} className="relative py-3">
+                  <li
+                    key={review.id ?? review.bookId}
+                    className="relative py-3"
+                  >
                     {index < likedReviewResults.length - 1 && (
                       <RoughDivider fullWidth />
                     )}

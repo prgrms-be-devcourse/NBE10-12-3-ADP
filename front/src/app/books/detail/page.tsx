@@ -16,19 +16,19 @@ import { ratingFillColor } from "@/lib/ratingColor";
 import { useToast } from "@/lib/toast/ToastProvider";
 
 import Avatar from "@/app/_components/Avatar";
-import BookGrid from "@/app/_components/BookGrid";
 import BookCoverCard from "@/app/_components/BookCoverCard";
+import BookGrid from "@/app/_components/BookGrid";
+import BookTape from "@/app/_components/BookTape";
 import BookThumbnail from "@/app/_components/BookThumbnail";
 import LoginRequiredModal from "@/app/_components/LoginRequiredModal";
 import RatingHistogram from "@/app/_components/RatingHistogram";
 import RatingValue from "@/app/_components/RatingValue";
 import { RoughStarIcon } from "@/app/_components/RatingValue";
+import ReviewDetailCard from "@/app/_components/ReviewDetailCard";
 import ReviewFormModal from "@/app/_components/ReviewFormModal";
 import RoughButton from "@/app/_components/RoughButton";
 import RoughDivider from "@/app/_components/RoughDivider";
 import RoughFrame from "@/app/_components/RoughFrame";
-import ReviewDetailCard from "@/app/_components/ReviewDetailCard";
-import BookTape from "@/app/_components/BookTape";
 
 type BookDetailDto = components["schemas"]["BookDetailDto"];
 type BookDetailWithWishId = BookDetailDto & {
@@ -38,29 +38,6 @@ type BookDetailWithWishId = BookDetailDto & {
 };
 type BookDto = components["schemas"]["BookDto"];
 type ReviewDto = components["schemas"]["ReviewDto"];
-
-function resolveAvatarUrl(source: unknown, context: string) {
-  const candidate = source as
-    | { imgUrl?: string | null; avatarUrl?: string | null; profileImgUrl?: string | null; iconUrl?: string | null }
-    | null
-    | undefined;
-
-  const avatarUrl =
-    candidate?.imgUrl?.trim() ||
-    candidate?.avatarUrl?.trim() ||
-    candidate?.profileImgUrl?.trim() ||
-    candidate?.iconUrl?.trim() ||
-    null;
-
-  console.debug(`[${context}] avatar lookup`, {
-    imgUrl: candidate?.imgUrl?.trim() || null,
-    avatarUrl,
-    usedFallback: avatarUrl == null,
-    source,
-  });
-
-  return avatarUrl;
-}
 
 function BookDetailSkeleton() {
   return (
@@ -215,9 +192,7 @@ function BookDetail() {
   const [reviews, setReviews] = useState<ReviewDto[] | null>(null);
   const [recommendBooks, setRecommendBooks] = useState<BookDto[] | null>(null);
   const [editingReviewId, setEditingReviewId] = useState<number | null>(null);
-  const [likedReviewIds, setLikedReviewIds] = useState<Set<number>>(
-    new Set(),
-  );
+  const [likedReviewIds, setLikedReviewIds] = useState<Set<number>>(new Set());
   const [showWriteForm, setShowWriteForm] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false);
   const recommendScrollRef = useRef<HTMLUListElement | null>(null);
@@ -439,7 +414,8 @@ function BookDetail() {
     })
       .then((data) => {
         showToast(
-          data?.message ?? (isLiked ? "좋아요를 취소했습니다." : "좋아요를 눌렀습니다."),
+          data?.message ??
+            (isLiked ? "좋아요를 취소했습니다." : "좋아요를 눌렀습니다."),
         );
         setLikedReviewIds((current) => {
           const next = new Set(current);
@@ -654,7 +630,9 @@ function BookDetail() {
                           <div className="flex items-center gap-1 text-xs font-bold">
                             <span className="relative inline-block h-3.5 w-3.5 shrink-0">
                               <RoughStarIcon
-                                fill={ratingFillColor(recommendBook.averageRating ?? 0)}
+                                fill={ratingFillColor(
+                                  recommendBook.averageRating ?? 0,
+                                )}
                                 className="rough-overlay"
                               />
                             </span>
