@@ -7,9 +7,11 @@ const SIZE_CLASSES = {
 
 export default function Avatar({
   label,
+  imageUrl,
   size = "sm",
 }: {
   label: string | null;
+  imageUrl?: string | null;
   size?: "sm" | "lg";
 }) {
   return (
@@ -17,9 +19,18 @@ export default function Avatar({
       className={`${SIZE_CLASSES[size]} relative shrink-0 rounded-full bg-gray-200 flex items-center justify-center font-bold text-gray-600`}
     >
       <RoughFrame className="rough-overlay" variant="circle" />
-      <span className="relative z-10">
-        {label ? label.charAt(0).toUpperCase() : "?"}
-      </span>
+      {imageUrl ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          src={imageUrl}
+          alt=""
+          className="absolute inset-0 h-full w-full rounded-full object-cover"
+        />
+      ) : (
+        <span className="relative z-10">
+          {label ? label.charAt(0).toUpperCase() : "?"}
+        </span>
+      )}
     </div>
   );
 }

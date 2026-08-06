@@ -11,8 +11,8 @@ type ReviewFormModalProps = {
   defaultContent?: string;
   defaultRating?: number;
   defaultTags?: string;
-  onCancel: () => void;
   onSubmit: FormEventHandler<HTMLFormElement>;
+  onCancel: () => void;
   submitLabel: string;
   title: string;
 };

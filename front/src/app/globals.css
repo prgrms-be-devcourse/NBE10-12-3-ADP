@@ -868,7 +868,7 @@ button:hover {
 
 .rough-panel-border > *:not(.rough-overlay),
 .rough-cover > *:not(.rough-overlay),
-.rough-book-card > *:not(.rough-overlay) {
+.rough-book-card > *:not(.rough-overlay):not(.rough-review-tape) {
   position: relative;
   z-index: 1;
 }

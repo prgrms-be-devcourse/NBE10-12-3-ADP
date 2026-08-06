@@ -227,7 +227,11 @@ export default function Header() {
     e.preventDefault();
 
     const term = searchTerm.trim();
-    if (term.length === 0 || isSearchPending) return;
+    if (isSearchPending) return;
+    if (term.length < 2) {
+      showToast("검색어는 2글자 이상 입력해주세요.");
+      return;
+    }
 
     const currentUrl = new URL(window.location.href);
     const currentSearchTerm = currentUrl.searchParams.get("searchTerm") ?? "";
