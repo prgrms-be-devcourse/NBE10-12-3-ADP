@@ -8,7 +8,7 @@ import jakarta.persistence.*
 
 @Entity
 @Table(
-    indexes = [Index(name = "idx_like_count", columnList = "likeCount")]
+    indexes = [Index(name = "idx_like_count", columnList = "like_count")]
 )
 class Review(
     @field:JoinColumn(name = "book_id")

@@ -86,7 +86,7 @@ class ReviewService(
 
     fun getReviewsOrderByLikeCount(page: Int, size: Int)
             = reviewRepository
-                .findAllByOrderByLikeCountDesc(
+                .findAllByOrderByLikeCountDescIdDesc(
                     PageRequest.of(page, size))
                 .toList()
                 .map { ReviewWithBookImgUrlDto(it) }
@@ -103,8 +103,7 @@ class ReviewService(
     }
 
     fun getReviewsWithMyLike(memberId: Long): List<ReviewWithBookImgUrlDto> {
-        return reviewRepository.findByIdIn(
-            reviewLikeRepository.findReviewIdsByMember(getMemberById(memberId)))
+        return reviewRepository.findLikedReviewsByMember(getMemberById(memberId))
             .map { ReviewWithBookImgUrlDto(it) }
     }
 
