@@ -13,10 +13,10 @@ import org.springframework.data.repository.query.Param
 
 interface ReviewRepository : JpaRepository<Review, Long> {
 
-    @EntityGraph(attributePaths = ["book", "reviewer", "reviewTags", "reviewTags.tag"])
+    @EntityGraph(attributePaths = ["book", "reviewer"])
     fun findAllByOrderByIdDesc(pageable: Pageable): Page<Review>
 
-    @EntityGraph(attributePaths = ["book", "reviewer", "reviewTags", "reviewTags.tag"])
+    @EntityGraph(attributePaths = ["book", "reviewer"])
     fun findAllByOrderByLikeCountDescIdDesc(pageable: Pageable): Page<Review>
 
     @EntityGraph(attributePaths = ["book", "reviewer", "reviewTags", "reviewTags.tag"])

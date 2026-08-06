@@ -5,6 +5,7 @@ import com.back.domain.member.entity.Member
 import com.back.domain.tag.entity.Tag
 import com.back.global.jpa.entity.BaseEntity
 import jakarta.persistence.*
+import org.hibernate.annotations.BatchSize
 
 @Entity
 @Table(
@@ -27,6 +28,7 @@ class Review(
     tags: MutableList<Tag>
 ) : BaseEntity() {
     @OneToMany(mappedBy = "review", cascade = [CascadeType.ALL], orphanRemoval = true)
+    @BatchSize(size = 100)
     private val reviewTags: MutableList<ReviewTag> = mutableListOf()
 
     var likeCount: Int = 0
