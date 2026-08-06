@@ -47,10 +47,16 @@ export default function ReviewDetailCard({
       <div className="flex items-center gap-3">
         {review.reviewer?.id != null ? (
           <Link href={reviewerHref ?? "/mypage"}>
-            <Avatar label={review.reviewer.githubId ?? null} />
+            <Avatar
+              label={review.reviewer.githubId ?? null}
+              imageUrl={review.reviewer.imgUrl ?? null}
+            />
           </Link>
         ) : (
-          <Avatar label={review.reviewer?.githubId ?? null} />
+          <Avatar
+            label={review.reviewer?.githubId ?? null}
+            imageUrl={review.reviewer?.imgUrl ?? null}
+          />
         )}
 
         <div className="flex min-w-0 flex-1 flex-col gap-1">

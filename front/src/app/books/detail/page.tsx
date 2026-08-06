@@ -464,6 +464,10 @@ function BookDetail() {
   const averageNumber = typeof average === "number" ? average : null;
   const authors = book.authors ?? [];
   const tags = book.tags ?? [];
+  const editingReview =
+    editingReviewId == null
+      ? null
+      : reviews.find((review) => review.id === editingReviewId) ?? null;
 
   return (
     <div className="flex flex-col gap-6 p-4 max-w-3xl mx-auto w-full">
@@ -474,6 +478,17 @@ function BookDetail() {
           onSubmit={handleWriteSubmit}
           submitLabel="리뷰 작성"
           title="리뷰 작성"
+        />
+      )}
+      {editingReview?.id != null && (
+        <ReviewFormModal
+          defaultContent={editingReview.content ?? ""}
+          defaultRating={editingReview.rating ?? undefined}
+          defaultTags={(editingReview.tags ?? []).join(", ")}
+          onCancel={() => setEditingReviewId(null)}
+          onSubmit={(e) => handleEditSubmit(e, editingReview.id)}
+          submitLabel="리뷰 수정"
+          title="리뷰 수정"
         />
       )}
 
