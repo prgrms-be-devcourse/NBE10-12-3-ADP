@@ -214,6 +214,40 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/reviews/member/mine/liked": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** 내 좋아요 누른 리뷰 다건 조회 */
+        get: operations["getReviewsWithMyLike"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/reviews/likeCount": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** 리뷰 좋아요순 다건 조회 */
+        get: operations["getReviewsOrderByLikeCount"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/reviews/latest": {
         parameters: {
             query?: never;
@@ -450,6 +484,7 @@ export interface components {
             id: number;
             githubId?: string | null;
             githubLink?: string | null;
+            imgUrl?: string | null;
         };
         ReviewDto: {
             /** Format: int64 */
@@ -587,44 +622,45 @@ export interface components {
             likeCount?: number;
         };
         PageAdminReviewDto: {
-            /** Format: int32 */
-            totalPages?: number;
             /** Format: int64 */
             totalElements?: number;
+            /** Format: int32 */
+            totalPages?: number;
+            /** Format: int32 */
+            numberOfElements?: number;
+            pageable?: components["schemas"]["PageableObject"];
+            sort?: components["schemas"]["SortObject"];
             /** Format: int32 */
             size?: number;
             content?: components["schemas"]["AdminReviewDto"][];
             /** Format: int32 */
             number?: number;
-            /** Format: int32 */
-            numberOfElements?: number;
-            pageable?: components["schemas"]["PageableObject"];
-            sort?: components["schemas"]["SortObject"];
             first?: boolean;
             last?: boolean;
             empty?: boolean;
         };
         PageableObject: {
-            /** Format: int64 */
-            offset?: number;
-            /** Format: int32 */
-            pageSize?: number;
+            paged?: boolean;
             /** Format: int32 */
             pageNumber?: number;
-            paged?: boolean;
+            /** Format: int32 */
+            pageSize?: number;
             sort?: components["schemas"]["SortObject"];
             unpaged?: boolean;
+            /** Format: int64 */
+            offset?: number;
         };
         SortObject: {
-            empty?: boolean;
-            sorted?: boolean;
             unsorted?: boolean;
+            sorted?: boolean;
+            empty?: boolean;
         };
         MemberWithUsernameAndWidgetLinkDto: {
             /** Format: int64 */
             id: number;
             githubId?: string | null;
             githubLink?: string | null;
+            imgUrl?: string | null;
             username?: string | null;
             widgetLink?: string | null;
         };
@@ -633,6 +669,7 @@ export interface components {
             id: number;
             githubId?: string | null;
             githubLink?: string | null;
+            imgUrl?: string | null;
             username?: string | null;
             nickname?: string | null;
             /** Format: date-time */
@@ -641,19 +678,19 @@ export interface components {
             admin?: boolean;
         };
         PageAdminMemberDto: {
-            /** Format: int32 */
-            totalPages?: number;
             /** Format: int64 */
             totalElements?: number;
+            /** Format: int32 */
+            totalPages?: number;
+            /** Format: int32 */
+            numberOfElements?: number;
+            pageable?: components["schemas"]["PageableObject"];
+            sort?: components["schemas"]["SortObject"];
             /** Format: int32 */
             size?: number;
             content?: components["schemas"]["AdminMemberDto"][];
             /** Format: int32 */
             number?: number;
-            /** Format: int32 */
-            numberOfElements?: number;
-            pageable?: components["schemas"]["PageableObject"];
-            sort?: components["schemas"]["SortObject"];
             first?: boolean;
             last?: boolean;
             empty?: boolean;
@@ -682,19 +719,19 @@ export interface components {
             imgUrl?: string | null;
         };
         PageBookDto: {
-            /** Format: int32 */
-            totalPages?: number;
             /** Format: int64 */
             totalElements?: number;
+            /** Format: int32 */
+            totalPages?: number;
+            /** Format: int32 */
+            numberOfElements?: number;
+            pageable?: components["schemas"]["PageableObject"];
+            sort?: components["schemas"]["SortObject"];
             /** Format: int32 */
             size?: number;
             content?: components["schemas"]["BookDto"][];
             /** Format: int32 */
             number?: number;
-            /** Format: int32 */
-            numberOfElements?: number;
-            pageable?: components["schemas"]["PageableObject"];
-            sort?: components["schemas"]["SortObject"];
             first?: boolean;
             last?: boolean;
             empty?: boolean;
@@ -1112,6 +1149,49 @@ export interface operations {
                 };
                 content: {
                     "application/json;charset=UTF-8": components["schemas"]["ReviewsByMemberDto"];
+                };
+            };
+        };
+    };
+    getReviewsWithMyLike: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json;charset=UTF-8": components["schemas"]["ReviewWithBookImgUrlDto"][];
+                };
+            };
+        };
+    };
+    getReviewsOrderByLikeCount: {
+        parameters: {
+            query?: {
+                page?: number;
+                size?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json;charset=UTF-8": components["schemas"]["ReviewWithBookImgUrlDto"][];
                 };
             };
         };

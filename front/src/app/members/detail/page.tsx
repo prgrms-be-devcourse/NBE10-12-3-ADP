@@ -14,6 +14,7 @@ import { ratingColor } from "@/lib/ratingColor";
 
 import LibraryProfilePanel from "@/app/_components/LibraryProfilePanel";
 import LibraryWidgetPreview from "@/app/_components/LibraryWidgetPreview";
+import BookThumbnail from "@/app/_components/BookThumbnail";
 import RatingValue from "@/app/_components/RatingValue";
 import RoughDivider from "@/app/_components/RoughDivider";
 import RoughFrame from "@/app/_components/RoughFrame";
@@ -25,6 +26,29 @@ type ReviewWithBookImgUrl = NonNullable<
 >[number] & {
   bookImgUrl?: string | null;
 };
+
+function resolveAvatarUrl(source: unknown, context: string) {
+  const candidate = source as
+    | { imgUrl?: string | null; avatarUrl?: string | null; profileImgUrl?: string | null; iconUrl?: string | null }
+    | null
+    | undefined;
+
+  const avatarUrl =
+    candidate?.imgUrl?.trim() ||
+    candidate?.avatarUrl?.trim() ||
+    candidate?.profileImgUrl?.trim() ||
+    candidate?.iconUrl?.trim() ||
+    null;
+
+  console.debug(`[${context}] avatar lookup`, {
+    imgUrl: candidate?.imgUrl?.trim() || null,
+    avatarUrl,
+    usedFallback: avatarUrl == null,
+    source,
+  });
+
+  return avatarUrl;
+}
 
 function MemberDetailSkeleton() {
   return (
@@ -122,6 +146,7 @@ function MemberDetail() {
         username={member.githubId}
         githubId={member.githubId}
         githubLink={member.githubLink}
+        avatarUrl={resolveAvatarUrl(member, "members/detail") ?? undefined}
         averageLabel="평균 별점"
         averageRating={averageNumber}
         rating={reviewData.rating}
@@ -166,16 +191,15 @@ function MemberDetail() {
                     className="rough-overlay rough-card-line rough-book-cover-line"
                     variant="card"
                   />
-                  {(review as ReviewWithBookImgUrl).bookImgUrl ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img
-                      src={(review as ReviewWithBookImgUrl).bookImgUrl ?? ""}
-                      alt=""
-                      className="h-full w-full object-cover"
-                    />
-                  ) : (
-                    <span className="text-xs text-gray-400">표지 없음</span>
-                  )}
+                  <BookThumbnail
+                    bookId={review.bookId}
+                    imgUrl={(review as ReviewWithBookImgUrl).bookImgUrl}
+                    title={review.bookTitle}
+                    className="h-full w-full object-cover"
+                    placeholderClassName="flex h-full w-full items-center justify-center"
+                    placeholderText="표지 없음"
+                    altClassName="text-xs text-gray-400"
+                  />
                 </Link>
                 <div className="flex-1 min-w-0">
                   <Link
