@@ -7,6 +7,7 @@ import { Suspense, useEffect, useState } from "react";
 
 import { API_BASE_URL, apiFetch } from "@/lib/backend/client";
 
+import { resolveAvatarUrl } from "@/lib/avatar";
 import type { components } from "@/lib/backend/apiV1/schema";
 import { goToErrorPage } from "@/lib/error/goToErrorPage";
 import { formatDateTime } from "@/lib/formatDate";
@@ -26,29 +27,6 @@ type ReviewWithBookImgUrl = NonNullable<
 >[number] & {
   bookImgUrl?: string | null;
 };
-
-function resolveAvatarUrl(source: unknown, context: string) {
-  const candidate = source as
-    | { imgUrl?: string | null; avatarUrl?: string | null; profileImgUrl?: string | null; iconUrl?: string | null }
-    | null
-    | undefined;
-
-  const avatarUrl =
-    candidate?.imgUrl?.trim() ||
-    candidate?.avatarUrl?.trim() ||
-    candidate?.profileImgUrl?.trim() ||
-    candidate?.iconUrl?.trim() ||
-    null;
-
-  console.debug(`[${context}] avatar lookup`, {
-    imgUrl: candidate?.imgUrl?.trim() || null,
-    avatarUrl,
-    usedFallback: avatarUrl == null,
-    source,
-  });
-
-  return avatarUrl;
-}
 
 function MemberDetailSkeleton() {
   return (
@@ -146,7 +124,7 @@ function MemberDetail() {
         username={member.githubId}
         githubId={member.githubId}
         githubLink={member.githubLink}
-        avatarUrl={resolveAvatarUrl(member, "members/detail") ?? undefined}
+        avatarUrl={resolveAvatarUrl(member) ?? undefined}
         averageLabel="평균 별점"
         averageRating={averageNumber}
         rating={reviewData.rating}

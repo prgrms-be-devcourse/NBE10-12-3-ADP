@@ -7,6 +7,7 @@ import { useEffect, useRef, useState } from "react";
 
 import { API_BASE_URL, apiFetch } from "@/lib/backend/client";
 
+import { resolveAvatarUrl } from "@/lib/avatar";
 import { useAuth } from "@/lib/auth/AuthProvider";
 import {
   consumeAuthReturnPath,
@@ -40,34 +41,6 @@ type ReviewWithBookImgUrl = NonNullable<
   bookImgUrl?: string | null;
 };
 type LikedReview = ReviewWithBookImgUrl;
-
-function resolveAvatarUrl(source: unknown, context: string) {
-  const candidate = source as
-    | {
-        imgUrl?: string | null;
-        avatarUrl?: string | null;
-        profileImgUrl?: string | null;
-        iconUrl?: string | null;
-      }
-    | null
-    | undefined;
-
-  const avatarUrl =
-    candidate?.imgUrl?.trim() ||
-    candidate?.avatarUrl?.trim() ||
-    candidate?.profileImgUrl?.trim() ||
-    candidate?.iconUrl?.trim() ||
-    null;
-
-  console.debug(`[${context}] avatar lookup`, {
-    imgUrl: candidate?.imgUrl?.trim() || null,
-    avatarUrl,
-    usedFallback: avatarUrl == null,
-    source,
-  });
-
-  return avatarUrl;
-}
 
 function MyPageSkeleton() {
   return (
@@ -371,7 +344,7 @@ export default function Page() {
         username={loginMember?.username}
         githubId={loginMember?.githubId}
         githubLink={loginMember?.githubLink}
-        avatarUrl={resolveAvatarUrl(loginMember, "mypage") ?? undefined}
+        avatarUrl={resolveAvatarUrl(loginMember) ?? undefined}
         averageLabel="내가 준 평균 별점"
         averageRating={averageNumber}
         rating={reviewData.rating}
@@ -690,10 +663,14 @@ export default function Page() {
 
           {tab === "wishes" && (
             <>
-              {wishes.length === 0 && (
-                <div className="text-sm theme-muted">
-                  보고 싶어요 한 도서가 없습니다.
-                </div>
+              {wishes == null ? (
+                <div className="text-sm theme-muted">로딩 중...</div>
+              ) : (
+                wishes.length === 0 && (
+                  <div className="text-sm theme-muted">
+                    보고 싶어요 한 도서가 없습니다.
+                  </div>
+                )
               )}
 
               <ul className="flex w-full flex-col">
