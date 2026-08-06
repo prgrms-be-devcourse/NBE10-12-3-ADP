@@ -463,6 +463,10 @@ function BookDetail() {
     editingReviewId == null
       ? null
       : reviews.find((review) => review.id === editingReviewId) ?? null;
+  const editingReviewTargetId = editingReview?.id;
+  const editingReviewContent = editingReview?.content ?? "";
+  const editingReviewRating = editingReview?.rating ?? undefined;
+  const editingReviewTags = (editingReview?.tags ?? []).join(", ");
 
   return (
     <div className="flex flex-col gap-6 p-4 max-w-3xl mx-auto w-full">
@@ -475,13 +479,13 @@ function BookDetail() {
           title="리뷰 작성"
         />
       )}
-      {editingReview?.id != null && (
+      {editingReviewTargetId != null && (
         <ReviewFormModal
-          defaultContent={editingReview.content ?? ""}
-          defaultRating={editingReview.rating ?? undefined}
-          defaultTags={(editingReview.tags ?? []).join(", ")}
+          defaultContent={editingReviewContent}
+          defaultRating={editingReviewRating}
+          defaultTags={editingReviewTags}
           onCancel={() => setEditingReviewId(null)}
-          onSubmit={(e) => handleEditSubmit(e, editingReview.id)}
+          onSubmit={(e) => handleEditSubmit(e, editingReviewTargetId)}
           submitLabel="리뷰 수정"
           title="리뷰 수정"
         />
