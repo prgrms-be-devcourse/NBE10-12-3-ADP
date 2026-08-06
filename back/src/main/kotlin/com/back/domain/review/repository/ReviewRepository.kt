@@ -7,6 +7,7 @@ import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Modifying
+import org.springframework.data.jpa.repository.EntityGraph
 import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.query.Param
 
@@ -22,13 +23,11 @@ interface ReviewRepository : JpaRepository<Review, Long> {
     fun findByReviewer(member: Member): List<Review>
     fun findByReviewer(member: Member, pageable: Pageable): Page<Review>
 
-    fun findByIdIn(ids: Collection<Long>): List<Review>
-
+    @EntityGraph(attributePaths = ["book", "reviewer", "reviewTags", "reviewTags.tag"])
     @Query(
-        "SELECT r FROM ReviewLike rl " +
-            "JOIN rl.review r " +
+        "SELECT DISTINCT rl.review FROM ReviewLike rl " +
             "WHERE rl.member = :member " +
-            "ORDER BY r.id DESC"
+            "ORDER BY rl.review.id DESC"
     )
     fun findLikedReviewsByMember(@Param("member") member: Member): List<Review>
 
