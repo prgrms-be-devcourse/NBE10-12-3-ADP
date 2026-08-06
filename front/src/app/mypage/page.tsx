@@ -137,7 +137,25 @@ export default function Page() {
     reviews?: ReviewsByMemberDto;
     wishes?: BookWithWishIdAndTagsDto[];
     likedReviews?: LikedReview[];
+    memberId?: number | null;
   }>({});
+
+  useEffect(() => {
+    if (isLoginMemberPending) return;
+
+    if (pageCacheRef.current.memberId !== loginMember?.id) {
+      pageCacheRef.current = {
+        memberId: loginMember?.id ?? null,
+      };
+      setReviewData(null);
+      setWishes(null);
+      setLikedReviews(null);
+      setEditingReview(null);
+      setTab("reviews");
+      setCopiedWidgetLink(false);
+      setIsWidgetGuideOpen(false);
+    }
+  }, [isLoginMemberPending, loginMember?.id]);
 
   const loadReviews = () => {
     if (pageCacheRef.current.reviews != null) {
@@ -245,12 +263,10 @@ export default function Page() {
     if (editingReview == null || editingReview.id == null) return;
 
     const form = e.currentTarget;
-    const ratingInput = form.elements.namedItem("rating") as HTMLInputElement;
-    const contentInput = form.elements.namedItem(
-      "content",
-    ) as HTMLTextAreaElement;
-    const tagsInput = form.elements.namedItem("tags") as HTMLInputElement;
-    const ratingValue = ratingInput.value.trim();
+    const formData = new FormData(form);
+    const ratingValue = String(formData.get("rating") ?? "").trim();
+    const contentValue = String(formData.get("content") ?? "").trim();
+    const tagsValue = String(formData.get("tags") ?? "");
     const parsedRating =
       ratingValue === "" ? null : Number.parseFloat(ratingValue);
 
@@ -266,8 +282,8 @@ export default function Page() {
 
     const body = {
       rating: parsedRating,
-      content: contentInput.value.trim(),
-      tags: tagsInput.value
+      content: contentValue,
+      tags: tagsValue
         .split(",")
         .map((tag) => tag.trim())
         .filter((tag) => tag.length > 0),
