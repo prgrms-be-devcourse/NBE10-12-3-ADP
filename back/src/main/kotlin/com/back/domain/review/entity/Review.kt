@@ -7,6 +7,9 @@ import com.back.global.jpa.entity.BaseEntity
 import jakarta.persistence.*
 
 @Entity
+@Table(
+    indexes = [Index(name = "idx_like_count", columnList = "likeCount")]
+)
 class Review(
     @field:JoinColumn(name = "book_id")
     @field:ManyToOne
