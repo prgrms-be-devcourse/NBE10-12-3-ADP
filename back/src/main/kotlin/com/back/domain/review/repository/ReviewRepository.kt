@@ -29,14 +29,13 @@ interface ReviewRepository : JpaRepository<Review, Long> {
     fun findByReviewer(member: Member, pageable: Pageable): Page<Review>
 
     @Query(
-        "SELECT DISTINCT r FROM Review r " +
-            "JOIN ReviewLike rl ON rl.review = r " +
-            "LEFT JOIN FETCH r.book " +
-            "LEFT JOIN FETCH r.reviewer " +
-            "LEFT JOIN FETCH r.reviewTags rt " +
-            "LEFT JOIN FETCH rt.tag " +
-            "WHERE rl.member = :member " +
-            "ORDER BY r.id DESC"
+        "SELECT rl.review FROM ReviewLike rl " +
+                "LEFT JOIN FETCH rl.review.book " +
+                "LEFT JOIN FETCH rl.review.reviewer " +
+                "LEFT JOIN FETCH rl.review.reviewTags rt " +
+                "LEFT JOIN FETCH rt.tag " +
+                "WHERE rl.member = :member " +
+                "ORDER BY rl.review.id DESC"
     )
     fun findLikedReviewsByMember(@Param("member") member: Member): List<Review>
 
