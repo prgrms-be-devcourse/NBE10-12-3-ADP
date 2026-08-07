@@ -168,6 +168,8 @@ class ReviewService(
             throw ServiceException("403-1", "리뷰 삭제 권한이 없습니다.")
         }
 
+        reviewLikeRepository.deleteAllByReview(review)
+
         val book = review.book
         reviewRepository.delete(review)
 
