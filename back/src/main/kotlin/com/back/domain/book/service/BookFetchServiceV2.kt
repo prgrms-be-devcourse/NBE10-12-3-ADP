@@ -5,7 +5,6 @@ import com.back.domain.book.entity.BookLastFetchedPage
 import com.back.domain.book.repository.BookLastFetchedPageRepository
 import com.back.domain.book.repository.BookRepository
 import com.back.standard.util.Ut
-import jakarta.persistence.Column
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
@@ -13,9 +12,9 @@ import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.bodyToMono
 import java.time.LocalDate
-import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import kotlin.String
+import org.springframework.transaction.annotation.Propagation.NOT_SUPPORTED
 
 @Service
 @Transactional(readOnly = true)
@@ -91,6 +90,7 @@ class BookFetchServiceV2(
 //        val ERR_MESSAGE: String? = null,
     )
 
+    @Transactional(propagation = NOT_SUPPORTED)
     fun fetchBooksFromLastFetchedPage(): List<Book> {
         val bookLastFetchedPage = bookLastFetchedPageRepository.findByIdOrNull(1)
             ?: bookLastFetchedPageRepository.save(BookLastFetchedPage())
