@@ -55,6 +55,7 @@ custom:
   accessToken:
     expirationSeconds: "#{60*${CUSTOM__JWT__EXPIRATION_MINUTES}}"
   book-fetch:
+    api-key: ${CUSTOM__BOOK_FETCH__API_KEY}
     api-keys: ${CUSTOM__BOOK__FETCH__API_KEYS}
   security:
     allowedOrigins: ${CUSTOM__SECURITY__ALLOWED_ORIGINS}

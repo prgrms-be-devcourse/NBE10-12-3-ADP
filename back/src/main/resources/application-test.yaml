@@ -23,6 +23,7 @@ custom:
   accessToken:
     expirationSeconds: "#{60*20}"
   book-fetch:
+    api-key: dummy
     api-keys: dummy
   security:
     allowedOrigins: dummy
