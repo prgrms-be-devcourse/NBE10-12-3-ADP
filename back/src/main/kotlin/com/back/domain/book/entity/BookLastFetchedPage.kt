@@ -5,8 +5,8 @@ import jakarta.persistence.Entity
 
 @Entity
 class BookLastFetchedPage : BaseEntity() {
-    final var number = 0
-        private set
+    var number = 0
+        protected set
 
     fun increaseNumber() {
         number++
