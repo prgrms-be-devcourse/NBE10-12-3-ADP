@@ -180,7 +180,7 @@ locals {
     -p 81:81 \
     -e TZ=Asia/Seoul \
     -e 'INITIAL_ADMIN_EMAIL=admin@npm.com' \
-    -e 'INITIAL_ADMIN_PASSWORD=${var.password_1}' \
+    -e 'INITIAL_ADMIN_PASSWORD=${var.password}' \
     -v /dockerProjects/npm_1/volumes/data:/data \
     zoeyvid/npmplus:latest
 
@@ -191,7 +191,7 @@ locals {
     -p 6379:6379 \
     -e TZ=Asia/Seoul \
     -v /dockerProjects/redis_1/volumes/data:/data \
-    redis --requirepass '${var.password_1}' --maxmemory 50mb --maxmemory-policy allkeys-lru
+    redis --requirepass '${var.password}'
 
   docker run -d \
     --name mysql_1 \
@@ -200,22 +200,24 @@ locals {
     -v /dockerProjects/mysql_1/volumes/var/lib/mysql:/var/lib/mysql \
     -v /dockerProjects/mysql_1/volumes/etc/mysql/conf.d:/etc/mysql/conf.d \
     -p 3306:3306 \
-    -e MYSQL_ROOT_PASSWORD=${var.password_1} \
+    -e MYSQL_ROOT_PASSWORD=${var.password} \
     -e TZ=Asia/Seoul \
     mysql:8.4.10
 
   echo "MySQL이 기동될 때까지 대기 중..."
 
-  until docker exec mysql_1 mysql -uroot -p${var.password_1} -e "SELECT 1" &> /dev/null; do
+  until docker exec mysql_1 mysql -uroot -p${var.password} -e "SELECT 1" &> /dev/null; do
     echo "MySQL이 아직 준비되지 않음. 5초 후 재시도..."
     sleep 5
   done
 
   echo "MySQL이 준비됨. 초기화 스크립트 실행 중..."
 
-  docker exec mysql_1 mysql -uroot -p${var.password_1} -e "
-  CREATE DATABASE readthem;
+  docker exec mysql_1 mysql -uroot -p${var.password} -e "
+  CREATE DATABASE ${var.db_name};
   "
+
+  echo "${var.github_access_token}" | docker login ghcr.io -u ${var.github_username} --password-stdin
 
   echo "BOOTSTRAP DONE"
   EOF
