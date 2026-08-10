@@ -7,12 +7,12 @@ import { useEffect, useRef, useState } from "react";
 
 import { API_BASE_URL, apiFetch } from "@/lib/backend/client";
 
-import { resolveAvatarUrl } from "@/lib/avatar";
 import { useAuth } from "@/lib/auth/AuthProvider";
 import {
   consumeAuthReturnPath,
   saveCurrentAuthReturnPath,
 } from "@/lib/auth/authReturnPath";
+import { resolveAvatarUrl } from "@/lib/avatar";
 import type { components } from "@/lib/backend/apiV1/schema";
 import { goToErrorPage } from "@/lib/error/goToErrorPage";
 import { formatDateTime } from "@/lib/formatDate";
@@ -21,6 +21,7 @@ import { useToast } from "@/lib/toast/ToastProvider";
 
 import BookTape from "@/app/_components/BookTape";
 import BookThumbnail from "@/app/_components/BookThumbnail";
+import LibraryPageLayout from "@/app/_components/LibraryPageLayout";
 import LibraryProfilePanel from "@/app/_components/LibraryProfilePanel";
 import LibraryWidgetPreview from "@/app/_components/LibraryWidgetPreview";
 import RatingValue from "@/app/_components/RatingValue";
@@ -104,9 +105,7 @@ function MyPageSkeleton() {
 }
 
 function WishIcon() {
-  return (
-    <SvgIcon name="bookmark" className="h-4 w-4 align-[-0.125em]" />
-  );
+  return <SvgIcon name="bookmark" className="h-4 w-4 align-[-0.125em]" />;
 }
 
 export default function Page() {
@@ -362,402 +361,397 @@ export default function Page() {
   const widgetCodeSnippet = `<img src="${widgetLink}" alt="내 서재 위젯" />`;
 
   return (
-    <div className="flex flex-col gap-4 sm:flex-row sm:gap-8">
-      <LibraryProfilePanel
-        avatarLabel={loginMember?.githubId ?? loginMember?.username}
-        username={loginMember?.username}
-        githubId={loginMember?.githubId}
-        githubLink={loginMember?.githubLink}
-        avatarUrl={resolveAvatarUrl(loginMember) ?? undefined}
-        averageLabel="내가 준 평균 별점"
-        averageRating={averageNumber}
-        rating={reviewData.rating}
-        mobileWidget={
-          <div className="max-sm:block sm:hidden">
-            <LibraryWidgetPreview
-              githubId={loginMember?.githubId}
-              widgetSrc={`${API_BASE_URL}/api/v2/widgets/${loginMember?.githubId ?? ""}`}
-              widgetLink={loginMember?.widgetLink}
-              actions={
-                <div className="flex flex-wrap justify-end gap-2">
-                  <RoughButton
-                    roughSize="sm"
-                    tone="history"
-                    type="button"
-                    disabled={!widgetLink}
-                    onClick={() => handleCopyWidgetLink(widgetCodeSnippet)}
-                  >
-                    {copiedWidgetLink ? "복사 완료" : "코드 복사"}
-                  </RoughButton>
-                  <RoughButton
-                    roughSize="sm"
-                    type="button"
-                    onClick={handleOpenWidgetGuide}
-                  >
-                    README 가이드 보기
-                  </RoughButton>
-                </div>
-              }
-            />
-          </div>
-        }
-        actions={
-          <div className="mt-4 flex w-full gap-2 max-sm:w-auto max-sm:flex-wrap">
-            <RoughButton
-              className="flex-1 max-sm:flex-none"
-              roughSize="sm"
-              type="button"
-              onClick={handleLogout}
-            >
-              로그아웃
-            </RoughButton>
-            <RoughButton
-              className="flex-1 max-sm:flex-none"
-              roughSize="sm"
-              tone="cancel"
-              type="button"
-              onClick={handleWithdraw}
-            >
-              회원 탈퇴
-            </RoughButton>
-          </div>
-        }
-      />
+    <LibraryPageLayout
+      sidebar={
+        <LibraryProfilePanel
+          avatarLabel={loginMember?.githubId ?? loginMember?.username}
+          username={loginMember?.username}
+          githubId={loginMember?.githubId}
+          githubLink={loginMember?.githubLink}
+          avatarUrl={resolveAvatarUrl(loginMember) ?? undefined}
+          averageLabel="내가 준 평균 별점"
+          averageRating={averageNumber}
+          rating={reviewData.rating}
+          mobileWidget={
+            <div className="max-sm:block sm:hidden">
+              <LibraryWidgetPreview
+                githubId={loginMember?.githubId}
+                widgetSrc={`${API_BASE_URL}/api/v2/widgets/${loginMember?.githubId ?? ""}`}
+                widgetLink={loginMember?.widgetLink}
+                actions={
+                  <div className="flex flex-wrap justify-end gap-2">
+                    <RoughButton
+                      roughSize="sm"
+                      tone="history"
+                      type="button"
+                      disabled={!widgetLink}
+                      onClick={() => handleCopyWidgetLink(widgetCodeSnippet)}
+                    >
+                      {copiedWidgetLink ? "복사 완료" : "코드 복사"}
+                    </RoughButton>
+                    <RoughButton
+                      roughSize="sm"
+                      type="button"
+                      onClick={handleOpenWidgetGuide}
+                    >
+                      README 가이드 보기
+                    </RoughButton>
+                  </div>
+                }
+              />
+            </div>
+          }
+          actions={
+            <div className="mt-4 flex w-full gap-2 max-sm:w-auto max-sm:flex-wrap">
+              <RoughButton
+                className="flex-1 max-sm:flex-none"
+                roughSize="sm"
+                type="button"
+                onClick={handleLogout}
+              >
+                로그아웃
+              </RoughButton>
+              <RoughButton
+                className="flex-1 max-sm:flex-none"
+                roughSize="sm"
+                tone="cancel"
+                type="button"
+                onClick={handleWithdraw}
+              >
+                회원 탈퇴
+              </RoughButton>
+            </div>
+          }
+        />
+      }
+    >
+      {editingReview != null && (
+        <ReviewFormModal
+          defaultContent={editingReview.content ?? ""}
+          defaultRating={editingReview.rating ?? undefined}
+          defaultTags={(editingReview.tags ?? []).join(", ")}
+          onCancel={() => setEditingReview(null)}
+          onSubmit={handleEditReviewSubmit}
+          submitLabel="수정 완료"
+          title="리뷰 수정"
+        />
+      )}
 
-      <div className="flex min-w-0 flex-1 flex-col gap-4 max-sm:gap-1">
-        {editingReview != null && (
-          <ReviewFormModal
-            defaultContent={editingReview.content ?? ""}
-            defaultRating={editingReview.rating ?? undefined}
-            defaultTags={(editingReview.tags ?? []).join(", ")}
-            onCancel={() => setEditingReview(null)}
-            onSubmit={handleEditReviewSubmit}
-            submitLabel="수정 완료"
-            title="리뷰 수정"
-          />
-        )}
+      <div className="max-sm:hidden">
+        <LibraryWidgetPreview
+          githubId={loginMember?.githubId}
+          widgetSrc={`${API_BASE_URL}/api/v2/widgets/${loginMember?.githubId ?? ""}`}
+          widgetLink={loginMember?.widgetLink}
+          actions={
+            <div className="flex flex-wrap justify-end gap-2">
+              <RoughButton
+                roughSize="sm"
+                tone="history"
+                type="button"
+                disabled={!widgetLink}
+                onClick={() => handleCopyWidgetLink(widgetCodeSnippet)}
+              >
+                {copiedWidgetLink ? "복사 완료" : "코드 복사"}
+              </RoughButton>
+              <RoughButton
+                roughSize="sm"
+                type="button"
+                onClick={handleOpenWidgetGuide}
+              >
+                README 가이드 보기
+              </RoughButton>
+            </div>
+          }
+        />
+      </div>
 
-        <div className="max-sm:hidden">
-          <LibraryWidgetPreview
-            githubId={loginMember?.githubId}
-            widgetSrc={`${API_BASE_URL}/api/v2/widgets/${loginMember?.githubId ?? ""}`}
-            widgetLink={loginMember?.widgetLink}
-            actions={
-              <div className="flex flex-wrap justify-end gap-2">
-                <RoughButton
-                  roughSize="sm"
-                  tone="history"
-                  type="button"
-                  disabled={!widgetLink}
-                  onClick={() => handleCopyWidgetLink(widgetCodeSnippet)}
-                >
-                  {copiedWidgetLink ? "복사 완료" : "코드 복사"}
-                </RoughButton>
-                <RoughButton
-                  roughSize="sm"
-                  type="button"
-                  onClick={handleOpenWidgetGuide}
-                >
-                  README 가이드 보기
-                </RoughButton>
-              </div>
-            }
-          />
+      <section className="flex flex-col gap-1">
+        <div className="flex gap-2">
+          <div className="theme-tab">
+            <button
+              type="button"
+              className={`px-3 py-2 text-sm ${
+                tab === "reviews" ? "theme-tab-active" : "theme-tab-inactive"
+              }`}
+              onClick={() => setTab("reviews")}
+            >
+              작성한 리뷰 {reviewResults.length}
+            </button>
+          </div>
+          <div className="theme-tab">
+            <button
+              type="button"
+              className={`px-3 py-2 text-sm ${
+                tab === "liked" ? "theme-tab-active" : "theme-tab-inactive"
+              }`}
+              onClick={() => setTab("liked")}
+            >
+              좋아요한 리뷰 {likedReviewResults.length}
+            </button>
+          </div>
+          <div className="theme-tab">
+            <button
+              type="button"
+              className={`px-3 py-2 text-sm ${
+                tab === "wishes" ? "theme-tab-active" : "theme-tab-inactive"
+              }`}
+              onClick={() => setTab("wishes")}
+            >
+              보고 싶어요 {wishes?.length ?? 0}
+            </button>
+          </div>
         </div>
 
-        <section className="flex flex-col gap-1">
-          <div className="flex gap-2">
-            <div className="theme-tab">
-              <button
-                type="button"
-                className={`px-3 py-2 text-sm ${
-                  tab === "reviews" ? "theme-tab-active" : "theme-tab-inactive"
-                }`}
-                onClick={() => setTab("reviews")}
-              >
-                작성한 리뷰 {reviewResults.length}
-              </button>
-            </div>
-            <div className="theme-tab">
-              <button
-                type="button"
-                className={`px-3 py-2 text-sm ${
-                  tab === "liked" ? "theme-tab-active" : "theme-tab-inactive"
-                }`}
-                onClick={() => setTab("liked")}
-              >
-                좋아요한 리뷰 {likedReviewResults.length}
-              </button>
-            </div>
-            <div className="theme-tab">
-              <button
-                type="button"
-                className={`px-3 py-2 text-sm ${
-                  tab === "wishes" ? "theme-tab-active" : "theme-tab-inactive"
-                }`}
-                onClick={() => setTab("wishes")}
-              >
-                보고 싶어요 {wishes?.length ?? 0}
-              </button>
-            </div>
-          </div>
+        {tab === "reviews" && (
+          <>
+            {reviewResults.length === 0 && (
+              <div className="text-sm theme-muted">작성한 리뷰가 없습니다.</div>
+            )}
 
-          {tab === "reviews" && (
-            <>
-              {reviewResults.length === 0 && (
-                <div className="text-sm theme-muted">
-                  작성한 리뷰가 없습니다.
-                </div>
-              )}
-
-              <ul className="flex w-full flex-col">
-                {reviewResults.map((review, index) => (
-                  <li
-                    key={review.id ?? review.bookId}
-                    className="relative flex items-start gap-3 py-3"
+            <ul className="flex w-full flex-col">
+              {reviewResults.map((review, index) => (
+                <li
+                  key={review.id ?? review.bookId}
+                  className="relative flex items-start gap-3 py-3"
+                >
+                  {index < reviewResults.length - 1 && (
+                    <RoughDivider fullWidth />
+                  )}
+                  <Link
+                    href={`/books/detail?id=${review.bookId}`}
+                    className="rough-book-card review-book-thumbnail relative flex h-20 w-14 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-white"
+                    aria-label={`${review.bookTitle ?? `책 #${review.bookId}`} 상세 보기`}
                   >
-                    {index < reviewResults.length - 1 && (
-                      <RoughDivider fullWidth />
-                    )}
+                    <RoughFrame
+                      className="rough-overlay rough-card-line rough-book-cover-line"
+                      variant="card"
+                    />
+                    <BookThumbnail
+                      bookId={review.bookId}
+                      imgUrl={(review as ReviewWithBookImgUrl).bookImgUrl}
+                      title={review.bookTitle}
+                      className="h-full w-full object-cover"
+                      placeholderClassName="flex h-full w-full items-center justify-center"
+                      placeholderText="표지 없음"
+                      altClassName="text-xs text-gray-400"
+                    />
+                  </Link>
+                  <div className="flex-1 min-w-0">
                     <Link
+                      className="font-semibold hover:underline"
                       href={`/books/detail?id=${review.bookId}`}
-                      className="rough-book-card review-book-thumbnail relative flex h-20 w-14 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-white"
-                      aria-label={`${review.bookTitle ?? `책 #${review.bookId}`} 상세 보기`}
                     >
-                      <RoughFrame
-                        className="rough-overlay rough-card-line rough-book-cover-line"
-                        variant="card"
-                      />
-                      <BookThumbnail
-                        bookId={review.bookId}
-                        imgUrl={(review as ReviewWithBookImgUrl).bookImgUrl}
-                        title={review.bookTitle}
-                        className="h-full w-full object-cover"
-                        placeholderClassName="flex h-full w-full items-center justify-center"
-                        placeholderText="표지 없음"
-                        altClassName="text-xs text-gray-400"
-                      />
+                      {review.bookTitle ?? `책 #${review.bookId}`}
                     </Link>
-                    <div className="flex-1 min-w-0">
-                      <Link
-                        className="font-semibold hover:underline"
-                        href={`/books/detail?id=${review.bookId}`}
-                      >
-                        {review.bookTitle ?? `책 #${review.bookId}`}
-                      </Link>
 
-                      <div className="flex flex-wrap gap-1 text-xs theme-tag">
-                        {(review.tags ?? []).map((tag) => (
-                          <span key={tag}>#{tag}</span>
-                        ))}
-                      </div>
-
-                      <div className="mt-1 text-sm">{review.content}</div>
-                      <div className="mt-1 text-xs theme-subtle">
-                        {formatDateTime(review.createdDate)}
-                      </div>
+                    <div className="flex flex-wrap gap-1 text-xs theme-tag">
+                      {(review.tags ?? []).map((tag) => (
+                        <span key={tag}>#{tag}</span>
+                      ))}
                     </div>
 
-                    <div className="flex shrink-0 flex-col items-end gap-2">
+                    <div className="mt-1 text-sm">{review.content}</div>
+                    <div className="mt-1 text-xs theme-subtle">
+                      {formatDateTime(review.createdDate)}
+                    </div>
+                  </div>
+
+                  <div className="flex shrink-0 flex-col items-end gap-2">
+                    <span
+                      className={`font-bold ${
+                        typeof review.rating === "number"
+                          ? ratingColor(review.rating)
+                          : ""
+                      }`}
+                    >
+                      <RatingValue rating={review.rating ?? 0} />
+                    </span>
+                    <div className="flex flex-wrap items-center justify-end gap-2">
+                      <RoughButton
+                        className="px-2"
+                        roughSize="sm"
+                        type="button"
+                        onClick={() => {
+                          if (review.id == null) return;
+                          setEditingReview(review);
+                        }}
+                      >
+                        수정
+                      </RoughButton>
+                      <RoughButton
+                        className="px-2"
+                        roughSize="sm"
+                        tone="cancel"
+                        type="button"
+                        onClick={() => {
+                          if (review.id == null) return;
+                          handleDeleteReview(review.id);
+                        }}
+                      >
+                        삭제
+                      </RoughButton>
+                    </div>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </>
+        )}
+
+        {tab === "liked" && (
+          <>
+            {likedReviewResults.length === 0 && (
+              <div className="text-sm theme-muted">
+                좋아요한 리뷰가 없습니다.
+              </div>
+            )}
+
+            <ul className="flex w-full flex-col">
+              {likedReviewResults.map((review, index) => (
+                <li key={review.id ?? review.bookId} className="relative py-3">
+                  {index < likedReviewResults.length - 1 && (
+                    <RoughDivider fullWidth />
+                  )}
+                  <div className="flex gap-3">
+                    <div className="relative w-24 shrink-0">
+                      <Link
+                        href={`/books/detail?id=${review.bookId}`}
+                        className="rough-book-card review-book-thumbnail relative flex h-36 w-24 items-center justify-center overflow-hidden rounded-lg bg-white"
+                        aria-label={`${review.bookTitle ?? `책 #${review.bookId}`} 상세 보기`}
+                      >
+                        <RoughFrame
+                          className="rough-overlay rough-card-line rough-book-cover-line"
+                          variant="card"
+                        />
+                        <BookThumbnail
+                          bookId={review.bookId}
+                          imgUrl={review.bookImgUrl}
+                          title={review.bookTitle}
+                          className="h-full w-full object-cover"
+                          placeholderClassName="flex h-full w-full items-center justify-center"
+                          placeholderText="표지 없음"
+                          altClassName="text-xs text-gray-400"
+                        />
+                        <BookTape>
+                          <div className="flex flex-col gap-1">
+                            <div className="line-clamp-1 text-xs font-bold">
+                              {review.bookTitle ?? `책 #${review.bookId}`}
+                            </div>
+                          </div>
+                        </BookTape>
+                      </Link>
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <ReviewDetailCard
+                        review={review}
+                        memberLink={
+                          review.reviewer?.id != null
+                            ? `/members/detail?id=${review.reviewer.id}`
+                            : null
+                        }
+                        showActions
+                        liked
+                        likeLabel="좋아요 취소"
+                        onToggleLike={() => handleToggleLikedReview(review)}
+                        onEdit={
+                          loginMember?.id != null &&
+                          loginMember.id === review.reviewer?.id
+                            ? () => {
+                                if (review.id == null) return;
+                                setEditingReview(review);
+                              }
+                            : undefined
+                        }
+                        onDelete={
+                          loginMember?.id != null &&
+                          loginMember.id === review.reviewer?.id
+                            ? () => {
+                                if (review.id == null) return;
+                                handleDeleteReview(review.id);
+                              }
+                            : undefined
+                        }
+                      />
+                    </div>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </>
+        )}
+
+        {tab === "wishes" && (
+          <>
+            {wishes == null ? (
+              <div className="text-sm theme-muted">로딩 중...</div>
+            ) : (
+              wishes.length === 0 && (
+                <div className="text-sm theme-muted">
+                  보고 싶어요 한 도서가 없습니다.
+                </div>
+              )
+            )}
+
+            <ul className="flex w-full flex-col">
+              {wishes.map((book, index) => {
+                const averageRating =
+                  typeof book.averageRating === "number"
+                    ? book.averageRating
+                    : null;
+                const title = book.title ?? "제목 없음";
+
+                return (
+                  <li
+                    key={book.wishId ?? book.id ?? index}
+                    className="relative flex items-center justify-between gap-3 py-3"
+                  >
+                    {index < wishes.length - 1 && <RoughDivider fullWidth />}
+                    {book.id != null ? (
+                      <Link
+                        href={`/books/detail?id=${book.id}`}
+                        className="font-semibold"
+                      >
+                        {title}
+                      </Link>
+                    ) : (
+                      <span className="font-semibold">{title}</span>
+                    )}
+                    <div className="flex items-center gap-3">
                       <span
                         className={`font-bold ${
-                          typeof review.rating === "number"
-                            ? ratingColor(review.rating)
+                          averageRating != null
+                            ? ratingColor(averageRating)
                             : ""
                         }`}
                       >
-                        <RatingValue rating={review.rating ?? 0} />
+                        {averageRating != null ? (
+                          <RatingValue rating={averageRating} />
+                        ) : (
+                          "-"
+                        )}
                       </span>
-                      <div className="flex flex-wrap items-center justify-end gap-2">
-                        <RoughButton
-                          className="px-2"
-                          roughSize="sm"
-                          type="button"
-                          onClick={() => {
-                            if (review.id == null) return;
-                            setEditingReview(review);
-                          }}
-                        >
-                          수정
-                        </RoughButton>
-                        <RoughButton
-                          className="px-2"
-                          roughSize="sm"
-                          tone="cancel"
-                          type="button"
-                          onClick={() => {
-                            if (review.id == null) return;
-                            handleDeleteReview(review.id);
-                          }}
-                        >
-                          삭제
-                        </RoughButton>
-                      </div>
+                      <RoughButton
+                        className="px-2"
+                        roughSize="sm"
+                        tone="wishActive"
+                        type="button"
+                        disabled={book.wishId == null}
+                        onClick={() => {
+                          if (book.wishId == null) return;
+                          handleRemoveWish(book.wishId);
+                        }}
+                      >
+                        <WishIcon />
+                        보고 싶어요 취소
+                      </RoughButton>
                     </div>
                   </li>
-                ))}
-              </ul>
-            </>
-          )}
-
-          {tab === "liked" && (
-            <>
-              {likedReviewResults.length === 0 && (
-                <div className="text-sm theme-muted">
-                  좋아요한 리뷰가 없습니다.
-                </div>
-              )}
-
-              <ul className="flex w-full flex-col">
-                {likedReviewResults.map((review, index) => (
-                  <li
-                    key={review.id ?? review.bookId}
-                    className="relative py-3"
-                  >
-                    {index < likedReviewResults.length - 1 && (
-                      <RoughDivider fullWidth />
-                    )}
-                    <div className="flex gap-3">
-                      <div className="relative w-24 shrink-0">
-                        <Link
-                          href={`/books/detail?id=${review.bookId}`}
-                          className="rough-book-card review-book-thumbnail relative flex h-36 w-24 items-center justify-center overflow-hidden rounded-lg bg-white"
-                          aria-label={`${review.bookTitle ?? `책 #${review.bookId}`} 상세 보기`}
-                        >
-                          <RoughFrame
-                            className="rough-overlay rough-card-line rough-book-cover-line"
-                            variant="card"
-                          />
-                          <BookThumbnail
-                            bookId={review.bookId}
-                            imgUrl={review.bookImgUrl}
-                            title={review.bookTitle}
-                            className="h-full w-full object-cover"
-                            placeholderClassName="flex h-full w-full items-center justify-center"
-                            placeholderText="표지 없음"
-                            altClassName="text-xs text-gray-400"
-                          />
-                          <BookTape>
-                            <div className="flex flex-col gap-1">
-                              <div className="line-clamp-1 text-xs font-bold">
-                                {review.bookTitle ?? `책 #${review.bookId}`}
-                              </div>
-                            </div>
-                          </BookTape>
-                        </Link>
-                      </div>
-                      <div className="min-w-0 flex-1">
-                        <ReviewDetailCard
-                          review={review}
-                          memberLink={
-                            review.reviewer?.id != null
-                              ? `/members/detail?id=${review.reviewer.id}`
-                              : null
-                          }
-                          showActions
-                          liked
-                          likeLabel="좋아요 취소"
-                          onToggleLike={() => handleToggleLikedReview(review)}
-                          onEdit={
-                            loginMember?.id != null &&
-                            loginMember.id === review.reviewer?.id
-                              ? () => {
-                                  if (review.id == null) return;
-                                  setEditingReview(review);
-                                }
-                              : undefined
-                          }
-                          onDelete={
-                            loginMember?.id != null &&
-                            loginMember.id === review.reviewer?.id
-                              ? () => {
-                                  if (review.id == null) return;
-                                  handleDeleteReview(review.id);
-                                }
-                              : undefined
-                          }
-                        />
-                      </div>
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            </>
-          )}
-
-          {tab === "wishes" && (
-            <>
-              {wishes == null ? (
-                <div className="text-sm theme-muted">로딩 중...</div>
-              ) : (
-                wishes.length === 0 && (
-                  <div className="text-sm theme-muted">
-                    보고 싶어요 한 도서가 없습니다.
-                  </div>
-                )
-              )}
-
-              <ul className="flex w-full flex-col">
-                {wishes.map((book, index) => {
-                  const averageRating =
-                    typeof book.averageRating === "number"
-                      ? book.averageRating
-                      : null;
-                  const title = book.title ?? "제목 없음";
-
-                  return (
-                    <li
-                      key={book.wishId ?? book.id ?? index}
-                      className="relative flex items-center justify-between gap-3 py-3"
-                    >
-                      {index < wishes.length - 1 && <RoughDivider fullWidth />}
-                      {book.id != null ? (
-                        <Link
-                          href={`/books/detail?id=${book.id}`}
-                          className="font-semibold"
-                        >
-                          {title}
-                        </Link>
-                      ) : (
-                        <span className="font-semibold">{title}</span>
-                      )}
-                      <div className="flex items-center gap-3">
-                        <span
-                          className={`font-bold ${
-                            averageRating != null
-                              ? ratingColor(averageRating)
-                              : ""
-                          }`}
-                        >
-                          {averageRating != null ? (
-                            <RatingValue rating={averageRating} />
-                          ) : (
-                            "-"
-                          )}
-                        </span>
-                        <RoughButton
-                          className="px-2"
-                          roughSize="sm"
-                          tone="wishActive"
-                          type="button"
-                          disabled={book.wishId == null}
-                          onClick={() => {
-                            if (book.wishId == null) return;
-                            handleRemoveWish(book.wishId);
-                          }}
-                        >
-                          <WishIcon />
-                          보고 싶어요 취소
-                        </RoughButton>
-                      </div>
-                    </li>
-                  );
-                })}
-              </ul>
-            </>
-          )}
-        </section>
-      </div>
+                );
+              })}
+            </ul>
+          </>
+        )}
+      </section>
 
       {isWidgetGuideOpen && (
         <WidgetGuideModal
@@ -767,6 +761,6 @@ export default function Page() {
           widgetLink={widgetLink}
         />
       )}
-    </div>
+    </LibraryPageLayout>
   );
 }
