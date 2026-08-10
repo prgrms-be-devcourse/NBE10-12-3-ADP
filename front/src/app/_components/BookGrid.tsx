@@ -19,6 +19,7 @@ type BookGridProps = {
   isLoading?: boolean;
   layout?: "grid" | "horizontal";
   scrollRef?: RefObject<HTMLUListElement | null>;
+  horizontalItemClassName?: string;
 };
 
 type BookGridItemProps = {
@@ -111,6 +112,7 @@ export default function BookGrid({
   isLoading = false,
   layout = "grid",
   scrollRef,
+  horizontalItemClassName,
 }: BookGridProps) {
   const [visibleContentKey, setVisibleContentKey] = useState("");
 
@@ -138,12 +140,14 @@ export default function BookGrid({
 
   const listClassName =
     layout === "horizontal"
-      ? "book-scroll-list flex gap-5 overflow-x-auto py-2 pb-4"
+      ? "book-scroll-list flex snap-x snap-mandatory gap-5 overflow-x-auto py-2 pb-4"
       : "grid grid-cols-2 gap-4 p-2 sm:grid-cols-4";
 
   const itemClassName =
     layout === "horizontal"
-      ? "book-horizontal-item group flex w-40 shrink-0 flex-col sm:w-44"
+      ? `book-horizontal-item group flex shrink-0 flex-col ${
+          horizontalItemClassName ?? "w-40 sm:w-44"
+        }`
       : "group flex flex-col";
 
   const coverClassName =
@@ -159,14 +163,22 @@ export default function BookGrid({
     <ul className={listClassName} ref={scrollRef}>
       {isLoading
         ? skeletonItems.map((_, index) => (
-            <li key={index} className={itemClassName} aria-hidden="true">
+            <li
+              key={index}
+              className={`${itemClassName} ${
+                index === skeletonItems.length - 1 ? "snap-end" : "snap-start"
+              }`}
+              aria-hidden="true"
+            >
               <SkeletonCard coverClassName={coverClassName} />
             </li>
           ))
         : books.map((book, index) => (
             <li
               key={`${book.id}:${book.imgUrl ?? ""}`}
-              className={`${itemClassName} relative`}
+              className={`${itemClassName} relative ${
+                index === books.length - 1 ? "snap-end" : "snap-start"
+              }`}
               data-book-item="true"
             >
               <div

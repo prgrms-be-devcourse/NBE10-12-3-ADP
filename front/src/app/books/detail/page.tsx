@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 
 import { Suspense, useCallback, useEffect, useRef, useState } from "react";
@@ -10,12 +9,10 @@ import { apiFetch } from "@/lib/backend/client";
 import { useAuth } from "@/lib/auth/AuthProvider";
 import type { components } from "@/lib/backend/apiV1/schema";
 import { goToErrorPage } from "@/lib/error/goToErrorPage";
-import { formatDateTime } from "@/lib/formatDate";
 import { ratingColor } from "@/lib/ratingColor";
 import { ratingFillColor } from "@/lib/ratingColor";
 import { useToast } from "@/lib/toast/ToastProvider";
 
-import Avatar from "@/app/_components/Avatar";
 import BookCoverCard from "@/app/_components/BookCoverCard";
 import BookGrid from "@/app/_components/BookGrid";
 import BookTape from "@/app/_components/BookTape";
@@ -29,6 +26,7 @@ import ReviewFormModal from "@/app/_components/ReviewFormModal";
 import RoughButton from "@/app/_components/RoughButton";
 import RoughDivider from "@/app/_components/RoughDivider";
 import RoughFrame from "@/app/_components/RoughFrame";
+import SvgIcon from "@/app/_components/SvgIcon";
 
 type BookDetailDto = components["schemas"]["BookDetailDto"];
 type BookDetailWithWishId = BookDetailDto & {
@@ -111,58 +109,21 @@ function BookDetailSkeleton() {
 
 function WishIcon({ filled = false }: { filled?: boolean }) {
   return (
-    <svg
-      aria-hidden="true"
-      className="inline-block h-4 w-4 shrink-0 align-[-0.125em]"
-      viewBox="0 0 24 24"
-      fill={filled ? "currentColor" : "none"}
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M19 21l-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />
-    </svg>
+    <SvgIcon
+      name={filled ? "bookmark" : "bookmark-outline"}
+      className="h-4 w-4 align-[-0.125em]"
+    />
   );
 }
 
 function ReviewIcon() {
   return (
-    <svg
-      aria-hidden="true"
-      className="inline-block h-4 w-4 shrink-0 align-[-0.125em]"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M12 20h9" />
-      <path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z" />
-    </svg>
+    <SvgIcon name="review" className="h-4 w-4 align-[-0.125em]" />
   );
 }
 
 function CarouselArrow({ direction }: { direction: "left" | "right" }) {
-  return (
-    <svg
-      aria-hidden="true"
-      className="h-4 w-4"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2.4"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      {direction === "left" ? (
-        <path d="M15 18l-6-6 6-6" />
-      ) : (
-        <path d="M9 18l6-6-6-6" />
-      )}
-    </svg>
-  );
+  return <SvgIcon name={`chevron-${direction}`} />;
 }
 
 function BookDetail() {

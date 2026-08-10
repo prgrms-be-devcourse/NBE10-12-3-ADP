@@ -44,7 +44,7 @@ function MemberDetailSkeleton() {
         </div>
       </aside>
 
-      <div className="flex-1 flex flex-col gap-4">
+      <div className="flex min-w-0 flex-1 flex-col gap-4">
         <div>
           <div className="flex items-center justify-between gap-2">
             <div className="book-skeleton h-6 w-28 rounded" />
@@ -130,7 +130,7 @@ function MemberDetail() {
         rating={reviewData.rating}
       />
 
-      <div className="flex-1 flex flex-col gap-4">
+      <div className="flex min-w-0 flex-1 flex-col gap-4">
         {member.githubId && (
           <LibraryWidgetPreview
             githubId={member.githubId}

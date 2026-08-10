@@ -10,23 +10,16 @@ import { ratingColor } from "@/lib/ratingColor";
 import Avatar from "@/app/_components/Avatar";
 import RatingValue from "@/app/_components/RatingValue";
 import RoughButton from "@/app/_components/RoughButton";
+import SvgIcon from "@/app/_components/SvgIcon";
 
 type ReviewDto = components["schemas"]["ReviewDto"];
 
 function HeartIcon({ filled = false }: { filled?: boolean }) {
   return (
-    <svg
-      aria-hidden="true"
-      className="inline-block h-4 w-4 shrink-0 align-[-0.125em]"
-      viewBox="0 0 24 24"
-      fill={filled ? "currentColor" : "none"}
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8Z" />
-    </svg>
+    <SvgIcon
+      name={filled ? "heart" : "heart-outline"}
+      className="h-4 w-4 align-[-0.125em]"
+    />
   );
 }
 
@@ -60,7 +53,7 @@ export default function ReviewDetailCard({
     : memberLink ?? (review.reviewer?.id != null ? `/members/detail?id=${review.reviewer.id}` : null);
 
   return (
-    <div className={`flex flex-col gap-2 ${className}`}>
+    <div className={`flex h-full flex-col gap-2 ${className}`}>
       <div className="flex items-center gap-3">
         {review.reviewer?.id != null ? (
           <Link href={reviewerHref ?? "/mypage"}>
@@ -119,10 +112,10 @@ export default function ReviewDetailCard({
         </div>
       </div>
 
-      <div className="flex items-start gap-3">
-        <div className="min-w-0 flex-1">
+      <div className="flex flex-1 items-start gap-3">
+        <div className="flex min-w-0 flex-1 flex-col self-stretch">
           <div className="text-sm">{review.content}</div>
-          <div className="text-xs theme-subtle">{formatDateTime(review.createdDate)}</div>
+          <div className="mt-auto pt-2 text-xs theme-subtle">{formatDateTime(review.createdDate)}</div>
         </div>
 
         {showActions && (

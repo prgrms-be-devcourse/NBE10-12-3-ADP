@@ -4,6 +4,10 @@ import { type RefObject, useEffect, useState } from "react";
 
 import { apiFetch } from "@/lib/backend/client";
 
+const MISSING_THUMBNAIL_CACHE_TTL_MS = 5 * 60 * 1000;
+const missingThumbnailRequestedAt = new Map<number, number>();
+const thumbnailRequestByBookId = new Map<number, Promise<string | null>>();
+
 type BookThumbnailProps = {
   bookId?: number;
   imgUrl?: string | null;
@@ -16,6 +20,49 @@ type BookThumbnailProps = {
   imgRef?: RefObject<HTMLImageElement | null>;
   onLoad?: () => void;
 };
+
+function hasRecentMissingThumbnail(bookId: number) {
+  const requestedAt = missingThumbnailRequestedAt.get(bookId);
+
+  if (requestedAt == null) {
+    return false;
+  }
+
+  if (Date.now() - requestedAt <= MISSING_THUMBNAIL_CACHE_TTL_MS) {
+    return true;
+  }
+
+  missingThumbnailRequestedAt.delete(bookId);
+  return false;
+}
+
+function fetchBookThumbnail(bookId: number) {
+  const currentRequest = thumbnailRequestByBookId.get(bookId);
+
+  if (currentRequest != null) {
+    return currentRequest;
+  }
+
+  const request = apiFetch(`/api/v1/books/${bookId}/thumbnail`)
+    .then((data) => {
+      const nextImgUrl =
+        typeof data?.imgUrl === "string" && data.imgUrl.trim() !== ""
+          ? data.imgUrl
+          : null;
+
+      if (nextImgUrl == null) {
+        missingThumbnailRequestedAt.set(bookId, Date.now());
+      }
+
+      return nextImgUrl;
+    })
+    .finally(() => {
+      thumbnailRequestByBookId.delete(bookId);
+    });
+
+  thumbnailRequestByBookId.set(bookId, request);
+  return request;
+}
 
 export default function BookThumbnail({
   bookId,
@@ -30,24 +77,45 @@ export default function BookThumbnail({
   onLoad,
 }: BookThumbnailProps) {
   const normalizedImgUrl = imgUrl?.trim() || null;
-  const [thumbnailUrl, setThumbnailUrl] = useState<string | null>(normalizedImgUrl);
+  const [fetchedThumbnail, setFetchedThumbnail] = useState<{
+    bookId: number;
+    imgUrl: string;
+  } | null>(null);
+  const fetchedThumbnailUrl =
+    fetchedThumbnail != null && fetchedThumbnail.bookId === bookId
+      ? fetchedThumbnail.imgUrl
+      : null;
+  const thumbnailUrl =
+    normalizedImgUrl ?? fetchedThumbnailUrl;
 
   useEffect(() => {
-    setThumbnailUrl(normalizedImgUrl);
-
-    if (bookId == null || normalizedImgUrl != null) {
+    if (normalizedImgUrl != null) {
       return;
     }
 
-    apiFetch(`/api/v1/books/${bookId}/thumbnail`)
-      .then((data) => {
-        if (data?.imgUrl && data.imgUrl.trim() !== "") {
-          setThumbnailUrl(data.imgUrl);
+    if (bookId == null) {
+      return;
+    }
+
+    if (hasRecentMissingThumbnail(bookId)) {
+      return;
+    }
+
+    let isMounted = true;
+
+    fetchBookThumbnail(bookId)
+      .then((nextImgUrl) => {
+        if (isMounted && nextImgUrl != null) {
+          setFetchedThumbnail({ bookId, imgUrl: nextImgUrl });
         }
       })
       .catch(() => {
         // 실패 시 아무 동작도 하지 않는다 (placeholder 유지)
       });
+
+    return () => {
+      isMounted = false;
+    };
   }, [bookId, normalizedImgUrl]);
 
   if (thumbnailUrl == null) {

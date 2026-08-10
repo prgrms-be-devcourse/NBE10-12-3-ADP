@@ -19,7 +19,6 @@ import { formatDateTime } from "@/lib/formatDate";
 import { ratingColor } from "@/lib/ratingColor";
 import { useToast } from "@/lib/toast/ToastProvider";
 
-import Avatar from "@/app/_components/Avatar";
 import BookTape from "@/app/_components/BookTape";
 import BookThumbnail from "@/app/_components/BookThumbnail";
 import LibraryProfilePanel from "@/app/_components/LibraryProfilePanel";
@@ -30,6 +29,7 @@ import ReviewFormModal from "@/app/_components/ReviewFormModal";
 import RoughButton from "@/app/_components/RoughButton";
 import RoughDivider from "@/app/_components/RoughDivider";
 import RoughFrame from "@/app/_components/RoughFrame";
+import SvgIcon from "@/app/_components/SvgIcon";
 import WidgetGuideModal from "@/app/_components/WidgetGuideModal";
 
 type ReviewsByMemberDto = components["schemas"]["ReviewsByMemberDto"];
@@ -62,7 +62,7 @@ function MyPageSkeleton() {
         </div>
       </aside>
 
-      <div className="flex-1 flex flex-col gap-4">
+      <div className="flex min-w-0 flex-1 flex-col gap-4">
         <div>
           <div className="flex items-center justify-between gap-2">
             <div className="book-skeleton h-6 w-28 rounded" />
@@ -105,18 +105,7 @@ function MyPageSkeleton() {
 
 function WishIcon() {
   return (
-    <svg
-      aria-hidden="true"
-      className="inline-block h-4 w-4 shrink-0 align-[-0.125em]"
-      viewBox="0 0 24 24"
-      fill="currentColor"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M19 21l-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />
-    </svg>
+    <SvgIcon name="bookmark" className="h-4 w-4 align-[-0.125em]" />
   );
 }
 
@@ -435,7 +424,7 @@ export default function Page() {
         }
       />
 
-      <div className="flex flex-1 flex-col gap-4 max-sm:gap-1">
+      <div className="flex min-w-0 flex-1 flex-col gap-4 max-sm:gap-1">
         {editingReview != null && (
           <ReviewFormModal
             defaultContent={editingReview.content ?? ""}

@@ -19,135 +19,7 @@ import { useToast } from "@/lib/toast/ToastProvider";
 import RoughBar from "@/app/_components/RoughBar";
 import RoughButton from "@/app/_components/RoughButton";
 import { RoughInput } from "@/app/_components/RoughInput";
-
-function LibraryIcon() {
-  return (
-    <svg
-      aria-hidden="true"
-      className="h-4 w-4"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M4 19.5V5a2 2 0 0 1 2-2h12" />
-      <path d="M6 17h12" />
-      <path d="M6 21h12a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2" />
-    </svg>
-  );
-}
-
-function LogoutIcon() {
-  return (
-    <svg
-      aria-hidden="true"
-      className="h-4 w-4"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
-      <path d="M16 17l5-5-5-5" />
-      <path d="M21 12H9" />
-    </svg>
-  );
-}
-
-function SearchIcon() {
-  return (
-    <svg
-      aria-hidden="true"
-      className="h-4 w-4"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <circle cx="11" cy="11" r="7" />
-      <path d="M20 20l-3.5-3.5" />
-    </svg>
-  );
-}
-
-function AdminIcon() {
-  return (
-    <svg
-      aria-hidden="true"
-      className="h-4 w-4"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M12 3l7 4v5c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V7l7-4Z" />
-      <path d="M9.5 12l1.7 1.7 3.6-3.7" />
-    </svg>
-  );
-}
-
-function MoonIcon() {
-  return (
-    <svg
-      aria-hidden="true"
-      className="theme-light-only h-4 w-4"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M20.5 14.5A8.5 8.5 0 0 1 9.5 3.5a7 7 0 1 0 11 11Z" />
-    </svg>
-  );
-}
-
-function SunIcon() {
-  return (
-    <svg
-      aria-hidden="true"
-      className="theme-dark-only h-4 w-4"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <circle cx="12" cy="12" r="4" />
-      <path d="M12 2v2" />
-      <path d="M12 20v2" />
-      <path d="M4.93 4.93l1.41 1.41" />
-      <path d="M17.66 17.66l1.41 1.41" />
-      <path d="M2 12h2" />
-      <path d="M20 12h2" />
-      <path d="M4.93 19.07l1.41-1.41" />
-      <path d="M17.66 6.34l1.41-1.41" />
-    </svg>
-  );
-}
-
-function GitHubIcon() {
-  return (
-    <svg
-      aria-hidden="true"
-      className="h-4 w-4"
-      viewBox="0 0 24 24"
-      fill="currentColor"
-    >
-      <path d="M12 2C6.48 2 2 6.58 2 12.22c0 4.52 2.87 8.35 6.84 9.71.5.09.68-.22.68-.49 0-.24-.01-.88-.01-1.73-2.78.62-3.37-1.37-3.37-1.37-.45-1.18-1.11-1.5-1.11-1.5-.91-.63.07-.62.07-.62 1 .07 1.53 1.05 1.53 1.05.89 1.56 2.34 1.11 2.91.85.09-.66.35-1.11.63-1.36-2.22-.26-4.56-1.14-4.56-5.06 0-1.12.39-2.03 1.03-2.75-.1-.26-.45-1.3.1-2.71 0 0 .84-.27 2.75 1.05A9.33 9.33 0 0 1 12 6.95c.85 0 1.7.12 2.5.34 1.9-1.32 2.74-1.05 2.74-1.05.55 1.41.2 2.45.1 2.71.64.72 1.03 1.63 1.03 2.75 0 3.93-2.34 4.8-4.57 5.05.36.32.68.94.68 1.9 0 1.37-.01 2.47-.01 2.81 0 .27.18.59.69.49A10.08 10.08 0 0 0 22 12.22C22 6.58 17.52 2 12 2Z" />
-    </svg>
-  );
-}
+import SvgIcon from "@/app/_components/SvgIcon";
 
 export default function Header() {
   const router = useRouter();
@@ -158,6 +30,7 @@ export default function Header() {
   const [isSearchPending, setIsSearchPending] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const searchInputRef = useRef<HTMLInputElement | null>(null);
+  const isSearchSubmitPointerDownRef = useRef(false);
   const githubLoginHref = !isLogin
     ? getGitHubLoginUrlForReturnPath(getCurrentAuthReturnPath())
     : "#";
@@ -190,7 +63,7 @@ export default function Header() {
   }, [isSearchOpen]);
 
   useEffect(() => {
-    const mediaQuery = window.matchMedia("(min-width: 521px)");
+    const mediaQuery = window.matchMedia("(min-width: 640px)");
     const closeMobileSearch = () => {
       if (mediaQuery.matches) {
         setIsSearchOpen(false);
@@ -249,15 +122,31 @@ export default function Header() {
   const closeMobileSearchOnBlur = (e: React.FocusEvent<HTMLFormElement>) => {
     if (!isSearchOpen) return;
     if (e.currentTarget.contains(e.relatedTarget)) return;
-    if (!window.matchMedia("(max-width: 520px)").matches) return;
+    if (isSearchSubmitPointerDownRef.current) return;
+    if (!window.matchMedia("(max-width: 639px)").matches) return;
 
     setIsSearchOpen(false);
+  };
+
+  const submitMobileSearchBeforeBlur = (
+    e: React.PointerEvent<HTMLButtonElement>,
+  ) => {
+    if (!window.matchMedia("(max-width: 639px)").matches) return;
+    if (isSearchPending) return;
+
+    isSearchSubmitPointerDownRef.current = true;
+    e.preventDefault();
+    e.currentTarget.form?.requestSubmit();
+
+    window.requestAnimationFrame(() => {
+      isSearchSubmitPointerDownRef.current = false;
+    });
   };
 
   return (
     <header className="theme-site-header relative">
       <nav className="mx-auto flex w-full max-w-4xl items-center gap-3 px-4 py-2">
-        <div className={`shrink-0 ${isSearchOpen ? "max-[520px]:hidden" : ""}`}>
+        <div className={`shrink-0 ${isSearchOpen ? "max-sm:hidden" : ""}`}>
           <Link
             href="/"
             className="shrink-0 text-xl font-bold whitespace-nowrap"
@@ -273,7 +162,7 @@ export default function Header() {
             onClick={() => setIsSearchOpen(true)}
             aria-label="검색창 열기"
           >
-            <SearchIcon />
+            <SvgIcon name="search" />
             <span className="theme-nav-label">검색</span>
           </button>
         )}
@@ -282,7 +171,7 @@ export default function Header() {
           className={`min-w-0 items-center gap-1 ${
             isSearchOpen
               ? "flex flex-1"
-              : "hidden w-72 shrink-0 min-[521px]:flex lg:w-80"
+              : "hidden w-72 shrink-0 sm:flex lg:w-80"
           }`}
           onSubmit={handleSearch}
           onBlur={closeMobileSearchOnBlur}
@@ -306,8 +195,9 @@ export default function Header() {
             roughSize="sm"
             type="submit"
             disabled={isSearchPending}
+            onPointerDown={submitMobileSearchBeforeBlur}
           >
-            <SearchIcon />
+            <SvgIcon name="search" />
             <span className="search-submit-label">
               {isSearchPending ? "검색중" : "검색"}
             </span>
@@ -316,7 +206,7 @@ export default function Header() {
 
         <div
           className={`ml-auto shrink-0 items-center justify-end gap-2 whitespace-nowrap ${
-            isSearchOpen ? "hidden min-[521px]:flex" : "flex"
+            isSearchOpen ? "hidden sm:flex" : "flex"
           }`}
         >
           <button
@@ -325,8 +215,8 @@ export default function Header() {
             onClick={toggleTheme}
             aria-label="테마 전환"
           >
-            <MoonIcon />
-            <SunIcon />
+            <SvgIcon name="moon" className="theme-light-only h-4 w-4" />
+            <SvgIcon name="sun" className="theme-dark-only h-4 w-4" />
             <span className="theme-nav-label theme-toggle-label" />
           </button>
 
@@ -335,7 +225,7 @@ export default function Header() {
               className="theme-nav-link theme-nav-control pointer-events-none invisible gap-1.5"
               aria-hidden="true"
             >
-              <GitHubIcon />
+              <SvgIcon name="github" />
               <span className="theme-nav-label">GitHub로 로그인</span>
             </span>
           )}
@@ -348,7 +238,7 @@ export default function Header() {
                 onClick={handleGitHubLogin}
                 aria-label="GitHub로 로그인"
               >
-                <GitHubIcon />
+                <SvgIcon name="github" />
                 <span className="theme-nav-label">GitHub로 로그인</span>
               </a>
             </div>
@@ -357,7 +247,7 @@ export default function Header() {
           {!isLoginMemberPending && isLogin && (
             <div className="auth-action-enter flex min-w-0 items-center gap-2 whitespace-nowrap">
               <Link href="/mypage" className="theme-nav-link theme-nav-control">
-                <LibraryIcon />
+                <SvgIcon name="library" />
                 <span className="theme-nav-label">내 서재</span>
               </Link>
               {isAdmin && (
@@ -365,7 +255,7 @@ export default function Header() {
                   href="/admin"
                   className="theme-nav-link theme-nav-control"
                 >
-                  <AdminIcon />
+                  <SvgIcon name="admin" />
                   <span className="theme-nav-label">관리자</span>
                 </Link>
               )}
@@ -373,8 +263,9 @@ export default function Header() {
                 type="button"
                 className="theme-nav-link theme-nav-control"
                 onClick={handleLogout}
+                aria-label="로그아웃"
               >
-                <LogoutIcon />
+                <SvgIcon name="logout" />
                 <span className="theme-nav-label">로그아웃</span>
               </button>
             </div>
