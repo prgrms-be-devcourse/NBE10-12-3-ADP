@@ -19,8 +19,8 @@ export default function LibraryWidgetPreview({
   actions,
 }: LibraryWidgetPreviewProps) {
   return (
-    <div>
-      <div className="flex items-center justify-between gap-2">
+    <div className="min-w-0 w-full">
+      <div className="flex min-w-0 items-center justify-between gap-2">
         <h2 className="font-bold">위젯 미리보기</h2>
         {actions}
       </div>
@@ -28,7 +28,7 @@ export default function LibraryWidgetPreview({
         <RoughFrame className="rough-overlay" variant="card" />
         {githubId ? (
           // eslint-disable-next-line @next/next/no-img-element
-          <img src={widgetSrc} alt="위젯 미리보기" />
+          <img className="max-w-full" src={widgetSrc} alt="위젯 미리보기" />
         ) : (
           <span className="text-sm theme-muted">위젯 정보가 없습니다</span>
         )}

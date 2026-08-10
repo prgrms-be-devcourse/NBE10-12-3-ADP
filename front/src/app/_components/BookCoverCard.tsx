@@ -46,7 +46,9 @@ export default function BookCoverCard({
           imgUrl={imgUrl}
           title={title}
           className="absolute inset-0 z-0 h-full w-full object-cover"
-          placeholderClassName={`absolute inset-0 flex h-full w-full items-center justify-center text-center ${placeholderClassName ?? ""}`}
+          placeholderClassName={`absolute inset-x-0 top-0 ${
+            children != null ? "bottom-[4.25rem]" : "bottom-0"
+          } flex items-center justify-center text-center ${placeholderClassName ?? ""}`}
           placeholderText={placeholderText}
           altClassName="text-xs text-gray-500"
         />

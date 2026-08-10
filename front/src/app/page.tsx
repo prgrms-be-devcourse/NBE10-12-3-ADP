@@ -1,7 +1,5 @@
 "use client";
 
-import Link from "next/link";
-
 import {
   Fragment,
   type ReactNode,
@@ -15,14 +13,12 @@ import type { components } from "@/lib/backend/apiV1/schema";
 
 import BookGrid from "@/app/_components/BookGrid";
 import BookCoverCard from "@/app/_components/BookCoverCard";
-import BookThumbnail from "@/app/_components/BookThumbnail";
 import RatingValue from "@/app/_components/RatingValue";
 import RoughBar from "@/app/_components/RoughBar";
 import RoughButton from "@/app/_components/RoughButton";
-import RoughFrame from "@/app/_components/RoughFrame";
-import ReviewDetailCard from "@/app/_components/ReviewDetailCard";
 import LikedReviewCard from "@/app/_components/LikedReviewCard";
 import BookTape from "@/app/_components/BookTape";
+import SvgIcon from "@/app/_components/SvgIcon";
 
 type BookDto = components["schemas"]["BookDto"];
 type ReviewDto = components["schemas"]["ReviewDto"];
@@ -51,97 +47,23 @@ function extractListData<T>(data: unknown): T[] {
 }
 
 function CarouselArrow({ direction }: { direction: "left" | "right" }) {
-  return (
-    <svg
-      aria-hidden="true"
-      className="h-4 w-4"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2.4"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      {direction === "left" ? (
-        <path d="M15 18l-6-6 6-6" />
-      ) : (
-        <path d="M9 18l6-6-6-6" />
-      )}
-    </svg>
-  );
+  return <SvgIcon name={`chevron-${direction}`} />;
 }
 
-function FireIcon() {
-  return (
-    <svg
-      aria-hidden="true"
-      className="h-5 w-5"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M12 22c4 0 7-2.8 7-6.7 0-2.3-1-4.2-2.9-5.9.1 1.9-.8 3.2-2.2 3.8.4-3.8-1.4-6.8-5-9.2.3 3-1.3 4.9-2.6 6.6A7.2 7.2 0 0 0 5 15.3C5 19.2 8 22 12 22Z" />
-      <path d="M10 17c0-1.4.8-2.4 2.1-3.4.8 1.1 1.9 2.2 1.9 3.7A2 2 0 0 1 12 19a2 2 0 0 1-2-2Z" />
-    </svg>
-  );
-}
+function scrollCarouselBy(
+  scrollElement: HTMLElement,
+  distance: number,
+  direction: -1 | 1,
+) {
+  const maxScrollLeft = scrollElement.scrollWidth - scrollElement.clientWidth;
 
-function SectionStarIcon() {
-  return (
-    <svg
-      aria-hidden="true"
-      className="h-5 w-5"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="m12 3 2.7 5.5 6 .9-4.3 4.2 1 6-5.4-2.9-5.4 2.9 1-6-4.3-4.2 6-.9L12 3Z" />
-    </svg>
-  );
-}
-
-function StackedBooksIcon() {
-  return (
-    <svg
-      aria-hidden="true"
-      className="h-5 w-5"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M4 6.5 15.5 4 20 6.5v13L8.5 22 4 19.5v-13Z" />
-      <path d="M8.5 9 20 6.5" />
-      <path d="M8.5 22V9L4 6.5" />
-      <path d="M12 6.7v13" />
-    </svg>
-  );
-}
-
-function ClockIcon() {
-  return (
-    <svg
-      aria-hidden="true"
-      className="h-5 w-5"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <circle cx="12" cy="12" r="8" />
-      <path d="M12 8v4l2.8 1.6" />
-    </svg>
-  );
+  scrollElement.scrollTo({
+    left: Math.min(
+      maxScrollLeft,
+      Math.max(0, scrollElement.scrollLeft + distance * direction),
+    ),
+    behavior: "smooth",
+  });
 }
 
 function MainBookSection({
@@ -173,10 +95,7 @@ function MainBookSection({
         ? bookItems[1].offsetLeft - bookItems[0].offsetLeft
         : (bookItems[0]?.getBoundingClientRect().width ?? 0);
 
-    scrollElement.scrollBy({
-      left: scrollDistance * 2 * direction,
-      behavior: "smooth",
-    });
+    scrollCarouselBy(scrollElement, scrollDistance * 2, direction);
   };
 
   return (
@@ -214,6 +133,7 @@ function MainBookSection({
         isLoading={books == null}
         layout="horizontal"
         scrollRef={scrollRef}
+        horizontalItemClassName="basis-[calc((100%_-_2.5rem)/3)] md:basis-[calc((100%_-_3.75rem)/4)] xl:basis-[calc((100%_-_5rem)/5)]"
       />
     </section>
   );
@@ -247,10 +167,7 @@ function PopularReviewSection({
         : (reviewItems[0]?.getBoundingClientRect().width ?? 0);
     const scrollStep = scrollDistance * 2 <= scrollElement.clientWidth ? 2 : 1;
 
-    scrollElement.scrollBy({
-      left: scrollDistance * scrollStep * direction,
-      behavior: "smooth",
-    });
+    scrollCarouselBy(scrollElement, scrollDistance * scrollStep, direction);
   };
 
   return (
@@ -286,13 +203,15 @@ function PopularReviewSection({
       <div className="book-scroll-fade">
         <ul
           ref={scrollRef}
-          className="book-scroll-list flex gap-4 overflow-x-auto py-2 pb-4"
+          className="book-scroll-list flex snap-x snap-mandatory gap-4 overflow-x-auto py-2 pb-4"
         >
           {reviews == null
             ? Array.from({ length: 4 }).map((_, index) => (
                 <li
                   key={index}
-                  className="latest-review-item shrink-0"
+                  className={`min-w-0 basis-full shrink-0 xl:basis-[calc((100%_-_1rem)/2)] ${
+                    index === 3 ? "snap-end" : "snap-start"
+                  }`}
                   aria-hidden="true"
                 >
                   <div className="book-skeleton h-32 rounded-lg" />
@@ -301,12 +220,14 @@ function PopularReviewSection({
             : reviews.map((review, index) => (
                 <li
                   key={`${review.id ?? "popular-review"}-${review.bookId ?? "book"}-${index}`}
-                  className="w-[calc((100%-1rem)/2)] shrink-0 max-[900px]:w-full"
+                  className={`min-w-0 basis-full shrink-0 xl:basis-[calc((100%_-_1rem)/2)] ${
+                    index === reviews.length - 1 ? "snap-end" : "snap-start"
+                  }`}
                   data-review-item="true"
                 >
                   <LikedReviewCard
                     review={review}
-                    className="rounded-2xl bg-[var(--surface)] p-3 shadow-sm"
+                    className="w-full rounded-2xl bg-[var(--surface)] p-3 shadow-sm"
                     reviewCardClassName="p-0"
                   />
                 </li>
@@ -345,10 +266,7 @@ function LatestReviewBookSection({
         : (reviewItems[0]?.getBoundingClientRect().width ?? 0);
     const scrollStep = window.matchMedia("(min-width: 640px)").matches ? 3 : 1;
 
-    scrollElement.scrollBy({
-      left: scrollDistance * scrollStep * direction,
-      behavior: "smooth",
-    });
+    scrollCarouselBy(scrollElement, scrollDistance * scrollStep, direction);
   };
 
   return (
@@ -384,22 +302,26 @@ function LatestReviewBookSection({
       <div className="book-scroll-fade">
         <ul
           ref={scrollRef}
-          className="book-scroll-list flex gap-3 overflow-x-auto py-2 pb-4"
+          className="book-scroll-list flex snap-x snap-mandatory gap-3 overflow-x-auto py-2 pb-4"
         >
           {reviews == null
             ? Array.from({ length: 6 }).map((_, index) => (
                 <li
                   key={index}
-                  className="shrink-0"
+                  className={`basis-[calc((100%_-_3rem)/5)] shrink-0 sm:basis-[calc((100%_-_3.75rem)/6)] lg:basis-[calc((100%_-_4.5rem)/7)] xl:basis-[calc((100%_-_5.25rem)/8)] ${
+                    index === 5 ? "snap-end" : "snap-start"
+                  }`}
                   aria-hidden="true"
                 >
-                  <div className="book-skeleton h-36 w-28 rounded-lg" />
+                  <div className="book-skeleton aspect-[2/3] w-full rounded-lg" />
                 </li>
               ))
             : reviews.map((review, index) => (
                 <li
                   key={`${review.id ?? "latest-review"}-${review.bookId ?? "book"}-${index}`}
-                  className="w-[calc((100%-3.75rem)/6)] shrink-0"
+                  className={`basis-[calc((100%_-_3rem)/5)] shrink-0 sm:basis-[calc((100%_-_3.75rem)/6)] lg:basis-[calc((100%_-_4.5rem)/7)] xl:basis-[calc((100%_-_5.25rem)/8)] ${
+                    index === reviews.length - 1 ? "snap-end" : "snap-start"
+                  }`}
                   data-review-item="true"
                 >
                   <article className="relative h-full w-full overflow-hidden rounded-xl bg-white">
@@ -484,12 +406,12 @@ export default function Page() {
   const rankedSections = [
     {
       title: "평점 좋은 도서",
-      icon: <SectionStarIcon />,
+      icon: <SvgIcon name="star" className="h-5 w-5" />,
       books: topRatedBooks,
     },
     {
       title: "리뷰 많은 도서",
-      icon: <StackedBooksIcon />,
+      icon: <SvgIcon name="stacked-books" className="h-5 w-5" />,
       books: mostReviewedBooks,
     },
   ].filter(({ books }) => books == null || books.length > 0);
@@ -502,7 +424,7 @@ export default function Page() {
               <MainBookSection
                 key="popular-books"
                 title="인기 도서"
-                icon={<FireIcon />}
+                icon={<SvgIcon name="fire" className="h-5 w-5" />}
                 books={popularBooks}
                 className="mt-4"
               />
@@ -513,7 +435,7 @@ export default function Page() {
               <PopularReviewSection
                 key="popular-reviews"
                 title="인기 많은 리뷰"
-                icon={<FireIcon />}
+                icon={<SvgIcon name="fire" className="h-5 w-5" />}
                 reviews={popularReviews}
               />
             )
@@ -523,7 +445,7 @@ export default function Page() {
               <LatestReviewBookSection
                 key="latest-reviews"
                 title="최근 리뷰가 추가된 도서"
-                icon={<ClockIcon />}
+                icon={<SvgIcon name="clock" className="h-5 w-5" />}
                 reviews={latestReviews}
               />
             )
