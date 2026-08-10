@@ -114,12 +114,12 @@ function MemberDetail() {
   const average = reviewData.rating?.["average"];
   const averageNumber = typeof average === "number" ? average : null;
   const reviewResults = reviewData.results ?? [];
-  const widgetPreview = (
+  const widgetPreview = member.githubId ? (
     <LibraryWidgetPreview
       githubId={member.githubId}
-      widgetSrc={`${API_BASE_URL}/api/v2/widgets/${member.githubId ?? ""}`}
+      widgetSrc={`${API_BASE_URL}/api/v2/widgets/${member.githubId}`}
     />
-  );
+  ) : null;
 
   return (
     <LibraryPageLayout
@@ -134,12 +134,14 @@ function MemberDetail() {
           averageRating={averageNumber}
           rating={reviewData.rating}
           mobileWidget={
-            <div className="max-sm:block sm:hidden">{widgetPreview}</div>
+            widgetPreview && (
+              <div className="max-sm:block sm:hidden">{widgetPreview}</div>
+            )
           }
         />
       }
     >
-      <div className="max-sm:hidden">{widgetPreview}</div>
+      {widgetPreview && <div className="max-sm:hidden">{widgetPreview}</div>}
 
       <div>
         <div className="flex gap-2">
