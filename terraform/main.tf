@@ -244,3 +244,15 @@ resource "aws_instance" "ec2_1" {
     Name = "${var.prefix}-ec2-1"
   }
 }
+
+data "aws_eip" "eip_ec2_1" {
+  filter {
+    name   = "tag:EC2"
+    values = ["${var.prefix}-ec2-1"]
+  }
+}
+
+resource "aws_eip_association" "ec2_1" {
+  instance_id   = aws_instance.ec2_1.id
+  allocation_id = data.aws_eip.eip_ec2_1.id
+}
