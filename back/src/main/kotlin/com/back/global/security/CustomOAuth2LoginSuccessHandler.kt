@@ -5,6 +5,7 @@ import com.back.global.rq.Rq
 import jakarta.servlet.ServletException
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
+import jakarta.servlet.http.HttpSession
 import org.springframework.security.core.Authentication
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler
 import org.springframework.stereotype.Component
@@ -47,6 +48,8 @@ class CustomOAuth2LoginSuccessHandler(
             redirectUrl = decodedStateParam.split("#".toRegex(), limit = 2).toTypedArray()[0]
         }
 
+        // getSession이 null을 반환할 수 있어 세이프콜을 해야 합니다.
+        request.getSession(false)?.invalidate()
 
         // ✅ 최종 리다이렉트
         rq.sendRedirect(redirectUrl)

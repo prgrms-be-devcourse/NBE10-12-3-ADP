@@ -219,7 +219,13 @@ locals {
   echo "MySQL이 준비됨. 초기화 스크립트 실행 중..."
 
   docker exec mysql_1 mysql -uroot -p${var.password} -e "
+  CREATE USER 'local'@'172.18.%.%' IDENTIFIED WITH caching_sha2_password BY '1234';
+
+  GRANT ALL PRIVILEGES ON *.* TO 'local'@'172.18.%.%';
+
   CREATE DATABASE ${var.db_name};
+
+  FLUSH PRIVILEGES;
   "
 
   echo "${var.github_access_token}" | docker login ghcr.io -u ${var.github_username} --password-stdin
