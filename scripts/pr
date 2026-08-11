@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 set -euo pipefail
 
 # ─────────────────────────────────────────────
@@ -137,6 +138,8 @@ if [[ -z "$TITLE" ]]; then
   exit 1
 fi
 
+PR_TITLE="[${BRANCH}] ${TITLE}"
+
 
 # description이 없을 수도 있음
 if [[ -z "$DESCRIPTION" ]]; then
@@ -162,7 +165,7 @@ echo ""
 echo "────────────────────────────────────"
 echo "PR Title"
 echo "────────────────────────────────────"
-echo "$TITLE"
+echo "$PR_TITLE"
 echo ""
 echo "────────────────────────────────────"
 echo "PR Body"
@@ -180,9 +183,19 @@ git push -u origin "$BRANCH"
 
 
 # ─────────────────────────────────────────────
-# 7. PR 생성
+# 7. PR 생성 또는 수정
 # ─────────────────────────────────────────────
 
-gh pr create \
-  --title "$TITLE" \
-  --body "$BODY"
+PR_NUMBER=$(gh pr view "$BRANCH" --json number --jq '.number' 2>/dev/null || true)
+
+if [[ -n "$PR_NUMBER" ]]; then
+  echo "🔁 기존 PR 수정: #$PR_NUMBER"
+  gh pr edit "$PR_NUMBER" \
+    --title "$PR_TITLE" \
+    --body "$BODY"
+else
+  echo "🆕 새 PR 생성"
+  gh pr create \
+    --title "$PR_TITLE" \
+    --body "$BODY"
+fi
