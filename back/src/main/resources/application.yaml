@@ -16,6 +16,10 @@ spring:
   output:
     ansi:
       enabled: always
+  data:
+    redis:
+      host: dummy
+      password: dummy
   datasource:
     url: jdbc:h2:./db_dev;MODE=MySQL;AUTO_SERVER=TRUE
     username: sa
