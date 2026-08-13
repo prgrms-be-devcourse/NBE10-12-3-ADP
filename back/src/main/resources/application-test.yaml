@@ -1,6 +1,10 @@
 server:
   ssl.enabled: false
 spring:
+  data:
+    redis:
+      host: dummy
+      password: dummy
   datasource:
     url: jdbc:h2:mem:db_test;MODE=MySQL
     username: sa
