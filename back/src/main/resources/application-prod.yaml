@@ -1,11 +1,24 @@
-server:
-  ssl.enabled: false
 spring:
+  autoconfigure:
+    exclude:
+  data:
+    redis:
+      host: redis_1
+      password: ${PROD__SPRING__DATA__REDIS__PASSWORD}
   datasource:
-    url: ${PROD__SPRING__DATASOURCE__URL}
-    username: ${PROD__SPRING__DATASOURCE__USERNAME}
-    password: ${PROD__SPRING__DATASOURCE__PASSWORD}
+    url: jdbc:mysql://mysql_1:3306/${PROD__SPRING__DATASOURCE__URL___DB_NAME}
+    username: local
+    password: 1234
     driver-class-name: com.mysql.cj.jdbc.Driver
+logging:
+  level:
+    com.back: INFO
+    org.hibernate.orm.jdbc.bind: INFO
+    org.hibernate.orm.jdbc.extract: INFO
+    org.springframework.transaction.interceptor: INFO
 custom:
-  security:
-    cookieSecure: true
+  site:
+    cookieDomain: "${custom.prod.cookieDomain}"
+    cookieSecure: "${custom.prod.cookieSecure}"
+    frontUrl: "${custom.prod.frontUrl}"
+    backUrl: "${custom.prod.backUrl}"

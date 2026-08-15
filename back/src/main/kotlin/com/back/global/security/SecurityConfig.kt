@@ -1,5 +1,6 @@
 package com.back.global.security
 
+import com.back.global.app.AppConfig
 import com.back.global.rsData.RsData
 import com.back.standard.util.Ut
 import org.springframework.beans.factory.annotation.Value
@@ -23,8 +24,6 @@ class SecurityConfig(
     private val customOAuth2LoginSuccessHandler: AuthenticationSuccessHandler,
     private val customOAuth2AuthorizationRequestResolver: CustomOAuth2AuthorizationRequestResolver
 ) {
-    @Value($$"${custom.security.allowedOrigins}")
-    private val allowedOriginList: String? = null
 
     @Bean
     fun filterChain(
@@ -53,7 +52,7 @@ class SecurityConfig(
                 authorize("/api/*/members/login", permitAll)
                 authorize("/api/*/members/logout", permitAll)
 
-                authorize(HttpMethod.POST,"/api/*/members", permitAll)
+                authorize(HttpMethod.POST, "/api/*/members", permitAll)
 
                 authorize(HttpMethod.PUT, "/api/*/books/{id:\\d+}", hasRole("ADMIN"))
                 authorize(HttpMethod.DELETE, "/api/*/books/{id:\\d+}", hasRole("ADMIN"))
@@ -120,7 +119,7 @@ class SecurityConfig(
 
 
         val configuration = CorsConfiguration().apply {
-            allowedOrigins = allowedOriginList?.split(",".toRegex()) ?: listOf()
+            allowedOrigins = listOf(AppConfig.siteFrontUrl)
             allowedMethods = listOf("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS")
             allowCredentials = true
             allowedHeaders = listOf("*")

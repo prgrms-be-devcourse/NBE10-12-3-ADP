@@ -1,20 +1,30 @@
 server:
   forward-headers-strategy: native
+  port: 8080
+  ssl.enabled: false
 spring:
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.data.redis.autoconfigure.DataRedisAutoConfiguration
+      - org.springframework.boot.session.data.redis.autoconfigure.SessionDataRedisAutoConfiguration
   application:
     name: back
   config:
     import: optional:file:.env[.properties]
   profiles:
     active: ${SPRING__PROFILES__ACTIVE}
-  data:
-    redis:
-      host: ${SPRING__REDIS__HOST}
-      port: ${SPRING__REDIS__PORT:6379}
   output:
     ansi:
       enabled: always
+  data:
+    redis:
+      host: dummy
+      password: dummy
   datasource:
+    url: jdbc:h2:./db_dev;MODE=MySQL;AUTO_SERVER=TRUE
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
     hikari:
       auto-commit: false
   jpa:
@@ -26,6 +36,7 @@ spring:
         format_sql: true
         highlight_sql: true
         use_sql_comments: true
+    open-in-view: false
   security:
     oauth2:
       client:
@@ -49,17 +60,39 @@ logging:
     org.hibernate.orm.jdbc.bind: TRACE
     org.hibernate.orm.jdbc.extract: TRACE
     org.springframework.transaction.interceptor: TRACE
+management:
+  endpoints:
+    web:
+      base-path: /actuator
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      probes:
+        enabled: true
+      show-details: never
 custom:
+  dev:
+    cookieDomain: localhost
+    cookieSecure: false
+    frontUrl: "http://${custom.dev.cookieDomain}:3000"
+    backUrl: "http://${custom.dev.cookieDomain}:${server.port}"
+  prod:
+    cookieDomain: ${CUSTOM__PROD__COOKIE_DOMAIN}
+    cookieSecure: ${CUSTOM__PROD__COOKIE_SECURE}
+    frontUrl: ${CUSTOM__PROD__FRONT_URL}
+    backUrl: ${CUSTOM__PROD__BACK_URL}
+  site:
+    cookieDomain: "${custom.dev.cookieDomain}"
+    cookieSecure: "${custom.dev.cookieSecure}"
+    frontUrl: "${custom.dev.frontUrl}"
+    backUrl: "${custom.dev.backUrl}"
   jwt:
     secretKey: ${CUSTOM__JWT__SECRET_KEY}
   accessToken:
     expirationSeconds: "#{60*${CUSTOM__JWT__EXPIRATION_MINUTES}}"
   book-fetch:
     api-keys: ${CUSTOM__BOOK__FETCH__API_KEYS}
-  security:
-    allowedOrigins: ${CUSTOM__SECURITY__ALLOWED_ORIGINS}
-    cookieDomain: ${CUSTOM__SECURITY__COOKIE_DOMAIN:localhost}
-    cookieSecure: false
   widget:
     renderer:
       base-url: ${CUSTOM__WIDGET__RENDERER__BASE_URL:http://localhost:3001}

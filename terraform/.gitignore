@@ -1,4 +1,4 @@
 .terraform
+.terraform.tfstate*
 terraform.tfstate*
-!secrets.tf.example
 secrets.tf
