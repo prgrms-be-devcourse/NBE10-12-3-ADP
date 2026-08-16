@@ -151,6 +151,10 @@ locals {
   sudo swapon /swapfile
   sudo sh -c 'echo "/swapfile swap swap defaults 0 0" >> /etc/fstab'
 
+  echo "BOOTSTRAP_ENV_PASSWORD=${var.password}" >> /etc/environment
+  echo "BOOTSTRAP_ENV_APPLICATION_DOMAIN=${var.application_domain}" >> /etc/environment
+  source /etc/environment
+
   sudo apt-get update
   sudo apt-get install -y ca-certificates curl
   sudo install -m 0755 -d /etc/apt/keyrings
