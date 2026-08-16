@@ -148,16 +148,16 @@ jobs:
 
             LOGIN_RESPONSE_JSON=$(curl -sk -c "${COOKIE_JAR}" -X POST "${NPM_API}/tokens" \
               -H "Content-Type: application/json" \
-              -d "{\"identity\": \"admin@npm.com\", \"secret\": \"${PASSWORD:-}\"}")
+              -d "{\"identity\": \"admin@npm.com\", \"secret\": \"${BOOTSTRAP_ENV_PASSWORD:-}\"}")
 
             EXPIRES=$(jq -r '.expires // empty' <<< "${LOGIN_RESPONSE_JSON}")
             [[ -n "${EXPIRES}" ]] || { echo "NPM login failed: ${LOGIN_RESPONSE_JSON}"; exit 1; }
             grep -q "Http-token" "${COOKIE_JAR}" || { echo "NPM token cookie missing"; exit 1; }
-            [[ -n "${APPLICATION_DOMAIN:-}" ]] || { echo "APPLICATION_DOMAIN is empty"; exit 1; }
+            [[ -n "${BOOTSTRAP_ENV_APPLICATION_DOMAIN:-}" ]] || { echo "BOOTSTRAP_ENV_APPLICATION_DOMAIN is empty"; exit 1; }
 
             PROXY_ID=$(curl -sk -b "${COOKIE_JAR}" -X GET "${NPM_API}/nginx/proxy-hosts" \
-              | jq ".[] | select(.domain_names[]==\"${APPLICATION_DOMAIN}\") | .id")
-            [[ -n "${PROXY_ID}" && "${PROXY_ID}" != "null" ]] || { echo "Proxy host not found for ${APPLICATION_DOMAIN}"; exit 1; }
+              | jq ".[] | select(.domain_names[]==\"${BOOTSTRAP_ENV_APPLICATION_DOMAIN}\") | .id")
+            [[ -n "${PROXY_ID}" && "${PROXY_ID}" != "null" ]] || { echo "Proxy host not found for ${BOOTSTRAP_ENV_APPLICATION_DOMAIN}"; exit 1; }
 
             CURRENT_HOST=$(curl -sk -b "${COOKIE_JAR}" -X GET "${NPM_API}/nginx/proxy-hosts/${PROXY_ID}" \
               | jq -r '.forward_host')
