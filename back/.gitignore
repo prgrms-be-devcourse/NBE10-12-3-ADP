@@ -41,5 +41,6 @@ out/
 db_dev.mv.db
 db_dev.lock.db
 db_dev.trace.db
+logs/
 src/test/java/com/back/domain/book/service/BookFetchBatchRunner.java
 src/test/java/com/back/domain/book/service/ProgressCheck.java
