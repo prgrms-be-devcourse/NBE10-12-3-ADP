@@ -15,6 +15,7 @@ import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import kotlin.String
 import org.springframework.transaction.annotation.Propagation.NOT_SUPPORTED
+import org.springframework.web.reactive.function.client.ExchangeStrategies
 
 @Service
 @Transactional(readOnly = true)
@@ -27,14 +28,17 @@ class BookFetchServiceV2(
 ) {
     private fun fetchBooks(pageNumber: Int) =
         WebClient
-            .create("https://www.nl.go.kr/seoji/SearchApi.do")
+            .builder()
+            .baseUrl("https://www.nl.go.kr/seoji/SearchApi.do")
+            .codecs { configurer -> configurer.defaultCodecs().maxInMemorySize(2 * 1024 * 1024) }
+            .build()
             .get()
             .uri {
                 it
                     .queryParam("cert_key", apiKey)
                     .queryParam("result_style", "json")
                     .queryParam("page_no", pageNumber)
-                    .queryParam("page_size", 2)
+                    .queryParam("page_size", 1000)
                     .queryParam("sort", "INPUT_DATE")
                     .queryParam("order_by", "ASC")
                     .build()
@@ -83,7 +87,10 @@ class BookFetchServiceV2(
     )
 
     private class ResponseBodyDto(
-        val docs: List<DocumentDto> // ? = null,
+        val docs: List<DocumentDto>? = null,
+
+        val resultCode: String? = null,
+        val resultMsg: String? = null,
 
 //        val RESULT: String? = null,
 //        val ERR_CODE: String? = null,
@@ -110,6 +117,11 @@ class BookFetchServiceV2(
             responseBody,
             ResponseBodyDto::class.java
         )
+
+        if (responseBodyDto.docs == null) {
+            throw RuntimeException("${responseBodyDto.resultCode}: ${responseBodyDto.resultMsg}")
+        }
+
 //        if (responseBodyDto.RESULT == "ERROR")
 //            throw RuntimeException("${responseBodyDto.ERR_CODE}: ${responseBodyDto.ERR_MESSAGE}")
 
@@ -140,8 +152,9 @@ class BookFetchServiceV2(
     @Transactional
     fun updateBooks(books: List<Book>) {
         books.forEach {
-            bookRepository.findByIsbn(it.isbn)
-                ?: bookRepository.save(it)
+//            bookRepository.findByIsbn(it.isbn)
+//                ?: bookRepository.save(it)
+            bookRepository.save(it)
         }
 
         val bookLastFetchedPage = bookLastFetchedPageRepository.findByIdOrNull(1)
