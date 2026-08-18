@@ -114,6 +114,11 @@ resource "aws_iam_role" "ec2_role_1" {
   })
 }
 
+resource "aws_iam_role_policy_attachment" "s3_full_access" {
+  role       = aws_iam_role.ec2_role_1.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonS3FullAccess"
+}
+
 resource "aws_iam_role_policy_attachment" "ec2_ssm" {
   role       = aws_iam_role.ec2_role_1.name
   policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
@@ -145,6 +150,10 @@ locals {
   sudo mkswap /swapfile
   sudo swapon /swapfile
   sudo sh -c 'echo "/swapfile swap swap defaults 0 0" >> /etc/fstab'
+
+  echo "BOOTSTRAP_ENV_PASSWORD=${var.password}" >> /etc/environment
+  echo "BOOTSTRAP_ENV_APPLICATION_DOMAIN=${var.application_domain}" >> /etc/environment
+  source /etc/environment
 
   sudo apt-get update
   sudo apt-get install -y ca-certificates curl
@@ -180,7 +189,7 @@ locals {
     -p 81:81 \
     -e TZ=Asia/Seoul \
     -e 'INITIAL_ADMIN_EMAIL=admin@npm.com' \
-    -e 'INITIAL_ADMIN_PASSWORD=${var.password_1}' \
+    -e 'INITIAL_ADMIN_PASSWORD=${var.password}' \
     -v /dockerProjects/npm_1/volumes/data:/data \
     zoeyvid/npmplus:latest
 
@@ -191,7 +200,7 @@ locals {
     -p 6379:6379 \
     -e TZ=Asia/Seoul \
     -v /dockerProjects/redis_1/volumes/data:/data \
-    redis --requirepass '${var.password_1}' --maxmemory 50mb --maxmemory-policy allkeys-lru
+    redis --requirepass '${var.password}'
 
   docker run -d \
     --name mysql_1 \
@@ -200,22 +209,30 @@ locals {
     -v /dockerProjects/mysql_1/volumes/var/lib/mysql:/var/lib/mysql \
     -v /dockerProjects/mysql_1/volumes/etc/mysql/conf.d:/etc/mysql/conf.d \
     -p 3306:3306 \
-    -e MYSQL_ROOT_PASSWORD=${var.password_1} \
+    -e MYSQL_ROOT_PASSWORD=${var.password} \
     -e TZ=Asia/Seoul \
     mysql:8.4.10
 
   echo "MySQL이 기동될 때까지 대기 중..."
 
-  until docker exec mysql_1 mysql -uroot -p${var.password_1} -e "SELECT 1" &> /dev/null; do
+  until docker exec mysql_1 mysql -uroot -p${var.password} -e "SELECT 1" &> /dev/null; do
     echo "MySQL이 아직 준비되지 않음. 5초 후 재시도..."
     sleep 5
   done
 
   echo "MySQL이 준비됨. 초기화 스크립트 실행 중..."
 
-  docker exec mysql_1 mysql -uroot -p${var.password_1} -e "
-  CREATE DATABASE readthem;
+  docker exec mysql_1 mysql -uroot -p${var.password} -e "
+  CREATE USER 'local'@'172.18.%.%' IDENTIFIED WITH caching_sha2_password BY '1234';
+
+  GRANT ALL PRIVILEGES ON *.* TO 'local'@'172.18.%.%';
+
+  CREATE DATABASE ${var.db_name};
+
+  FLUSH PRIVILEGES;
   "
+
+  echo "${var.github_access_token}" | docker login ghcr.io -u ${var.github_username} --password-stdin
 
   echo "BOOTSTRAP DONE"
   EOF
@@ -241,4 +258,16 @@ resource "aws_instance" "ec2_1" {
   tags = {
     Name = "${var.prefix}-ec2-1"
   }
+}
+
+data "aws_eip" "eip_ec2_1" {
+  filter {
+    name   = "tag:EC2"
+    values = ["${var.prefix}-ec2-1"]
+  }
+}
+
+resource "aws_eip_association" "ec2_1" {
+  instance_id   = aws_instance.ec2_1.id
+  allocation_id = data.aws_eip.eip_ec2_1.id
 }

@@ -1,5 +1,6 @@
 package com.back.global.initData
 
+import com.back.global.app.AppConfig
 import com.back.standard.util.Ut
 import org.springframework.boot.ApplicationArguments
 import org.springframework.boot.ApplicationRunner
@@ -20,7 +21,7 @@ class DevInitData {
                 "--yes",
                 "--package", "typescript@v5",
                 "--package", "openapi-typescript",
-                "openapi-typescript", "http://localhost:8080/v3/api-docs/apiV1",
+                "openapi-typescript", "${AppConfig.siteBackUrl}/v3/api-docs/apiV1",
                 "-o", "../front/src/lib/backend/apiV1/schema.d.ts"
             )
         }

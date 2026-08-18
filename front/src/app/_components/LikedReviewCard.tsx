@@ -35,7 +35,7 @@ export default function LikedReviewCard({
   likeLabel = "좋아요 취소",
 }: Props) {
   return (
-    <div className={`relative flex gap-3 ${className}`}>
+    <div className={`relative flex min-w-0 gap-3 ${className}`}>
       <RoughFrame className="rough-overlay" variant="card" />
       <div className="relative flex w-24 shrink-0 flex-col">
         <Link

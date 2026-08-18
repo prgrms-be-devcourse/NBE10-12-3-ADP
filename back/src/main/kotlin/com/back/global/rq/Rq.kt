@@ -3,6 +3,7 @@ package com.back.global.rq
 import com.back.domain.member.entity.Member
 import com.back.domain.member.entity.Role
 import com.back.domain.member.service.MemberService
+import com.back.global.app.AppConfig
 import com.back.global.exception.ServiceException
 import com.back.global.security.SecurityUser
 import jakarta.servlet.http.Cookie
@@ -18,14 +19,7 @@ class Rq(
     private val req: HttpServletRequest,
     private val resp: HttpServletResponse,
     private val memberService: MemberService
-
 ) {
-
-    @Value($$"${custom.security.cookieSecure}")
-    private val isSecure = false
-
-    @Value($$"${custom.security.cookieDomain}")
-    private val cookieDomain: String? = null
 
     val actorOrNull: Member?
         get() {
@@ -70,9 +64,9 @@ class Rq(
 
     fun getCookieValue(name: String, defaultValue: String): String =
         req.cookies
-            ?.firstOrNull {it.name == name}
+            ?.firstOrNull { it.name == name }
             ?.value
-            ?.takeIf {it.isNotBlank()}
+            ?.takeIf { it.isNotBlank() }
             ?: defaultValue
 
     fun setCookie(name: String?, value: String?, maxAge: Int) {
@@ -82,9 +76,9 @@ class Rq(
         val cookie = Cookie(name, value)
         cookie.path = "/"
         cookie.isHttpOnly = true
-        cookie.domain = cookieDomain
-        cookie.secure = isSecure
-        cookie.setAttribute("SameSite", if (isSecure) "None" else "Strict")
+        cookie.domain = AppConfig.cookieDomain
+        cookie.secure = AppConfig.cookieSecure
+        cookie.setAttribute("SameSite", "Strict")
 
         if (value.isBlank()) cookie.maxAge = 0
         else cookie.maxAge = maxAge

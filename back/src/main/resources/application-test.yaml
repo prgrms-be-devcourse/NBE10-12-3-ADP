@@ -13,11 +13,9 @@ spring:
           github:
             client-id: dummy
             client-secret: dummy
-  data:
-    redis:
-      host: 127.0.0.1
-      port: 6379
 custom:
+  prod:
+    cookieDomain: dummy
   jwt:
     secretKey: dummydummydummydummydummydummydummy
   accessToken:
@@ -25,7 +23,5 @@ custom:
   book-fetch:
     api-key: dummy
     api-keys: dummy
-  security:
-    allowedOrigins: dummy
   kakao:
     api-key: dummy
