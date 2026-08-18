@@ -4,7 +4,6 @@ import org.slf4j.LoggerFactory
 import org.springframework.context.annotation.Profile
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
-import org.springframework.transaction.annotation.Transactional
 
 @Service
 @Profile("prod")
@@ -19,7 +18,7 @@ class BookScheduler(
         bookService.updateBooksViewCountInDb()
     }
 
-    @Scheduled(fixedDelay = 10000, initialDelay = 3000)
+//    @Scheduled(fixedDelay = 10000, initialDelay = 3000)
     fun fetchBooks() {
         try {
             val books = bookFetchService.fetchBooksFromLastFetchedPage()
