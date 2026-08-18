@@ -118,15 +118,19 @@ class BookFetchServiceV2(
 //            throw RuntimeException("documents is null or empty.")
 
         return documents.map {
+            val publishedDate = it.PUBLISH_PREDATE.takeIf(String::isNotBlank)?.let { date ->
+                LocalDate.parse(
+                    date,
+                    DateTimeFormatter.ofPattern("yyyyMMdd"),
+                ).atStartOfDay()
+            }
+
             Book(
                 title = it.TITLE,
                 description = it.BOOK_INTRODUCTION,
                 isbn = it.EA_ISBN,
                 authors = it.AUTHOR,
-                publishedDate = LocalDate.parse(
-                    it.PUBLISH_PREDATE,
-                    DateTimeFormatter.ofPattern("yyyyMMdd")
-                ).atStartOfDay(),
+                publishedDate = publishedDate,
                 publisher = it.PUBLISHER,
                 imgUrl = it.TITLE_URL,
             )
