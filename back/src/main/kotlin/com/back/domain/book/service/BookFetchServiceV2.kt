@@ -5,6 +5,7 @@ import com.back.domain.book.entity.BookLastFetchedPage
 import com.back.domain.book.repository.BookLastFetchedPageRepository
 import com.back.domain.book.repository.BookRepository
 import com.back.standard.util.Ut
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
@@ -43,6 +44,8 @@ class BookFetchServiceV2(
                     .queryParam("order_by", "ASC")
                     .build()
             }
+
+    private val logger = LoggerFactory.getLogger(BookFetchServiceV2::class.java)
 
     private data class DocumentDto(
         val PUBLISHER: String,
@@ -147,21 +150,33 @@ class BookFetchServiceV2(
                 imgUrl = it.TITLE_URL,
             )
         }
+            .reversed()
     }
 
     @Transactional
     fun updateBooks(books: List<Book>) {
-        books.forEach {
-//            bookRepository.findByIsbn(it.isbn)
-//                ?: bookRepository.save(it)
-            bookRepository.save(it)
+        if (books.isNotEmpty()) {
+            val existingIsbnSet = bookRepository
+                .findByIsbnIn(books.map { it.isbn })
+                .map { it.isbn }
+                .toMutableSet()
+
+            val newBooks = mutableListOf<Book>()
+            books.forEach {
+                if (it.isbn in existingIsbnSet) return@forEach
+                newBooks.add(it)
+                existingIsbnSet.add(it.isbn)
+            }
+
+            bookRepository.saveBulk(newBooks)
+
+            if (existingIsbnSet.isNotEmpty())
+                logger.debug("이미 존재하는 `isbn` 목록입니다.\n${existingIsbnSet.joinToString("\n")}")
         }
 
         val bookLastFetchedPage = bookLastFetchedPageRepository.findByIdOrNull(1)
             ?: throw RuntimeException("Cannot find last fetched page.")
-
         bookLastFetchedPage.increaseNumber()
-
         bookLastFetchedPageRepository.save(bookLastFetchedPage)
     }
 }
