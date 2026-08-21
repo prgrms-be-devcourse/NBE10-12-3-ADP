@@ -35,7 +35,7 @@ class BookFetchServiceV2(
         WebClient
             .builder()
             .baseUrl("https://www.nl.go.kr/seoji/SearchApi.do")
-            .codecs { configurer -> configurer.defaultCodecs().maxInMemorySize(2 * 1024 * 1024) }
+            .codecs { configurer -> configurer.defaultCodecs().maxInMemorySize(4 * 1024 * 1024) }
             .build()
             .get()
             .uri {
@@ -147,23 +147,23 @@ class BookFetchServiceV2(
                     return@mapIndexedNotNull null
                 }
 
-            val publishedDate = it.PUBLISH_PREDATE.takeIf(String::isNotBlank)?.let { date ->
-                LocalDate.parse(
-                    date,
-                    DateTimeFormatter.ofPattern("yyyyMMdd"),
-                ).atStartOfDay()
-            }
+                val publishedDate = it.PUBLISH_PREDATE.takeIf(String::isNotBlank)?.let { date ->
+                    LocalDate.parse(
+                        date,
+                        DateTimeFormatter.ofPattern("yyyyMMdd"),
+                    ).atStartOfDay()
+                }
 
-            Book(
-                title = it.TITLE,
-                description = it.BOOK_INTRODUCTION,
+                Book(
+                    title = it.TITLE,
+                    description = it.BOOK_INTRODUCTION,
                     isbn = isbn,
-                authors = it.AUTHOR,
-                publishedDate = publishedDate,
-                publisher = it.PUBLISHER,
-                imgUrl = it.TITLE_URL,
-            )
-        }
+                    authors = it.AUTHOR,
+                    publishedDate = publishedDate,
+                    publisher = it.PUBLISHER,
+                    imgUrl = it.TITLE_URL,
+                )
+            }
             .reversed()
     }
 
