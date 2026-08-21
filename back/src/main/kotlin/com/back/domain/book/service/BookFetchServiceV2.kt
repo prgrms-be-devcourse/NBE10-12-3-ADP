@@ -126,7 +126,8 @@ class BookFetchServiceV2(
         )
 
         if (responseBodyDto.docs == null) {
-            throw RuntimeException("${responseBodyDto.resultCode}: ${responseBodyDto.resultMsg}")
+            logger.debug("$currentPageNumber: ${responseBodyDto.resultCode}-${responseBodyDto.resultMsg}")
+            return listOf()
         }
 
 //        if (responseBodyDto.RESULT == "ERROR")
