@@ -134,8 +134,8 @@ class BookFetchServiceV2(
 //            throw RuntimeException("${responseBodyDto.ERR_CODE}: ${responseBodyDto.ERR_MESSAGE}")
 
         val documents = responseBodyDto.docs // ?: listOf()
-//        if (documents.isEmpty())
-//            throw RuntimeException("documents is null or empty.")
+        if (documents.isEmpty())
+            throw RuntimeException("documents is empty.")
 
         return documents
             .mapIndexedNotNull { i, it ->
