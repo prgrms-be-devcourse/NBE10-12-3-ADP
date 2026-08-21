@@ -27,6 +27,10 @@ class BookFetchServiceV2(
     private val bookLastFetchedPageRepository: BookLastFetchedPageRepository,
     private val bookRepository: BookRepository
 ) {
+    companion object {
+        private const val PAGE_SIZE = 1000
+    }
+
     private fun fetchBooks(pageNumber: Int) =
         WebClient
             .builder()
@@ -39,7 +43,7 @@ class BookFetchServiceV2(
                     .queryParam("cert_key", apiKey)
                     .queryParam("result_style", "json")
                     .queryParam("page_no", pageNumber)
-                    .queryParam("page_size", 1000)
+                    .queryParam("page_size", PAGE_SIZE)
                     .queryParam("sort", "INPUT_DATE")
                     .queryParam("order_by", "ASC")
                     .build()
@@ -132,7 +136,16 @@ class BookFetchServiceV2(
 //        if (documents.isEmpty())
 //            throw RuntimeException("documents is null or empty.")
 
-        return documents.map {
+        return documents
+            .mapIndexedNotNull { i, it ->
+                val currentDocumentNumber = (currentPageNumber - 1) * PAGE_SIZE + i + 1;
+
+                val isbn = it.EA_ISBN.uppercase()
+                if (isbn.isBlank()) {
+                    logger.debug("document#${currentDocumentNumber}: EA_ISBN is blank.")
+                    return@mapIndexedNotNull null
+                }
+
             val publishedDate = it.PUBLISH_PREDATE.takeIf(String::isNotBlank)?.let { date ->
                 LocalDate.parse(
                     date,
@@ -143,7 +156,7 @@ class BookFetchServiceV2(
             Book(
                 title = it.TITLE,
                 description = it.BOOK_INTRODUCTION,
-                isbn = it.EA_ISBN,
+                    isbn = isbn,
                 authors = it.AUTHOR,
                 publishedDate = publishedDate,
                 publisher = it.PUBLISHER,
