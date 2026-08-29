@@ -1,11 +1,19 @@
 @import "tailwindcss";
+@import url("https://fonts.googleapis.com/css2?family=Klee+One:wght@400;600&display=swap");
 
+/*
+ * GangwonEducationModuche contains empty glyphs for some Hanja characters.
+ * Limit it to non-Hanja ranges so the browser can select Klee One instead.
+ */
 @font-face {
   font-family: "GangwonEducationModuche";
   src: url("https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2201-2@1.0/GangwonEdu_OTFLightA.woff")
     format("woff");
   font-weight: 300;
   font-display: swap;
+  unicode-range:
+    U+0000-2E7F, U+1100-11FF, U+3130-318F, U+A960-A97F, U+AC00-D7FF,
+    U+FFA0-FFDC;
 }
 
 @font-face {
@@ -14,6 +22,9 @@
     format("woff");
   font-weight: 400;
   font-display: swap;
+  unicode-range:
+    U+0000-2E7F, U+1100-11FF, U+3130-318F, U+A960-A97F, U+AC00-D7FF,
+    U+FFA0-FFDC;
 }
 
 @font-face {
@@ -22,6 +33,9 @@
     format("woff");
   font-weight: 500;
   font-display: swap;
+  unicode-range:
+    U+0000-2E7F, U+1100-11FF, U+3130-318F, U+A960-A97F, U+AC00-D7FF,
+    U+FFA0-FFDC;
 }
 
 @font-face {
@@ -30,6 +44,9 @@
     format("woff");
   font-weight: 600;
   font-display: swap;
+  unicode-range:
+    U+0000-2E7F, U+1100-11FF, U+3130-318F, U+A960-A97F, U+AC00-D7FF,
+    U+FFA0-FFDC;
 }
 
 @font-face {
@@ -38,6 +55,9 @@
     format("woff");
   font-weight: 700;
   font-display: swap;
+  unicode-range:
+    U+0000-2E7F, U+1100-11FF, U+3130-318F, U+A960-A97F, U+AC00-D7FF,
+    U+FFA0-FFDC;
 }
 
 :root {
@@ -92,8 +112,8 @@
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans:
-    "GangwonEducationModuche", "Apple SD Gothic Neo", "Malgun Gothic", Arial,
-    Helvetica, sans-serif;
+    "GangwonEducationModuche", "Klee One", "Apple SD Gothic Neo",
+    "Malgun Gothic", Arial, Helvetica, sans-serif;
   --text-xs: 0.8125rem;
   --text-sm: 0.9375rem;
   --text-base: 1.0625rem;
@@ -110,8 +130,8 @@ input,
 textarea,
 select {
   font-family:
-    "GangwonEducationModuche", "Apple SD Gothic Neo", "Malgun Gothic", Arial,
-    Helvetica, sans-serif;
+    "GangwonEducationModuche", "Klee One", "Apple SD Gothic Neo",
+    "Malgun Gothic", Arial, Helvetica, sans-serif;
 }
 
 body {
