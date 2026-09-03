@@ -2,6 +2,9 @@ server:
   forward-headers-strategy: native
   port: 8080
   ssl.enabled: false
+  tomcat:
+    mbeanregistry:
+      enabled: true
 spring:
   autoconfigure:
     exclude:
@@ -61,11 +64,13 @@ logging:
     org.hibernate.orm.jdbc.extract: TRACE
     org.springframework.transaction.interceptor: TRACE
 management:
+  server:
+    port: 8081
   endpoints:
     web:
       base-path: /actuator
       exposure:
-        include: health,info
+        include: health,info,prometheus
   endpoint:
     health:
       probes:

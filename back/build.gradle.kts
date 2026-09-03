@@ -51,17 +51,20 @@ dependencies {
     // Spring Boot Actuator
     implementation("org.springframework.boot:spring-boot-starter-actuator")
 
+    // WebFlux
+    implementation("org.springframework.boot:spring-boot-starter-webflux")
+
     // JJWT
     implementation("io.jsonwebtoken:jjwt-api:0.13.0")
     runtimeOnly("io.jsonwebtoken:jjwt-impl:0.13.0")
     runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.13.0")
 
-    // WebFlux
-    implementation("org.springframework.boot:spring-boot-starter-webflux")
-
     // Database
     runtimeOnly("com.h2database:h2")
     runtimeOnly("com.mysql:mysql-connector-j")
+
+    // Prometheus
+    runtimeOnly("io.micrometer:micrometer-registry-prometheus")
 
     // Dev
     developmentOnly("org.springframework.boot:spring-boot-devtools")
