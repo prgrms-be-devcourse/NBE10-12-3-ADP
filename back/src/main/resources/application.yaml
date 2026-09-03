@@ -64,6 +64,8 @@ logging:
     org.hibernate.orm.jdbc.extract: TRACE
     org.springframework.transaction.interceptor: TRACE
 management:
+  server:
+    port: 8081
   endpoints:
     web:
       base-path: /actuator
